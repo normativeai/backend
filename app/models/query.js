@@ -14,18 +14,13 @@ var querySchema = new Schema({
 querySchema.methods.execQuery = function(cb) {
 	// in case query is not in cache and cache is not invalidated
 	const { execFile } = require('child_process');
-	var execStr = "ruby -Ctools prove1.rb \"" + this.content + "\"";
+	var execStr = "ruby -Ctools prove1.rb " + this.content;
 	console.log(execStr);
-	const child = execFile("ruby", ["-Ctools", "prove1.rb", "\"" + this.content + "\""], (error, stdout, stderr) => {
+	const child = execFile("ruby", ["-Ctools", "prove1.rb", this.content], (error, stdout, stderr) => {
 		var helper = require('./queryHelper');
-		if (error || stderr) {
-			console.log('error: %s',error.message);
-			console.log('stderr: %s', stderr);
-			cb(helper.parseError(stderr));
-		} else {
-			console.log('ok: %s',stdout);
-			cb(helper.parse(helper.parse(stdout)));
-		}
+		console.log('stderr: %s', stderr);
+		console.log('ok: %s',stdout);
+		cb(helper.parse(stdout,stderr));
 	});
 };
 

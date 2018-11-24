@@ -174,10 +174,9 @@ parser = Grammar.build do
 end
 
 #puts parser.run('([],(~ (Ob (a | (~ a)))))')
-puts ARGV[0]
-puts parser.run(ARGV[0]).output
-#File.open('problem', 'w') { |file| file.write(parser.run(ARGV[0]).output)}
-#time = Benchmark.measure {
-#  system("./mleancop.sh problem 1")
-# }
-#STDERR.puts "Took #{time.real} seconds"
+#puts parser.run(ARGV[0])
+File.open('problem', 'w') { |file| file.write(parser.run(ARGV[0]).output)}
+time = Benchmark.measure {
+  system("./mleancop.sh problem 1")
+ }
+STDERR.puts "Took #{time.real} seconds"

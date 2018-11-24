@@ -1,9 +1,6 @@
 class QueryHelper {
-	static parse(proof) {
+	static parse(proof, errors) {
 		return proof;
-	}
-	static parseError(error) {
-		return error;
 	}
 }
 
