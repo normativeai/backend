@@ -1,9 +1,9 @@
 class QueryHelper {
 	static parse(proof) {
-		return 1;
+		return proof;
 	}
 	static parseError(error) {
-		return -1;
+		return error;
 	}
 }
 

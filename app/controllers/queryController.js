@@ -7,10 +7,9 @@ exports.exec = function(req, res) {
     // saved!
   //});
   //var query = Query.findById(req.params.id);
-  Query.findOne({"name": "Q1"}, function(err, query) {
-    console.log(query.name);
-    query.execQuery(function() {
-      res.send('Success!');
+  Query.findOne({"name": req.params.name}, function(err, query) {
+    query.execQuery(function(proof) {
+      res.send(proof);
     });
   });
 };
