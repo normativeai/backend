@@ -25,7 +25,6 @@ exports.logout = function(req, res, next) {
 };
 
 exports.authMiddleware = (req, res, next) => {
-		console.log(req.isAuthenticated());
   if (!req.isAuthenticated()) {
     res.status(401).send('You are not authenticated')
   } else {
@@ -34,7 +33,7 @@ exports.authMiddleware = (req, res, next) => {
 };
 
 exports.user = function(req, res, next) {
-  User.findById(req.session.passport.user, function(err, user) {
+  User.findById(req.session.passport.user).populate('queries').exec(function(err, user) {
     console.log([user, req.session])
     res.send({ user: user })
   })

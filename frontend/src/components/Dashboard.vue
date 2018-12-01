@@ -2,6 +2,7 @@
     <div>
         <h2>Dashboard</h2>
         <p>Name: {{ user.name }}</p>
+        <p>Query: {{ user.queries[0].name }}</p>
     </div>
 </template>
 <script>

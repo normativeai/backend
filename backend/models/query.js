@@ -9,6 +9,7 @@ var querySchema = new Schema({
     content           : String,
 		cached_result			: String,
 		theory						: { type: Schema.Types.ObjectId, ref: 'Theory' },
+		user 							: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 querySchema.methods.execQuery = function(cb) {
