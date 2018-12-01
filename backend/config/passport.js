@@ -3,6 +3,21 @@ var passport = require('passport');
 // getting the local authentication type
 var LocalStrategy = require('passport-local').Strategy;
 
+let users = [
+  {
+    id: 1,
+    name: "Jude",
+    email: "user@email.com",
+    password: "password"
+  },
+  {
+    id: 2,
+    name: "Emma",
+    email: "emma@email.com",
+    password: "password2"
+  }
+]
+
 passport.use(
   new LocalStrategy(
     {
