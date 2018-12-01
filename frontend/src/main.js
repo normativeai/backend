@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import VueCookies from 'vue-cookies'
+Vue.use(VueCookies)
+window.axios = require('axios')
 
 Vue.config.productionTip = false
 

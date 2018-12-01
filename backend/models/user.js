@@ -12,4 +12,9 @@ var userSchema = new Schema({
 		queries						: [{ type: Schema.Types.ObjectId, ref: 'Query' }],
 });
 
+
+userSchema.methods.validPassword = function(pwd) {
+	return pwd == this.password;
+};
+
 module.exports = mongoose.model('User', userSchema );

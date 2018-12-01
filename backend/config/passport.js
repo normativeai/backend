@@ -1,22 +1,9 @@
 var passport = require('passport');
 
+var User = require('../models/user');
+
 // getting the local authentication type
 var LocalStrategy = require('passport-local').Strategy;
-
-let users = [
-  {
-    id: 1,
-    name: "Jude",
-    email: "user@email.com",
-    password: "password"
-  },
-  {
-    id: 2,
-    name: "Emma",
-    email: "emma@email.com",
-    password: "password2"
-  }
-]
 
 passport.use(
   new LocalStrategy(
@@ -25,17 +12,20 @@ passport.use(
       passwordField: "password"
     },
 
-    (username, password, done) => {
-			console.log("Verification function called");
-      let user = users.find((user) => {
-        return user.email === username && user.password === password
-      })
-
-      if (user) {
-        done(null, user)
-      } else {
-        done(null, false, { message: 'Incorrect username or password'})
-      }
+    (email, password, done) => {
+			console.log("Validtaing user...");
+			User.findOne({ email: email}, function(err, user) {
+				console.log(email);
+				console.log(user);
+				if (err) { return done(err); }
+				if (!user) {
+					return done(null, false, { message: 'Incorrect username.' });
+				}
+				if (!user.validPassword(password)) {
+					return done(null, false, { message: 'Incorrect password.' });
+				}
+				return done(null, user);
+			});
     }
   )
 )
@@ -45,11 +35,10 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser((id, done) => {
-  let user = users.find((user) => {
-    return user.id === id
+	console.log(id);
+  User.findById(id, function(err, user) {
+    done(null, user.id === id)
   })
-
-  done(null, user)
 })
 
 module.exports = passport;
