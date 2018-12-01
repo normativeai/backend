@@ -30,15 +30,17 @@ app.use(cookieSession({
     keys: ['vueauthrandomkey'],
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/', index);
 app.use('/', queries);
 app.use('/', users);
 
 // catch 404 and forward to error handler
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;

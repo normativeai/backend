@@ -11,6 +11,7 @@ passport.use(
     },
 
     (username, password, done) => {
+			console.log("Verification function called");
       let user = users.find((user) => {
         return user.email === username && user.password === password
       })
