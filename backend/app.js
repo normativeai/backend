@@ -15,9 +15,12 @@ var app = express();
 var passport = require('./config/passport');
 var db = require('./config/db');
 
+var cors = require('cors');
+
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'pug');
+app.use(cors());
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -36,6 +39,7 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/', queries);
 app.use('/', users);
+
 
 // catch 404 and forward to error handler
 //app.use(express.static(path.join(__dirname, 'public')));
