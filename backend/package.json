@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "devstart": "nodemon ./bin/www"
+    "devstart": "nodemon ./bin/www",
+    "test": "mocha"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -21,6 +22,11 @@
     "serve-favicon": "~2.4.5"
   },
   "devDependencies": {
-    "nodemon": "^1.18.6"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.6",
+    "superagent": "^4.0.0",
+    "supertest": "^3.3.0"
   }
 }

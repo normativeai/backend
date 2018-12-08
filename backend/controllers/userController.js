@@ -8,7 +8,7 @@ exports.login = function(req, res, next) {
 			return next(err);
 		}
     if (!user) {
-			return res.status(400).send([user, "Cannot log in", info])
+			return res.status(400).send([user, info])
 		}
 		req.logIn(user, function(err) {
 			res.send("Logged in")
@@ -19,9 +19,7 @@ exports.login = function(req, res, next) {
 exports.logout = function(req, res, next) {
   req.logout();
 
-  console.log("logged out")
-
-  return res.send();
+  return res.status(200).send('Logged out.');
 };
 
 exports.authMiddleware = (req, res, next) => {
