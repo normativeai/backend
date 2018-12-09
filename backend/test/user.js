@@ -42,12 +42,12 @@ describe("Logout",function(){
   });
 });
 
-describe("Logout",function(){
+describe("Connecting to API",function(){
 
-  it("should return code 200",function(done){
+  it("should return code 401 on unauthenticated user",function(done){
     server
-    .get("/api/logout")
-		.expect(200, {
+    .get("/api/user")
+		.expect(401, {
 		}, done);
   });
 });
