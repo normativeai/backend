@@ -1,19 +1,36 @@
-var db = require('mongoose');
-var supertest = require("supertest");
+'use strict';
 
-async function dropDBs() {
-	const mongo = await db;
-	await mongo.connection.dropDatabase();
-};
-function seedUser(server, done) {
-	const user = require('./fixtures/user.json');
-	server
-    .post("/api/user")
-    .send(user)
-    .then(response => {
-			done();
-    });
-};
+ //  Modified from https://github.com/elliotf/mocha-mongoose
+
+ var config = require('../config/development');
+ var mongoose = require('mongoose');
+
+ before(function (done) {
+
+   function clearDB() {
+     for (var i in mongoose.connection.collections) {
+       mongoose.connection.collections[i].remove(function() {});
+     }
+     return done();
+   }
+
+   if (mongoose.connection.readyState === 0) {
+     mongoose.connect(config.db, function (err) {
+       if (err) {
+         throw err;
+       }
+       return clearDB();
+     });
+   } else {
+     return clearDB();
+   }
+ });
+
+ after(function (done) {
+   mongoose.disconnect();
+   return done();
+ });
+
 function login(server, done) {
 	server
     .post("/api/login")
@@ -23,8 +40,4 @@ function login(server, done) {
 		});
 };
 
-
-
-module.exports.dropDBs = dropDBs;
-module.exports.seedUser = seedUser;
 module.exports.login = login;

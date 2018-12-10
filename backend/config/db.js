@@ -4,14 +4,25 @@ var mongoose = require('mongoose');
 module.exports = function (mongo) {
 
 	//Set up default mongoose connection
-	mongoose.connect(mongo);
+	var connection = mongoose.connect(mongo);
 	// Get Mongoose to use the global promise library
 	mongoose.Promise = global.Promise;
-	//Get the default connection
-	var db = mongoose.connection;
 
-	//Bind connection to error event (to get notification of connection errors)
-	db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+	connection
+		.then(db => {
+			logger.info(
+				`Successfully connected to ${mongo} MongoDB cluster`
+			);
+			return db;
+		})
+		.catch(err => {
+			if (err.message.code === 'ETIMEDOUT') {
+				logger.info('Attempting to re-establish database connection.');
+				mongoose.connect(mongo);
+			} else {
+				logger.error('Error while attempting to connect to database:', { err });
+			}
+		});
 
-	return db;
+	return connection;
 }

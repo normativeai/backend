@@ -1,0 +1,25 @@
+{
+    "Theory":
+        {
+          "_id"           : "4342306d8e147f10f16aceaa",
+					"name"          : "Test",
+					"description"   : "Desc",
+					"content"       : "Content",
+					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
+        },
+
+		"Theory2":
+        {
+          "_id"           : "4542306d8e147f10f16aceaa",
+					"name"          : "Test 2",
+					"description"   : "Desc",
+					"content"       : "Content",
+					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
+        }
+
+
+
+}
+

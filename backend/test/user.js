@@ -1,17 +1,14 @@
 var supertest = require("supertest");
 var server = supertest.agent("http://localhost:3000");
 const utils = require('./utils.js');
+const User = require('../models/user');
+const user = require('./fixtures/user.json').User;
 
 describe("Creation of users",function(){
 
-	before(async () => {
-		//await utils.dropDBs();
-	});
-
-	const user = require('./fixtures/user.json').User;
   it("should return the user if all input is ok",function(done){
     server
-    .post("/api/user")
+    .post("/api/users")
     .send(user)
 		.expect(200)
 		.then(response => {
@@ -21,6 +18,10 @@ describe("Creation of users",function(){
 });
 
 describe("Login",function(){
+
+	before(done => {
+		User.create(user, function (err) { done();});
+	});
 
   it("should return code 200 on success",function(done){
     server
@@ -53,6 +54,10 @@ describe("Login",function(){
 
 describe("Logout",function(){
 
+	before(done => {
+		User.create(user, function (err) { done();});
+	});
+
   it("should return code 200",function(done){
     server
     .get("/api/logout")
@@ -63,9 +68,13 @@ describe("Logout",function(){
 
 describe("Connecting to API",function(){
 
+	before(done => {
+		User.create(user, function (err) { done();});
+	});
+
   it("should return code 401 on unauthenticated user",function(done){
     server
-    .get("/api/user")
+    .get("/api/users")
 		.expect(401, {
 		}, done);
   });
@@ -78,7 +87,7 @@ describe("Connecting to API",function(){
 
 		it("should return code 200",function(done){
 			server
-			.get("/api/user")
+			.get("/api/users")
 			.expect(200)
 			.end(function(err, response){
 				done();

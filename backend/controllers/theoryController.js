@@ -26,3 +26,10 @@ exports.create = [
 
   }
 ]
+
+exports.get = function(req, res, next) {
+  Theory.find({ "user": req.session.passport.user }, ['_id','name','lastUpdate','description'], function (err, theories) {
+    res.send(theories)
+  });
+};
+
