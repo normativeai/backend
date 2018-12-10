@@ -11,6 +11,8 @@ router.get("/api/logout", userController.logout);
 
 router.get("/api/user", userController.authMiddleware, userController.user);
 
+router.post("/api/user", userController.create);
+
 // theories
 
 router.post("/api/theory", userController.authMiddleware, theoryController.create);

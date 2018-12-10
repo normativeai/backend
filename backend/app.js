@@ -6,17 +6,18 @@ var logger = require('morgan');
 //var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+//setting default env to dev
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+var config = require(`./config/${process.env.NODE_ENV}`);
 
 var router = require('./router');
 
 var app = express();
 var passport = require('./config/passport');
-var db = require('./config/db');
+var db = require('./config/db')(config.db);
 
 var cors = require('cors');
 
-//setting default env to dev
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));

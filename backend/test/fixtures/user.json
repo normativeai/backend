@@ -1,0 +1,10 @@
+{
+    "User":
+        {
+            "_id"     : "4342306d8e147f10f16aceaf",
+            "email"   : "test@test.com",
+            "name"    : "Test",
+            "password": "test"
+        }
+
+}

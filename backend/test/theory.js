@@ -2,21 +2,19 @@ var supertest = require("supertest");
 const sinon = require('sinon');
 const userController = require('../controllers/userController');
 var server = supertest.agent("http://localhost:3000");
-
-var login = function(done) {
-  server
-    .post("/api/login")
-    .send({email: 'test@test.com', password: 'test'})
-    .then(response => {
-      done();
-    });
-};
+const utils = require('./utils.js');
 
 describe("Create theory", function(){
 
-	before(function(done) {
-		login(done);
-	})
+	before(done => {
+		//await utils.dropDBs();
+		//await utils.seedUser();
+		utils.login(done);
+		//await loadFixture('initial-data', 'articles');
+		//article = await Article.findOne({});
+		//expect(article).to.not.be.null;
+		//expect(article.rss).to.not.be.null;
+	});
 
 	it("should return the created theory", function(done){
 			server
