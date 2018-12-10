@@ -33,3 +33,18 @@ exports.get = function(req, res, next) {
   });
 };
 
+exports.getOne = function(req, res, next) {
+  Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description'], function (err, theory) {
+    res.send(theory)
+  });
+};
+
+exports.update = function(req, res, next) {
+  Theory.update({ _id: id, "user": req.session.passport.user }, { $set: req.body}, function (err, theory) {
+    if (!err & theory) {
+      res.status(200)
+    } else {
+      res.status(400)
+    }
+  });
+};

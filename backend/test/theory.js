@@ -60,5 +60,38 @@ describe("Get theories", function(){
 				.get("/api/theories")
 				.expect(200, [t1, t2], done);
 		});
+
+  it("should return a chosen theory of connected user", function(done){
+			server
+				.get(`/api/theories/${theory._id}`)
+				.expect(200, t1, done);
+		});
 });
 
+describe("Update theory", function(){
+
+  const t = Object.assign({}, theory);
+  t.name = "temp";
+
+	before(done => {
+		User.create(user, function (err) {});
+		utils.login(server, done);
+		theory.user = user;
+    t.user = user;
+		Theory.create(theory, function (err) {});
+	});
+
+	after(done => {
+		Theory.deleteOne({"name": "temp"}, function (err) {done();});
+	});
+
+	it("should return 200 on success", function(done){
+			server
+				.put(`/api/theories/${t._id}`)
+				.send(t)
+				.expect(200)
+				.end(function(err, response){
+					done();
+				});
+  });
+});

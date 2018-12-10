@@ -14,4 +14,8 @@ router.route("/api/theories")
 	.get(userController.authMiddleware, theoryController.get)
 	.post(userController.authMiddleware, theoryController.create)
 
+router.route('/api/theories/:theoryId')
+  .get(userController.authMiddleware, theoryController.getOne)
+  .put(userController.authMiddleware, theoryController.update)
+
 module.exports = router;
