@@ -5,23 +5,6 @@ var User = require('../models/user');
 // getting the local authentication type
 var LocalStrategy = require('passport-local').Strategy;
 
-passport.use('signup',
-  new LocalStrategy(
-    {
-      usernameField: "email",
-      passwordField: "password"
-    },
-    async (email, password, done) => {
-			try {
-				//Save the information provided by the user to the the database
-				const user = await User.create({ email, password });
-				//Send the user information to the next middleware
-				return done(null, user);
-			} catch (error) {
-				done(error);
-			}
-}));
-
 //Create a passport middleware to handle User login
 passport.use('login', new LocalStrategy({
   usernameField : 'email',
