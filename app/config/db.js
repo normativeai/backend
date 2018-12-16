@@ -10,7 +10,7 @@ module.exports = function (mongo) {
 
 	connection
 		.then(db => {
-			logger.info(
+			console.log(
 				`Successfully connected to ${mongo} MongoDB cluster`
 			);
 			return db;
@@ -20,7 +20,7 @@ module.exports = function (mongo) {
 				logger.info('Attempting to re-establish database connection.');
 				mongoose.connect(mongo);
 			} else {
-				logger.error('Error while attempting to connect to database:', { err });
+				console.log('Error while attempting to connect to database:', { err });
 			}
 		});
 

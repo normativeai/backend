@@ -33,7 +33,7 @@
 
 function login(server, done) {
 	server
-    .post("/api/login")
+    .post("/login")
     .send({"email": 'test@test.com', "password": 'test'})
 		.end(function(err, response){
 			done();

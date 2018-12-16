@@ -8,7 +8,7 @@ describe("Creation of users",function(){
 
   it("should return the user if all input is ok",function(done){
     server
-    .post("/api/users")
+    .post("/signup")
     .send(user)
 		.expect(200)
 		.then(response => {
@@ -25,7 +25,7 @@ describe("Login",function(){
 
   it("should return code 200 on success",function(done){
     server
-    .post("/api/login")
+    .post("/login")
 		.send({email: 'test@test.com', password: 'test'})
     .expect(200)
 		.then(response => {
@@ -35,7 +35,7 @@ describe("Login",function(){
 
 	it("should return code 400 on unknown user",function(done){
     server
-    .post("/api/login")
+    .post("/login")
 		.send({email: 'unknown@test.com', password: 'test'})
 		.expect(400, [false, {
 			message: 'Incorrect username.'
@@ -44,7 +44,7 @@ describe("Login",function(){
 
 	it("should return code 400 on wrong password",function(done){
     server
-    .post("/api/login")
+    .post("/login")
 		.send({email: 'test@test.com', password: 'wrong'})
 		.expect(400, [false, {
 			message: 'Incorrect password.'
@@ -60,7 +60,7 @@ describe("Logout",function(){
 
   it("should return code 200",function(done){
     server
-    .get("/api/logout")
+    .get("/logout")
 		.expect(200, {
 		}, done);
   });
@@ -79,7 +79,7 @@ describe("Connecting to API",function(){
 		}, done);
   });
 
-	describe("with authenticaed user",function(){
+	describe("with authenticated user",function(){
 
 		before(function(done){
 			utils.login(server,done);

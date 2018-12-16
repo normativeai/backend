@@ -1,5 +1,5 @@
 var express = require('express');
-var cookieSession = require('cookie-session')
+//var cookieSession = require('cookie-session')
 //var path = require('path');
 //var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -11,13 +11,13 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 var config = require(`./config/${process.env.NODE_ENV}`);
 
 var router = require('./router');
+var srouter = require('./secureRouter');
 
 var app = express();
 var passport = require('./config/passport');
 var db = require('./config/db')(config.db);
 
 var cors = require('cors');
-
 
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
@@ -30,16 +30,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 //app.use(cookieParser());
-app.use(cookieSession({
+/*app.use(cookieSession({
     name: 'mysession',
     keys: ['vueauthrandomkey'],
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
+}))*/
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use('/api', passport.authenticate('jwt', { session : false }), srouter);
 app.use('/', router);
-
 
 // catch 404 and forward to error handler
 //app.use(express.static(path.join(__dirname, 'public')));
