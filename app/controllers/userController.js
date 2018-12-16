@@ -57,9 +57,7 @@ exports.logout = function(req, res, next) {
 };
 
 exports.user = function(req, res, next) {
-  console.log(req.user);
   User.findById(req.user).populate('queries').exec(function(err, user) {
-    console.log([user, req.session])
     res.send({ user: user })
   })
 };

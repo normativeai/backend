@@ -40,7 +40,7 @@ exports.getOne = function(req, res, next) {
 };
 
 exports.update = function(req, res, next) {
-  Theory.updateOne({ id: req.theoryId }, { $set: req.body}, function (err, result) {
+  Theory.updateOne({ id: req.theoryId, user: req.user._id }, { $set: req.body}, function (err, result) {
     if (!err & (result.nModified > 0)) {
       res.status(200).send('Theory created');
     } else {
