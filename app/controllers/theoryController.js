@@ -28,7 +28,7 @@ exports.create = [
 ]
 
 exports.get = function(req, res, next) {
-  Theory.find({ "user": req.session.passport.user }, ['_id','name','lastUpdate','description'], function (err, theories) {
+  Theory.find({ "user": req.user }, ['_id','name','lastUpdate','description'], function (err, theories) {
     res.send(theories)
   });
 };
@@ -40,11 +40,11 @@ exports.getOne = function(req, res, next) {
 };
 
 exports.update = function(req, res, next) {
-  Theory.update({ _id: id, "user": req.session.passport.user }, { $set: req.body}, function (err, theory) {
-    if (!err & theory) {
-      res.status(200)
+  Theory.updateOne({ id: req.theoryId }, { $set: req.body}, function (err, result) {
+    if (!err & (result.nModified > 0)) {
+      res.status(200).send('Theory created');
     } else {
-      res.status(400)
+      res.status(400).send(`Error: ${err}`);
     }
   });
 };

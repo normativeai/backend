@@ -36,8 +36,8 @@ app.use(bodyParser.json());
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))*/
 
-app.use('/api', passport.authenticate('jwt', { session : false }), srouter);
 app.use('/', router);
+app.use('/api', passport.authenticate('jwt', { session : false }), srouter);
 
 // catch 404 and forward to error handler
 //app.use(express.static(path.join(__dirname, 'public')));

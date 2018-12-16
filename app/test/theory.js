@@ -14,9 +14,11 @@ describe("Create theory", function(){
   const t = Object.assign({}, theory);
   t.name = "temp";
 
+  var token = {token: undefined};
+
 	before(done => {
 		User.create(user, function (err) {});
-		utils.login(server, done);
+		utils.login(server, token, done);
 	});
 
 	after(done => {
@@ -46,24 +48,30 @@ describe("Get theories", function(){
     name: theory2.name,
     description: theory2.description,
   };
-	before(done => {
-		User.create(user, function (err) {});
-		utils.login(server, () => {});
+  var token = {token: undefined};
+
+	before(function(done) {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
 		theory.user = user;
-		Theory.create(theory, function (err) {});
+		Theory.create(theory, function (err) {
 		theory2.user = user;
-		Theory.create(theory2, function (err) { done(); });
+		Theory.create(theory2, function (err) {
+      done();
+    })})})});
 	});
 
 	it("should return an array of all theories of connected user", function(done){
 			server
 				.get("/api/theories")
+        .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, [t1, t2], done);
 		});
 
   it("should return a chosen theory of connected user", function(done){
 			server
 				.get(`/api/theories/${theory._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, t1, done);
 		});
 });
@@ -72,13 +80,14 @@ describe("Update theory", function(){
 
   const t = Object.assign({}, theory);
   t.name = "temp";
+  var token = {token: undefined};
 
 	before(done => {
-		User.create(user, function (err) {});
-		utils.login(server, done);
+		User.create(user, function (err) {
+		utils.login(server, token, () => {
 		theory.user = user;
     t.user = user;
-		Theory.create(theory, function (err) {});
+		Theory.create(theory, function (err) {done();})})});
 	});
 
 	after(done => {
@@ -88,10 +97,9 @@ describe("Update theory", function(){
 	it("should return 200 on success", function(done){
 			server
 				.put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
 				.send(t)
-				.expect(200)
-				.end(function(err, response){
-					done();
-				});
+        .expect(200, {
+        },	done);
   });
 });

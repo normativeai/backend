@@ -4,6 +4,7 @@
 
  var config = require('../config/development');
  var mongoose = require('mongoose');
+const user = require('./fixtures/user.json').User;
 
  before(function (done) {
 
@@ -31,11 +32,12 @@
    return done();
  });
 
-function login(server, done) {
+function login(server, token, done) {
 	server
-    .post("/login")
-    .send({"email": 'test@test.com', "password": 'test'})
+    .post("/api/login")
+    .send(user)
 		.end(function(err, response){
+      token.token = response.body.token;
 			done();
 		});
 };
