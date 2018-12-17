@@ -2,6 +2,6 @@
 
 module.exports = {
   env: 'production',
-  db: 'mongodb://localhost/norm-test',
+  db: 'mongodb://localhost/norm-dev',
   port: 80,
 };
