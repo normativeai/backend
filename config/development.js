@@ -3,5 +3,5 @@
 module.exports = {
   env: 'development',
   db: 'mongodb://localhost/norm-test',
-  port: process.env.PORT || 4000,
+  port: process.env.PORT || 3000,
 };

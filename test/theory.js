@@ -17,9 +17,10 @@ describe("Create theory", function(){
   var token = {token: undefined};
 
 	before(done => {
-		User.create(user, function (err) {});
-		utils.login(server, token, done);
-	});
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+      done();});
+	})});
 
 	after(done => {
 		Theory.deleteOne({"name": "temp"}, function (err) {done();});
@@ -28,11 +29,12 @@ describe("Create theory", function(){
 	it("should return the created theory", function(done){
 			server
 				.post("/api/theories")
+        .set('Authorization', `Bearer ${token.token}`)
 				.send(t)
-				.expect(200)
-				.end(function(err, response){
-					done();
-				});
+        .expect(201)
+        .then(response => {
+          done();
+        })
 		});
 });
 
@@ -78,6 +80,52 @@ describe("Get theories", function(){
 
 describe("Update theory", function(){
 
+  var token = {token: undefined};
+
+	before(done => {
+		User.create(user, function (err) {
+		utils.login(server, token, () => {
+		theory.user = user;
+    theory.user = user;
+		Theory.create(theory, function (err) {done();})})});
+	});
+
+	after(done => {
+		Theory.deleteOne({"name": "temp"}, function (err) {done();});
+	});
+
+	it("should return 200 on success", function(done){
+      const t = Object.assign({}, theory);
+      t.name = "temp";
+			server
+				.put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(t)
+        .expect(200, {
+        },	done);
+  });
+
+  /*Mongo doesnt give this information it("should return 204 on no update was needed", function(done){
+			server
+				.put(`/api/theories/${theory._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(theory)
+        .expect(204, {
+        },	done);
+  });*/
+  it("should return 404 on inability to find theory to update", function(done){
+			server
+				.put('/api/theories/111')
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(theory)
+        .expect(404, {
+        },	done);
+  });
+
+});
+
+describe("Delete theory", function(){
+
   const t = Object.assign({}, theory);
   t.name = "temp";
   var token = {token: undefined};
@@ -90,16 +138,19 @@ describe("Update theory", function(){
 		Theory.create(theory, function (err) {done();})})});
 	});
 
-	after(done => {
-		Theory.deleteOne({"name": "temp"}, function (err) {done();});
-	});
-
 	it("should return 200 on success", function(done){
 			server
-				.put(`/api/theories/${t._id}`)
+				.delete(`/api/theories/${t._id}`)
         .set('Authorization', `Bearer ${token.token}`)
-				.send(t)
         .expect(200, {
         },	done);
   });
+  it("should return 404 on inability to find theory to delete", function(done){
+			server
+				.delete('/api/theories/111')
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(404, {
+        },	done);
+  });
+
 });

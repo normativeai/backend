@@ -6,14 +6,32 @@ const user = require('./fixtures/user.json').User;
 
 describe("Creation of users",function(){
 
-  it("should return the user if all input is ok",function(done){
+  it("should return code 201 and created the user if all input is ok",function(done){
     server
     .post("/api/signup")
     .send(user)
-		.expect(200)
+		.expect(201)
 		.then(response => {
 			done();
 		})
+  });
+  it("should return code 422 and message if no email was given",function(done){
+    var obj = Object.assign({}, user);
+    obj.email = '';
+    server
+    .post("/api/signup")
+    .send(obj)
+		.expect(422, { errors:
+       [ { location: 'body', param: 'email', msg: 'email required', value: '' }]}, done);
+  });
+  it("should return code 422 and message if no password was given",function(done){
+    var obj = Object.assign({}, user);
+    obj.password= '';
+    server
+    .post("/api/signup")
+    .send(obj)
+		.expect(422, { errors:
+       [ { location: 'body', param: 'password', msg: 'password required', value: '' }]}, done);
   });
 });
 

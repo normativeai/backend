@@ -20,7 +20,7 @@ exports.signup = [
       email: req.body.email,
       password: req.body.password,
       name: req.body.name,
-    }).then(user => res.json(user));
+    }).then(user => res.status(201).json(user));
 
   }
 ];

@@ -16,13 +16,13 @@ exports.create = [
     Theory.create({
       name: req.body.name,
       lastUpdate: new Date(),
-      user: req.session.passport.user,
+      user: req.user,
       description: req.body.description,
       content: req.body.content,
       vocabulary: req.body.vocabulary,
       formalization: req.body.formalization,
       creator: req.body.creator
-    }).then(theory => res.json(theory));
+    }).then(theory => res.status(201).json(theory));
 
   }
 ]
@@ -40,9 +40,23 @@ exports.getOne = function(req, res, next) {
 };
 
 exports.update = function(req, res, next) {
-  Theory.updateOne({ id: req.theoryId, user: req.user._id }, { $set: req.body}, function (err, result) {
-    if (!err & (result.nModified > 0)) {
-      res.status(200).send('Theory created');
+  Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: req.body}, function (err, result) {
+    if (!err && (result.nModified > 0)) {
+      res.status(200).send('Theory updated');
+    } else if (err.name = 'CastError' || result.nModified < 1) {
+      res.status(404).send('Theory could not be found');
+    } else {
+      res.status(400).send(`Error: ${err}`);
+    }
+  });
+};
+
+exports.delete= function(req, res, next) {
+  Theory.deleteOne({ '_id': req.params.theoryId, user: req.user._id }, function (err, result) {
+    if (!err && (result.n > 0)) {
+      res.status(200).send('Theory deleted');
+    } else if (err.name = 'CastError' || result.n < 1) {
+      res.status(404).send('Theory could not be found');
     } else {
       res.status(400).send(`Error: ${err}`);
     }

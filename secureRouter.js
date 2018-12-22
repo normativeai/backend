@@ -13,5 +13,6 @@ router.route("/theories")
 router.route('/theories/:theoryId')
   .get(theoryController.getOne)
   .put(theoryController.update)
+  .delete(theoryController.delete)
 
 module.exports = router;
