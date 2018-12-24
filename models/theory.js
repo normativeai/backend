@@ -12,7 +12,7 @@ var theorySchema = new Schema({
     vocabulary        : [{symbol: String, original: String}],
     formalization     : [{original: String, formula: String}],
 		user 							: { type: Schema.Types.ObjectId, ref: 'User' },
-    creator           : { type: Schema.Types.ObjectId, ref: 'User' }
+    clonedForm        : { type: Schema.Types.ObjectId, ref: 'Theory' }
 });
 
 module.exports = mongoose.model('Theory', theorySchema );

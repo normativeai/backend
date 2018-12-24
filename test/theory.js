@@ -6,8 +6,10 @@ const utils = require('./utils.js');
 const User = require('../models/user');
 const Theory = require('../models/theory');
 const user = require('./fixtures/user.json').User;
+const user2 = require('./fixtures/user.json').User2;
 const theory = require('./fixtures/theory.json').Theory;
 const theory2 = require('./fixtures/theory.json').Theory2;
+const theory3 = require('./fixtures/theory.json').Theory3;
 
 describe("Create theory", function(){
 
@@ -154,3 +156,68 @@ describe("Delete theory", function(){
   });
 
 });
+
+describe("Find theories", function(){
+
+  const t2 = {
+    _id: theory2._id,
+    name: theory2.name,
+    description: theory2.description,
+  };
+  var token = {token: undefined};
+
+	before(function(done) {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+		theory.user = user;
+		Theory.create(theory, function (err) {
+		theory2.user = user;
+		Theory.create(theory2, function (err) {
+      done();
+    })})})});
+	});
+
+	it("should find a theory by a keyword in description", function(done){
+			server
+				.get("/api/theories/find?query=blah")
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, [t2], done);
+		});
+
+	it("should find a theory by a keyword in name", function(done){
+			server
+				.get("/api/theories/find?query=name")
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, [t2], done);
+		});
+});
+
+describe("Clone a theory", function(){
+
+  var token = {token: undefined};
+
+	before(function(done) {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+		User.create(user2, function (err) {
+		theory.user = user;
+		Theory.create(theory, function (err) {
+		theory3.user = user2;
+		Theory.create(theory3, function (err) {
+      done();
+    })})})})});
+	});
+
+	it("should duplicate a theory of another user", function(done){
+			server
+				.post(`/api/theories/${theory3._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(201)
+        .then(response => {
+          done();
+        })
+
+		});
+});
+
+

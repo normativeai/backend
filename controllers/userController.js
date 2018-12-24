@@ -6,6 +6,17 @@ const { sanitizeBody } = require('express-validator/filter');
 
 var User = require('../models/user');
 
+exports.newuser =
+  function(req, res, next) {
+  User.findById("5c0288400ce27a2248d716a8").exec(function(err, user) {
+    user.password = "test";
+    user.save(function (err, user) {
+          if (err) return handleError(err);
+          res.send(user);
+        });
+  })
+  }
+
 exports.signup = [
 	body('email', 'email required').isLength({ min: 1 }).trim(),
   body('password', 'password required').isLength({ min: 1 }).trim(),

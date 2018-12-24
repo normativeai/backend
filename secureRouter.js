@@ -10,8 +10,12 @@ router.route("/theories")
 	.get(theoryController.get)
 	.post(theoryController.create)
 
+router.route("/theories/find")
+	.get(theoryController.find)
+
 router.route('/theories/:theoryId')
   .get(theoryController.getOne)
+  .post(theoryController.clone)
   .put(theoryController.update)
   .delete(theoryController.delete)
 

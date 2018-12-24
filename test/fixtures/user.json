@@ -5,6 +5,15 @@
             "email"   : "test@test.com",
             "name"    : "Test",
             "password": "test"
+        },
+
+    "User2":
+        {
+            "_id"     : "4742306d8e147f10f16aceaf",
+            "email"   : "test2@test.com",
+            "name"    : "Test2",
+            "password": "test"
         }
+
 
 }

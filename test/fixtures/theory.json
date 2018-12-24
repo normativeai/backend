@@ -2,8 +2,8 @@
     "Theory":
         {
           "_id"           : "4342306d8e147f10f16aceaa",
-					"name"          : "Test",
-					"description"   : "Desc",
+					"name"          : "Test title",
+					"description"   : "Desc plah plah",
 					"content"       : "Content",
 					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
 					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
@@ -12,14 +12,22 @@
 		"Theory2":
         {
           "_id"           : "4542306d8e147f10f16aceaa",
-					"name"          : "Test 2",
-					"description"   : "Desc",
+					"name"          : "Test2 name",
+					"description"   : "Desc2 blah blah",
+					"content"       : "Content",
+					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
+        },
+
+    "Theory3":
+        {
+          "_id"           : "4742306d8e147f10f16aceaa",
+					"name"          : "Test3 title",
+					"description"   : "Desc3 plah plah",
 					"content"       : "Content",
 					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
 					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
         }
-
-
 
 }
 
