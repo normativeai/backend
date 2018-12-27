@@ -6,6 +6,9 @@ var userController = require('./controllers/userController')
 router.route("/users")
 	.get(userController.user)
 
+router.route('/logout')
+  .get(userController.logout);
+
 router.route("/theories")
 	.get(theoryController.get)
 	.post(theoryController.create)

@@ -87,20 +87,37 @@ describe("Login",function(){
 
 describe("Logout",function(){
 
+  var token = {token: undefined};
 	before(done => {
-		User.create(user, function (err) { done();});
+		User.create(user, function (err) {
+    utils.login(server,token, done)});
 	});
 
 	after(done => {
 		User.deleteOne({'email': user.email}, function (err) {done();});
 	});
-
-  it("should return code 200",function(done){
+  it("should access user data before logout",function(done){
     server
-    .get("/api/logout")
+    .get("/api/users")
+    .set('Authorization', `Bearer ${token.token}`)
 		.expect(200, {
 		}, done);
   });
+  it("should return code 200",function(done){
+    server
+    .get("/api/logout")
+    .set('Authorization', `Bearer ${token.token}`)
+		.expect(200, {
+		}, done);
+  });
+  /*it("should fail to access user data after logout",function(done){
+    server
+    .get("/api/users")
+    .set('Authorization', `Bearer ${token.token}`)
+		.expect(401, {
+		}, done);
+  })*/;
+  // it seems impossible to logout a user with JWT on the server side https://medium.com/devgorilla/how-to-log-out-when-using-jwt-a8c7823e8a6
 });
 
 describe("Connecting to API",function(){

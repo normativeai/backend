@@ -74,7 +74,7 @@ exports.logout = function(req, res, next) {
 
 exports.user = function(req, res, next) {
   User.findById(req.user).populate('queries').exec(function(err, user) {
-    res.send({ user: user })
+    res.status(200).send({ user: user })
   })
 };
 
