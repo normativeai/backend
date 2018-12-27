@@ -13,7 +13,7 @@ var userSchema = new Schema({
     },
 		password    			: String,
 		theories					: [{ type: Schema.Types.ObjectId, ref: 'Theory' }],
-		queries						: [{ type: Schema.Types.ObjectId, ref: 'Query' }],
+		queries						: [{ type: Schema.Types.ObjectId, ref: 'Query' }]
 });
 
 //This is called a pre-hook, before the user information is saved in the database

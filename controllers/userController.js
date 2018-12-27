@@ -73,7 +73,9 @@ exports.logout = function(req, res, next) {
 };
 
 exports.user = function(req, res, next) {
-  User.findById(req.user).populate('queries').exec(function(err, user) {
+  User.findById(req.user, ['_id', 'name', 'email'])
+    .populate('theories', ['_id', 'name', 'description'])
+    .exec(function(err, user) {
     res.status(200).send({ user: user })
   })
 };

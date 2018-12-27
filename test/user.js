@@ -100,8 +100,10 @@ describe("Logout",function(){
     server
     .get("/api/users")
     .set('Authorization', `Bearer ${token.token}`)
-		.expect(200, {
-		}, done);
+		.expect(200)
+		.then(response => {
+			done();
+		})
   });
   it("should return code 200",function(done){
     server
@@ -122,8 +124,10 @@ describe("Logout",function(){
 
 describe("Connecting to API",function(){
 
+  var u;
+
 	before(done => {
-		User.create(user, function (err) { done();});
+		User.create(user, function (err, user) { u = user; done();});
 	});
 
 	after(done => {
@@ -139,17 +143,46 @@ describe("Connecting to API",function(){
 
 	describe("with authenticated user",function(){
 
+    const Theory = require('../models/theory');
+    const theory = require('./fixtures/theory.json').Theory;
+    const theory2 = require('./fixtures/theory.json').Theory2;
+    const t1 = {
+      _id: theory._id,
+      name: theory.name,
+      description: theory.description,
+    };
+    const t2 = {
+      _id: theory2._id,
+      name: theory2.name,
+      description: theory2.description,
+    };
+
     var token = {token: undefined};
 
-		before(function(done){
-			utils.login(server,token, done);
-		});
+    before(function(done) {
+      utils.login(server, token, () => {
+      theory.user = u;
+      Theory.create(theory, function (err) {
+      theory2.user = u;
+      Theory.create(theory2, function (err) {
+      u.theories.push(theory);
+      u.theories.push(theory2);
+      u.save(function (err, u2) {
+        done();
+      })})})});
+    });
+    after(done => {
+      Theory.deleteOne({'name': theory.name}, function (err) {
+      Theory.deleteOne({'name': theory2.name}, function (err) {
+        done();
+      })});
+    });
 
-		it("should return code 200",function(done){
+		it("should return code 200 and all dashboard information",function(done){
 			server
 			.get("/api/users")
       .set('Authorization', `Bearer ${token.token}`)
-			.expect(200, {
+			.expect(200, { 'user': {'_id': user._id, 'name': user.name, 'email': user.email, 'theories': [t1, t2] }
       },	done);
 		});
 	});
