@@ -31,8 +31,13 @@ exports.signup = [
       email: req.body.email,
       password: req.body.password,
       name: req.body.name,
-    }).then(user => res.status(201).json(user));
-
+    }, function (err, user) {
+        if (err) {
+          res.status(400).send('User already exists');
+        } else {
+          res.status(201).json(user);
+        }
+    });
   }
 ];
 

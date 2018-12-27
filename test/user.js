@@ -6,6 +6,10 @@ const user = require('./fixtures/user.json').User;
 
 describe("Creation of users",function(){
 
+	after(done => {
+		User.deleteOne({'email': user.email}, function (err) {done();});
+	});
+
   it("should return code 201 and created the user if all input is ok",function(done){
     server
     .post("/api/signup")
@@ -14,6 +18,13 @@ describe("Creation of users",function(){
 		.then(response => {
 			done();
 		})
+  });
+  it("should return code 400 if user already exists",function(done){
+		User.create(user, function (err) { });
+    server
+    .post("/api/signup")
+    .send(user)
+		.expect(400, 'User already exists', done);
   });
   it("should return code 422 and message if no email was given",function(done){
     var obj = Object.assign({}, user);
@@ -39,6 +50,10 @@ describe("Login",function(){
 
 	before(done => {
 		User.create(user, function (err) { done();});
+	});
+
+	after(done => {
+		User.deleteOne({'email': user.email}, function (err) {done();});
 	});
 
   it("should return code 200 on success",function(done){
@@ -76,6 +91,10 @@ describe("Logout",function(){
 		User.create(user, function (err) { done();});
 	});
 
+	after(done => {
+		User.deleteOne({'email': user.email}, function (err) {done();});
+	});
+
   it("should return code 200",function(done){
     server
     .get("/api/logout")
@@ -88,6 +107,10 @@ describe("Connecting to API",function(){
 
 	before(done => {
 		User.create(user, function (err) { done();});
+	});
+
+	after(done => {
+		User.deleteOne({'email': user.email}, function (err) {done();});
 	});
 
   it("should return code 401 on unauthenticated user",function(done){

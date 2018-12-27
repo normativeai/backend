@@ -25,7 +25,8 @@ describe("Create theory", function(){
 	})});
 
 	after(done => {
-		Theory.deleteOne({"name": "temp"}, function (err) {done();});
+		Theory.deleteOne({'name': t.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})});
 	});
 
 	it("should return the created theory", function(done){
@@ -65,6 +66,12 @@ describe("Get theories", function(){
     })})})});
 	});
 
+	after(done => {
+		Theory.deleteOne({'name': theory.name}, function (err) {
+		Theory.deleteOne({'name': theory2.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})});
+	});
+
 	it("should return an array of all theories of connected user", function(done){
 			server
 				.get("/api/theories")
@@ -93,7 +100,8 @@ describe("Update theory", function(){
 	});
 
 	after(done => {
-		Theory.deleteOne({"name": "temp"}, function (err) {done();});
+		Theory.deleteOne({"name": "temp"}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})});
 	});
 
 	it("should return 200 on success", function(done){
@@ -140,6 +148,10 @@ describe("Delete theory", function(){
 		Theory.create(theory, function (err) {done();})})});
 	});
 
+	after(done => {
+		User.deleteOne({'email': user.email}, function (err) {done();});
+	});
+
 	it("should return 200 on success", function(done){
 			server
 				.delete(`/api/theories/${t._id}`)
@@ -177,6 +189,12 @@ describe("Find theories", function(){
     })})})});
 	});
 
+	after(done => {
+		Theory.deleteOne({'name': theory.name}, function (err) {
+		Theory.deleteOne({'name': theory2.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})});
+	});
+
 	it("should find a theory by a keyword in description", function(done){
 			server
 				.get("/api/theories/find?query=blah")
@@ -206,6 +224,14 @@ describe("Clone a theory", function(){
 		Theory.create(theory3, function (err) {
       done();
     })})})})});
+	});
+
+	after(done => {
+		Theory.deleteOne({'name': theory.name}, function (err) {
+		Theory.deleteOne({'name': theory2.name}, function (err) {
+		Theory.deleteOne({'name': theory3.name}, function (err) {
+		Theory.deleteOne({'name': theory3.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
 	});
 
 	it("should duplicate a theory of another user", function(done){

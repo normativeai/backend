@@ -7,7 +7,10 @@ var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
     name 		          : String,
-    email             : String,
+    email             : {
+          type: String,
+          unique: true
+    },
 		password    			: String,
 		theories					: [{ type: Schema.Types.ObjectId, ref: 'Theory' }],
 		queries						: [{ type: Schema.Types.ObjectId, ref: 'Query' }],
