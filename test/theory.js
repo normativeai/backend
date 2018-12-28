@@ -1,4 +1,5 @@
 var supertest = require("supertest");
+var assert = require('assert')
 const sinon = require('sinon');
 const userController = require('../controllers/userController');
 var server = supertest.agent("http://localhost:3000");
@@ -13,9 +14,6 @@ const theory3 = require('./fixtures/theory.json').Theory3;
 
 describe("Create theory", function(){
 
-  const t = Object.assign({}, theory);
-  t.name = "temp";
-
   var token = {token: undefined};
 
 	before(done => {
@@ -25,17 +23,20 @@ describe("Create theory", function(){
 	})});
 
 	after(done => {
-		Theory.deleteOne({'name': t.name}, function (err) {
+		Theory.deleteOne({'name': theory.name}, function (err) {
 		User.deleteOne({'email': user.email}, function (err) {done();})});
 	});
 
-	it("should return the created theory", function(done){
+	it("should return the created theory and check it was added to the user", function(done){
 			server
 				.post("/api/theories")
         .set('Authorization', `Bearer ${token.token}`)
-				.send(t)
+				.send(theory)
         .expect(201)
         .then(response => {
+          User.findById(user._id, function(err, user) {
+            assert(user.theories[0]._id == theory._id);
+          });
           done();
         })
 		});

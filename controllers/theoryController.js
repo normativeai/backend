@@ -1,9 +1,10 @@
 var Theory = require('../models/theory');
+var User= require('../models/user');
 const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
 exports.create = [
-  body('name', 'Genre name required').isLength({ min: 1 }).trim(),
+  body('name', 'Theory name required').isLength({ min: 1 }).trim(),
   sanitizeBody('name').trim().escape(),
 
   function(req, res, next) {
@@ -14,6 +15,7 @@ exports.create = [
     }
 
     Theory.create({
+      _id: req.body._id,
       name: req.body.name,
       lastUpdate: new Date(),
       user: req.user,
@@ -22,8 +24,16 @@ exports.create = [
       vocabulary: req.body.vocabulary,
       formalization: req.body.formalization,
       creator: req.body.creator
-    }).then(theory => res.status(201).json(theory));
-
+    }).then(theory => {
+      User.findById(req.user._id, function(err, user) {
+        user.theories.push(theory._id);
+        user.save(err => {
+          if (err) {
+            res.status(400).send(err);
+          } else {
+            res.status(201).json(theory);
+          }
+      })})});
   }
 ]
 
