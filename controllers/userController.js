@@ -18,15 +18,15 @@ exports.newuser =
   }
 
 exports.signup = [
-	body('email', 'email required').isLength({ min: 1 }).trim(),
-  body('password', 'password required').isLength({ min: 1 }).trim(),
-
+	body('email', 'email required').isEmail(),
+  body('password', 'password required').not().isEmpty(),
+  sanitizeBody('email').normalizeEmail({all_lowercase: true}),
+  sanitizeBody('password').trim(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-
     User.create({
       email: req.body.email,
       password: req.body.password,
@@ -41,7 +41,12 @@ exports.signup = [
   }
 ];
 
-exports.login = async function(req, res, next) {
+exports.login = [
+	body('email', 'email required').isEmail(),
+  body('password', 'password required').not().isEmpty(),
+  sanitizeBody('email').normalizeEmail({all_lowercase: true}),
+  sanitizeBody('password').trim(),
+  async function(req, res, next) {
   passport.authenticate('login', async function(err, user, info) {
 		try {
 			if (err) {
@@ -64,7 +69,7 @@ exports.login = async function(req, res, next) {
 			return next(error);
 		}
   })(req, res, next);
-};
+}];
 
 exports.logout = function(req, res, next) {
   req.logout();

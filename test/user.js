@@ -66,6 +66,16 @@ describe("Login",function(){
 		})
   });
 
+  it("should be case insensitive on email",function(done){
+    server
+    .post("/api/login")
+		.send({email: 'Test@tEst.com', password: 'test'})
+    .expect(200)
+		.then(response => {
+			done();
+		})
+  });
+
 	it("should return code 400 on unknown user",function(done){
     server
     .post("/api/login")
