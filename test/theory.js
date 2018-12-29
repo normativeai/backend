@@ -235,12 +235,15 @@ describe("Clone a theory", function(){
 		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
 	});
 
-	it("should duplicate a theory of another user", function(done){
+	it("should duplicate a theory of another user and check it is connected to the current user", function(done){
 			server
 				.post(`/api/theories/${theory3._id}`)
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(201)
         .then(response => {
+          User.findById(user._id, function(err, user) {
+            assert(user.theories[0]._id == response.body.theory._id);
+          });
           done();
         })
 

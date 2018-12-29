@@ -92,9 +92,14 @@ exports.clone = function(req, res, next) {
       if (err) {
         res.status(400).send(`Could not clone: ${err}`)
       } else {
-        res.status(201).send("Theory cloned");
-      }
-    });
+        User.findById(req.user._id, function(err, user) {
+          user.theories.push(theory._id);
+          user.save(err => {
+            if (err) {
+              res.status(400).send(err);
+            } else {
+              res.status(201).json({theory: {_id: theory._id}});
+            }})})}});
   });
 };
 
