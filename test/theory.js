@@ -80,11 +80,22 @@ describe("Get theories", function(){
 				.expect(200, [t1, t2], done);
 		});
 
-  it("should return a chosen theory of connected user", function(done){
+  it("should return a chosen theory of connected user with all information", function(done){
 			server
 				.get(`/api/theories/${theory._id}`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, t1, done);
+        .expect(200)
+        .then(response => {
+          const t = response.body;
+          assert(theory.name == t.name);
+          assert(theory.description == t.description);
+          assert(JSON.stringify(theory.formalization) == JSON.stringify(t.formalization));
+          assert(theory.content == t.content);
+          assert(JSON.stringify(theory.vocabulary) == JSON.stringify(t.vocabulary));
+          done();
+        }).catch(err => {
+          console.log(err);
+        })
 		});
 });
 

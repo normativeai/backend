@@ -5,8 +5,8 @@
 					"name"          : "Test title",
 					"description"   : "Desc plah plah",
 					"content"       : "Content",
-					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
-					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
+					"vocabulary"    : [{"_id": "4342306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4342306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"_id": "4342306d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "D => I"}]
         },
 
 		"Theory2":
@@ -15,8 +15,8 @@
 					"name"          : "Test2 name",
 					"description"   : "Desc2 blah blah",
 					"content"       : "Content",
-					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
-					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
+					"vocabulary"    : [{"_id": "4542306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4542306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"_id": "4542306d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "D => I"}]
         },
 
     "Theory3":
@@ -25,8 +25,8 @@
 					"name"          : "Test3 title",
 					"description"   : "Desc3 plah plah",
 					"content"       : "Content",
-					"vocabulary"    : [{"symbol": "D", "original": "Delivery"}, {"symbol": "I", "original": "Insurance"}],
-					"formalization" : [{"original": "Delivery means you should make Insurance", "formula": "D => I"}]
+					"vocabulary"    : [{"_id": "4742306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4742306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"_id": "4742306d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "D => I"}]
         }
 
 }
