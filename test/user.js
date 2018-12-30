@@ -160,11 +160,13 @@ describe("Connecting to API",function(){
       _id: theory._id,
       name: theory.name,
       description: theory.description,
+      lastUpdate: theory.lastUpdate
     };
     const t2 = {
       _id: theory2._id,
       name: theory2.name,
       description: theory2.description,
+      lastUpdate: theory2.lastUpdate
     };
 
     var token = {token: undefined};

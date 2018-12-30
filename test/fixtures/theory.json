@@ -2,6 +2,7 @@
     "Theory":
         {
           "_id"           : "4342306d8e147f10f16aceaa",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
 					"name"          : "Test title",
 					"description"   : "Desc plah plah",
 					"content"       : "Content",
@@ -12,6 +13,7 @@
 		"Theory2":
         {
           "_id"           : "4542306d8e147f10f16aceaa",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
 					"name"          : "Test2 name",
 					"description"   : "Desc2 blah blah",
 					"content"       : "Content",
@@ -22,6 +24,7 @@
     "Theory3":
         {
           "_id"           : "4742306d8e147f10f16aceaa",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
 					"name"          : "Test3 title",
 					"description"   : "Desc3 plah plah",
 					"content"       : "Content",

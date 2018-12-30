@@ -50,7 +50,9 @@ exports.getOne = function(req, res, next) {
 };
 
 exports.update = function(req, res, next) {
-  Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: req.body}, function (err, result) {
+  var body = req.body;
+  body.lastUpdate = new Date();
+  Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
     if (!err && (result.nModified > 0)) {
       res.status(200).send('Theory updated');
     } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
