@@ -16,6 +16,9 @@ router.route("/theories")
 router.route("/theories/find")
 	.get(theoryController.find)
 
+router.route('/theories/:theoryId/consistency')
+  .get(theoryController.consistency)
+
 router.route('/theories/:theoryId')
   .get(theoryController.getOne)
   .post(theoryController.clone)

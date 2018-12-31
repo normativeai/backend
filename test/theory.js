@@ -264,4 +264,39 @@ describe("Clone a theory", function(){
 		});
 });
 
+describe("Checking a theory for consistency", function(){
+
+  var token = {token: undefined};
+
+	before(function(done) {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+		User.create(user2, function (err) {
+		theory.user = user;
+		Theory.create(theory, function (err) {
+		theory2.user = user2;
+		Theory.create(theory2, function (err) {
+      done();
+    })})})})});
+	});
+
+	after(done => {
+		Theory.deleteOne({'name': theory.name}, function (err) {
+		Theory.deleteOne({'name': theory2.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})});
+	});
+
+	it("should return true in case it is consistent", function(done){
+			server
+				.get(`/api/theories/${theory._id}/consistency`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {"consistent": "true"}, done);
+  });
+  it("should return false in case it is inconsistent", function(done){
+			server
+				.get(`/api/theories/${theory2._id}/consistency`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {"consistent": "false"}, done);
+		});
+});
 

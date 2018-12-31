@@ -85,7 +85,6 @@ exports.find = function(req, res, next) {
 
 exports.clone = function(req, res, next) {
   Theory.findById(req.params.theoryId, function (err, theory) {
-    console.log(theory.user);
     theory.user = req.user._id;
     theory.clonedForm = theory._id;
     theory._id = undefined;
@@ -105,3 +104,9 @@ exports.clone = function(req, res, next) {
   });
 };
 
+exports.consistency = function(req, res, next) {
+  Theory.findById(req.params.theoryId, function (err, theory) {
+    theory.isConsistent(function(cons) {
+      res.status(200).json({"consistent": cons});
+    })});
+};

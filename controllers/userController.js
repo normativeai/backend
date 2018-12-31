@@ -81,7 +81,6 @@ exports.user = function(req, res, next) {
   User.findById(req.user, ['_id', 'name', 'email'])
     .populate('theories', ['_id', 'lastUpdate', 'name', 'description'])
     .exec(function(err, user) {
-      console.log(user);
     res.status(200).send({ user: user })
   })
 };
