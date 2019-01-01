@@ -80,6 +80,7 @@ exports.logout = function(req, res, next) {
 exports.user = function(req, res, next) {
   User.findById(req.user, ['_id', 'name', 'email'])
     .populate('theories', ['_id', 'lastUpdate', 'name', 'description'])
+    .populate('queries', ['_id', 'lastUpdate', 'name', 'description'])
     .exec(function(err, user) {
     res.status(200).send({ user: user })
   })

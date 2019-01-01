@@ -36,18 +36,51 @@ exports.create = [
   }
 ]
 
+exports.get = function(req, res, next) {
+  Query.find({ "user": req.user }, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'], {"sort": {"_id": 1}}, function (err, queries) {
+    res.send(queries)
+  });
+};
 
+exports.getOne = function(req, res, next) {
+  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'], function (err, query) {
+    res.send(query)
+  });
+};
+
+exports.update = function(req, res, next) {
+  var body = req.body;
+  body.lastUpdate = new Date();
+  Query.updateOne({ '_id': req.params.queryId, user: req.user._id }, { $set: body}, function (err, result) {
+    if (!err && (result.nModified > 0)) {
+      res.status(200).send('Query updated');
+    } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
+      res.status(404).send('Query could not be found');
+    } else {
+      res.status(400).send(`Error: ${err}`);
+    }
+  });
+};
+
+exports.delete = function(req, res, next) {
+  Query.deleteOne({ '_id': req.params.queryId, user: req.user._id }, function (err, result) {
+    if (!err && (result.n > 0)) {
+      res.status(200).send('Query deleted');
+    } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
+      res.status(404).send('Query could not be found');
+    } else {
+      res.status(400).send(`Error: ${err}`);
+    }
+  });
+};
 
 // Execute query.
 exports.exec = function(req, res) {
-  //Query.create({ name: 'Q1', content: "([un, t , (~ c1), c2], (Ob d2))"}, function (err, small) {
-  //if (err) return handleError(err);
-    // saved!
-  //});
-  //var query = Query.findById(req.params.id);
-  Query.findOne({"name": req.params.name}, function(err, query) {
-    query.execQuery(function(proof) {
-      res.send(proof);
+  Query.findOne({"_id": req.params.queryId})
+    .populate('theory')
+    .exec(function(err, query) {
+      query.execQuery(function(theorem, proof) {
+      res.json({"result":theorem,"proof":proof});
     });
   });
 };

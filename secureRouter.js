@@ -27,7 +27,17 @@ router.route('/theories/:theoryId')
   .delete(theoryController.delete)
 
 router.route("/queries")
+	.get(queryController.get)
 	.post(queryController.create)
+
+router.route('/queries/:queryId/exec')
+  .get(queryController.exec)
+
+router.route('/queries/:queryId')
+  .get(queryController.getOne)
+  .put(queryController.update)
+  .delete(queryController.delete)
+
 
 
 module.exports = router;

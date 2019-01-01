@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
-    "test": "mocha"
+    "test": "mocha --grep @slow --invert",
+    "test-grep": "mocha --grep",
+    "test-all": "mocha"
   },
   "dependencies": {
     "bcrypt": "^3.0.2",

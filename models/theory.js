@@ -15,14 +15,14 @@ var theorySchema = new Schema({
     clonedForm        : { type: Schema.Types.ObjectId, ref: 'Theory' }
 });
 
-theorySchema.methods.formulaizationAsString = function(possibleFurtherAssumtions) {
+theorySchema.methods.formalizationAsString = function(possibleFurtherAssumtions) {
   return JSON.stringify(this.formalization.map(f => f.formula).concat(possibleFurtherAssumtions)).replace(/\"/g,"");
 };
 
 theorySchema.methods.isConsistent = function(cb) {
 	// in case the theory is not dirty
   var helper = require('./queryHelper');
-  helper.mleancop(this.formulaizationAsString(), "(x, (~ x))", function(theorem, proof) {
+  helper.mleancop(this.formalizationAsString(), "(x, (~ x))", function(theorem, proof) {
     cb(theorem != 'Theorem');
   });
 };

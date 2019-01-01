@@ -286,13 +286,13 @@ describe("Checking a theory for consistency", function(){
 		User.deleteOne({'email': user.email}, function (err) {done();})})});
 	});
 
-	it("should return true in case it is consistent", function(done){
+	it("should return true in case it is consistent @slow", function(done){
 			server
 				.get(`/api/theories/${theory._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, {"consistent": "true"}, done);
   });
-  it("should return false in case it is inconsistent", function(done){
+  it("should return false in case it is inconsistent @slow", function(done){
 			server
 				.get(`/api/theories/${theory2._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)

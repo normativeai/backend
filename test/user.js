@@ -156,6 +156,10 @@ describe("Connecting to API",function(){
     const Theory = require('../models/theory');
     const theory = require('./fixtures/theory.json').Theory;
     const theory2 = require('./fixtures/theory.json').Theory2;
+    const Query = require('../models/query');
+    const query = require('./fixtures/query.json').Query;
+    const query2 = require('./fixtures/query.json').Query2;
+
     const t1 = {
       _id: theory._id,
       name: theory.name,
@@ -169,6 +173,19 @@ describe("Connecting to API",function(){
       lastUpdate: theory2.lastUpdate
     };
 
+    const q1 = {
+      _id: query._id,
+      name: query.name,
+      description: query.description,
+      lastUpdate: query.lastUpdate
+    }
+    const q2 = {
+      _id: query2._id,
+      name: query2.name,
+      description: query2.description,
+      lastUpdate: query2.lastUpdate
+    }
+
     var token = {token: undefined};
 
     before(function(done) {
@@ -177,24 +194,32 @@ describe("Connecting to API",function(){
       Theory.create(theory, function (err) {
       theory2.user = u;
       Theory.create(theory2, function (err) {
+      query.user = u;
+      Query.create(query, function (err) {
+      query2.user = u;
+      Query.create(query2, function (err) {
       u.theories.push(theory);
       u.theories.push(theory2);
+      u.queries.push(query);
+      u.queries.push(query2);
       u.save(function (err, u2) {
         done();
-      })})})});
+      })})})})})});
     });
     after(done => {
       Theory.deleteOne({'name': theory.name}, function (err) {
       Theory.deleteOne({'name': theory2.name}, function (err) {
+      Query.deleteOne({'name': query.name}, function (err) {
+      Query.deleteOne({'name': query2.name}, function (err) {
         done();
-      })});
+      })})})});
     });
 
 		it("should return code 200 and all dashboard information",function(done){
 			server
 			.get("/api/users")
       .set('Authorization', `Bearer ${token.token}`)
-			.expect(200, { 'user': {'_id': user._id, 'name': user.name, 'email': user.email, 'theories': [t1, t2] }
+			.expect(200, { 'user': {'_id': user._id, 'name': user.name, 'email': user.email, 'theories': [t1, t2], 'queries': [q1,q2] }
       },	done);
 		});
 	});

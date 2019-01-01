@@ -7,6 +7,16 @@
 					"description"   : "Desc plah plah query",
 					"assumptions"   : ["d01"],
 					"goal"          : "(Ob d1)"
+        },
+
+    "Query2":
+        {
+          "_id"           : "4542306d8e147f10f16aceaa",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Query 2",
+					"description"   : "Desc plah plah query",
+					"assumptions"   : ["d01"],
+					"goal"          : "(Ob d2)"
         }
 }
 
