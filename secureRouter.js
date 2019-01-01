@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var theoryController = require('./controllers/theoryController')
+var queryController = require('./controllers/queryController')
 var userController = require('./controllers/userController')
 
 router.route("/users")
@@ -24,5 +25,9 @@ router.route('/theories/:theoryId')
   .post(theoryController.clone)
   .put(theoryController.update)
   .delete(theoryController.delete)
+
+router.route("/queries")
+	.post(queryController.create)
+
 
 module.exports = router;

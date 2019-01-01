@@ -6,8 +6,8 @@
 					"name"          : "Test title",
 					"description"   : "Desc plah plah",
 					"content"       : "Content",
-					"vocabulary"    : [{"_id": "4342306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4342306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
-					"formalization" : [{"_id": "4342306d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "(d => i)"}]
+					"vocabulary"    : [{"_id": "4342306d8e147f10f16aceaa", "symbol": "D0.1", "original": "the contract requires the seller to take care of the carriage of goods"}, {"_id": "4342306d8e147f10f16aceab", "symbol": "D1", "original": "the goods are handed over to the first carrier"}],
+					"formalization" : [{"_id": "4342306d8e147f10f16aceaa", "original": "31(a) if the contract of sale involves carriage of the goods – in handing the goods over to the first carrier for transmission to the buyer", "formula": "(NO d01 d1)"}]
         },
 
 		"Theory2":

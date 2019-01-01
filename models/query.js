@@ -5,8 +5,11 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var querySchema = new Schema({
+    lastUpdate        : Date,
     name 		          : String,
-    content           : String,
+    assumptions       : [String],
+    goal              : String,
+    description       : String,
 		cached_result			: String,
 		theory						: { type: Schema.Types.ObjectId, ref: 'Theory' },
 		user 							: { type: Schema.Types.ObjectId, ref: 'User' }
@@ -15,7 +18,8 @@ var querySchema = new Schema({
 querySchema.methods.execQuery = function(cb) {
 	// in case query is not in cache and cache is not invalidated
   var helper = require('./queryHelper');
-  helper.mleancop(theory.formalization.formula, this.content,cb);
+
+  helper.mleancop(this.theory.formalizationAsString(this.assumptions), this.goal, cb);
 };
 
 module.exports = mongoose.model('Query', querySchema );
