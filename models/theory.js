@@ -20,11 +20,7 @@ theorySchema.methods.isConsistent = function(cb) {
 	// in case the theory is not dirty
   var helper = require('./queryHelper');
   helper.mleancop(JSON.stringify(this.formalization.map(f => f.formula)).replace(/\"/g,""), "(x, (~ x))", function(theorem, proof) {
-    if (theorem == 'Theorem') {
-      cb('false');
-    } else {
-      cb('true');
-    }
+    cb(theorem != 'Theorem');
   });
 };
 
