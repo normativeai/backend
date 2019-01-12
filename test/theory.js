@@ -298,5 +298,11 @@ describe("Checking a theory for consistency", function(){
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, {"consistent": "false"}, done);
 		});
+  it("should return 404 in case it cannot find the theory", function(done){
+			server
+				.get('/api/theories/111/consistency')
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(404, {}, done);
+		});
 });
 

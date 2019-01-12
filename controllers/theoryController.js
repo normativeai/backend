@@ -106,11 +106,16 @@ exports.clone = function(req, res, next) {
 
 exports.consistency = function(req, res, next) {
   Theory.findById(req.params.theoryId, function (err, theory) {
-    theory.isConsistent(function(cons) {
-      if (cons) {
-        res.status(200).json({"consistent": "true"});
-      } else {
-        res.status(200).json({"consistent": "false"});
-      }
-    })});
+    if (theory) {
+      theory.isConsistent(function(cons) {
+        if (cons) {
+          res.status(200).json({"consistent": "true"});
+        } else {
+          res.status(200).json({"consistent": "false"});
+        }
+      })
+    } else {
+      res.status(404).send("Cannot find theory");
+    }
+    });
 };
