@@ -80,7 +80,11 @@ exports.exec = function(req, res) {
     .populate('theory')
     .exec(function(err, query) {
       query.execQuery(function(theorem, proof) {
-      res.json({"result":theorem,"proof":proof});
+        if (theorem) {
+          res.json({"result":theorem,"proof":proof});
+        } else {
+          res.status(400).send('MleanCoP error: invalid query');
+        }
     });
   });
 };

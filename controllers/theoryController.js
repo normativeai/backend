@@ -107,11 +107,15 @@ exports.clone = function(req, res, next) {
 exports.consistency = function(req, res, next) {
   Theory.findById(req.params.theoryId, function (err, theory) {
     if (theory) {
-      theory.isConsistent(function(cons) {
-        if (cons) {
-          res.status(200).json({"consistent": "true"});
-        } else {
-          res.status(200).json({"consistent": "false"});
+      theory.isConsistent(function(code, cons) {
+        if (code == 1) { // mleancop ok
+          if (cons) {
+            res.status(200).json({"consistent": "true"});
+          } else {
+            res.status(200).json({"consistent": "false"});
+          }
+        } else { //mleancop error
+          res.status(400).send('MleanCoP error: invalid formula');
         }
       })
     } else {

@@ -11,6 +11,7 @@ const theory = require('./fixtures/theory.json').Theory;
 const Query = require('../models/query');
 const query = require('./fixtures/query.json').Query;
 const query2 = require('./fixtures/query.json').Query2;
+const query3 = require('./fixtures/query.json').Query3;
 
 describe("Create query", function(){
 
@@ -181,14 +182,17 @@ describe("Execute query", function(){
     Query.create(query, function(err, query) {
     query2.theory = theory._id;
     Query.create(query2, function(err, query) {
-    done();})})})});
+    query3.theory = theory._id;
+    Query.create(query3, function(err, query) {
+    done();})})})})});
 	})});
 
 	after(done => {
 		Query.deleteOne({'name': query.name}, function (err) {
 		Query.deleteOne({'name': query2.name}, function (err) {
+		Query.deleteOne({'name': query3.name}, function (err) {
 		Theory.deleteOne({'name': theory.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})})});
+		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
 	});
 
   it("should return true and the proof when it is a theorem @slow", function(done){
@@ -207,4 +211,12 @@ describe("Execute query", function(){
         .expect(200, { "result": "Non-Theorem"
         },	done);
   });
+  it("should return code 400 if query is illegal @slow", function(done){
+      this.timeout(5000);
+			server
+				.get(`/api/queries/${query3._id}/exec`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(400, 'MleanCoP error: invalid query', done);
+  });
+
 });

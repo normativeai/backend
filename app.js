@@ -31,8 +31,11 @@ var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-//app.use(morgan('dev'));
-app.use(morgan('combined', { stream: accessLogStream }))
+if (process.env.NODE_ENV == 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined', { stream: accessLogStream }))
+}
 
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));

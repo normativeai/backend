@@ -271,11 +271,12 @@ describe("Checking a theory for consistency", function(){
 	before(function(done) {
 		User.create(user, function (err) {
     utils.login(server, token, () => {
-		User.create(user2, function (err) {
 		theory.user = user;
 		Theory.create(theory, function (err) {
-		theory2.user = user2;
+		theory2.user = user;
 		Theory.create(theory2, function (err) {
+		theory3.user = user;
+		Theory.create(theory3, function (err) {
       done();
     })})})})});
 	});
@@ -283,7 +284,8 @@ describe("Checking a theory for consistency", function(){
 	after(done => {
 		Theory.deleteOne({'name': theory.name}, function (err) {
 		Theory.deleteOne({'name': theory2.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})});
+		Theory.deleteOne({'name': theory3.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})})});
 	});
 
 	it("should return true in case it is consistent @slow", function(done){
@@ -303,6 +305,13 @@ describe("Checking a theory for consistency", function(){
 				.get('/api/theories/111/consistency')
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(404, {}, done);
+		});
+  it("should return 400 in case it cannot parse the prover output from some reason @slow", function(done){
+      this.timeout(5000);
+			server
+				.get(`/api/theories/${theory3._id}/consistency`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(400, 'MleanCoP error: invalid formula', done);
 		});
 });
 

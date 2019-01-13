@@ -17,6 +17,17 @@
 					"description"   : "Desc plah plah query",
 					"assumptions"   : ["d01"],
 					"goal"          : "(Ob d2)"
+        },
+
+    "Query3":
+        {
+          "_id"           : "4542106d8e147f10f16aceaa",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Query 3",
+					"description"   : "Illegal query",
+					"assumptions"   : ["we32e432"],
+					"goal"          : "%$"
         }
+
 }
 
