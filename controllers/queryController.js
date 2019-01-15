@@ -43,9 +43,11 @@ exports.get = function(req, res, next) {
 };
 
 exports.getOne = function(req, res, next) {
-  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'], function (err, query) {
-    res.json({"data": query})
-  });
+  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'])
+    .populate('theory', ['_id', 'lastUpdate', 'name', 'description'])
+    .exec(function(err, query) {
+      res.json({"data": query});
+    });
 };
 
 exports.update = function(req, res, next) {

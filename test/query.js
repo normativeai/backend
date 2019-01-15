@@ -57,12 +57,15 @@ describe("Get queries", function(){
 	before(function(done) {
 		User.create(user, function (err) {
     utils.login(server, token, () => {
+    theory.user = user;
+    Theory.create(theory, function(err) {
 		query.user = user;
+		query.theory = theory;
 		Query.create(query, function (err) {
 		query2.user = user;
 		Query.create(query2, function (err) {
       done();
-    })})})});
+    })})})})});
 	});
 
 	after(done => {
@@ -89,6 +92,7 @@ describe("Get queries", function(){
           assert(query.description == t.description);
           assert(JSON.stringify(query.assumptions) == JSON.stringify(t.assumptions));
           assert(query.goal == t.goal);
+          assert(query.theory._id == t.theory._id);
           done();
         }).catch(err => {
           console.log(err);
