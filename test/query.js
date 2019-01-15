@@ -75,7 +75,7 @@ describe("Get queries", function(){
 			server
 				.get("/api/queries")
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, [q1, q2], done);
+				.expect(200, {"data": [q1, q2]}, done);
 		});
 
   it("should return a chosen query of connected user with all information", function(done){
@@ -84,7 +84,7 @@ describe("Get queries", function(){
         .set('Authorization', `Bearer ${token.token}`)
         .expect(200)
         .then(response => {
-          const t = response.body;
+          const t = response.body.data;
           assert(query.name == t.name);
           assert(query.description == t.description);
           assert(JSON.stringify(query.assumptions) == JSON.stringify(t.assumptions));
@@ -119,7 +119,7 @@ describe("Update query", function(){
 				.put(`/api/queries/${t._id}`)
         .set('Authorization', `Bearer ${token.token}`)
 				.send(t)
-        .expect(200, {
+        .expect(200, { "message": 'Query updated'
         },	done);
   });
 
@@ -128,7 +128,7 @@ describe("Update query", function(){
 				.put('/api/queries/111')
         .set('Authorization', `Bearer ${token.token}`)
 				.send(query)
-        .expect(404, {
+        .expect(404, { err: 'Query could not be found'
         },	done);
   });
 
@@ -156,14 +156,14 @@ describe("Delete query", function(){
 			server
 				.delete(`/api/queries/${t._id}`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(200, {
+        .expect(200, { message: 'Query deleted'
         },	done);
   });
   it("should return 404 on inability to find the query to delete", function(done){
 			server
 				.delete('/api/queries/111')
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(404, {
+        .expect(404, { err: 'Query could not be found'
         },	done);
   });
 
@@ -200,7 +200,7 @@ describe("Execute query", function(){
 				.get(`/api/queries/${query._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
     //        .expect(200, { "result": "Theorem", "proof": "[[d01:[],d1:[ (2^d)^ (2^d)^19^[]]],[[-d01: -[]]],[[-d1: -[ (2^d)^19^[]],d1:[ (1^d)^18^[]]],[[-d1: -[ (1^d)^ (1^d)^18^[]],d01:[]],[[-d01:_G3948]]]]]"
-        .expect(200, {"result": "Theorem", "proof": "[[d01 : [], d1 : [(2 ^ d) ^ (2 ^ d) ^ 19 ^ []]], [[-(d01) : -([])]], [[-(d1) : -([(2 ^ d) ^ 19 ^ []]), d1 : [(1 ^ d) ^ 18 ^ []]], [[-(d1) : -([(1 ^ d) ^ (1 ^ d) ^ 18 ^ []]), d01 : []], [[-(d01) : _6544]]]]]"
+        .expect(200, {data: {"result": "Theorem", "proof": "[[d01 : [], d1 : [(2 ^ d) ^ (2 ^ d) ^ 19 ^ []]], [[-(d01) : -([])]], [[-(d1) : -([(2 ^ d) ^ 19 ^ []]), d1 : [(1 ^ d) ^ 18 ^ []]], [[-(d1) : -([(1 ^ d) ^ (1 ^ d) ^ 18 ^ []]), d01 : []], [[-(d01) : _6544]]]]]"}
         },	done);
   });
 
@@ -208,7 +208,7 @@ describe("Execute query", function(){
 			server
 				.get(`/api/queries/${query2._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(200, { "result": "Non-Theorem"
+        .expect(200, { data: {"result": "Non-Theorem"}
         },	done);
   });
   it("should return code 400 if query is illegal @slow", function(done){
@@ -216,7 +216,7 @@ describe("Execute query", function(){
 			server
 				.get(`/api/queries/${query3._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(400, 'MleanCoP error: invalid query', done);
+        .expect(400, {err: 'MleanCoP error: invalid query'}, done);
   });
 
 });

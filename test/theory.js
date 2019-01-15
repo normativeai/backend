@@ -79,7 +79,7 @@ describe("Get theories", function(){
 			server
 				.get("/api/theories")
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, [t1, t2], done);
+				.expect(200, {data: [t1, t2]}, done);
 		});
 
   it("should return a chosen theory of connected user with all information", function(done){
@@ -88,7 +88,7 @@ describe("Get theories", function(){
         .set('Authorization', `Bearer ${token.token}`)
         .expect(200)
         .then(response => {
-          const t = response.body;
+          const t = response.body.data;
           assert(theory.name == t.name);
           assert(theory.description == t.description);
           assert(JSON.stringify(theory.formalization) == JSON.stringify(t.formalization));
@@ -125,7 +125,7 @@ describe("Update theory", function(){
 				.put(`/api/theories/${t._id}`)
         .set('Authorization', `Bearer ${token.token}`)
 				.send(t)
-        .expect(200, {
+        .expect(200, { message: 'Theory updated'
         },	done);
   });
 
@@ -142,7 +142,7 @@ describe("Update theory", function(){
 				.put('/api/theories/111')
         .set('Authorization', `Bearer ${token.token}`)
 				.send(theory)
-        .expect(404, {
+        .expect(404, { err:  'Theory could not be found'
         },	done);
   });
 
@@ -170,14 +170,14 @@ describe("Delete theory", function(){
 			server
 				.delete(`/api/theories/${t._id}`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(200, {
+        .expect(200, { message: 'Theory deleted'
         },	done);
   });
   it("should return 404 on inability to find theory to delete", function(done){
 			server
 				.delete('/api/theories/111')
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(404, {
+        .expect(404, { err:  'Theory could not be found'
         },	done);
   });
 
@@ -214,14 +214,14 @@ describe("Find theories", function(){
 			server
 				.get("/api/theories/find?query=blah")
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, [t2], done);
+				.expect(200, {data: [t2]}, done);
 		});
 
 	it("should find a theory by a keyword in name", function(done){
 			server
 				.get("/api/theories/find?query=name")
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, [t2], done);
+				.expect(200, {data: [t2]}, done);
 		});
 });
 
@@ -256,7 +256,7 @@ describe("Clone a theory", function(){
 				.expect(201)
         .then(response => {
           User.findById(user._id, function(err, user) {
-            assert(user.theories[0]._id == response.body.theory._id);
+            assert(user.theories[0]._id == response.body.data.theory._id);
           });
           done();
         })
@@ -292,26 +292,26 @@ describe("Checking a theory for consistency", function(){
 			server
 				.get(`/api/theories/${theory._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {"consistent": "true"}, done);
+				.expect(200, {data: {"consistent": "true"}}, done);
   });
   it("should return false in case it is inconsistent @slow", function(done){
 			server
 				.get(`/api/theories/${theory2._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {"consistent": "false"}, done);
+				.expect(200, {data: {"consistent": "false"}}, done);
 		});
   it("should return 404 in case it cannot find the theory", function(done){
 			server
 				.get('/api/theories/111/consistency')
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(404, {}, done);
+				.expect(404, { err:  'Cannot find theory'  }, done);
 		});
   it("should return 400 in case it cannot parse the prover output from some reason @slow", function(done){
       this.timeout(5000);
 			server
 				.get(`/api/theories/${theory3._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(400, 'MleanCoP error: invalid formula', done);
+				.expect(400, {err: 'MleanCoP error: invalid formula'}, done);
 		});
 });
 

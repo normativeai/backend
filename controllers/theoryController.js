@@ -29,9 +29,9 @@ exports.create = [
         user.theories.push(theory._id);
         user.save(err => {
           if (err) {
-            res.status(400).send(err);
+            res.status(400).json({err: err});
           } else {
-            res.status(201).json(theory);
+            res.status(201).json({data: theory});
           }
       })})});
   }
@@ -39,13 +39,13 @@ exports.create = [
 
 exports.get = function(req, res, next) {
   Theory.find({ "user": req.user }, ['_id','name','lastUpdate','description'], {"sort": {"_id": 1}}, function (err, theories) {
-    res.send(theories)
+    res.json({data: theories})
   });
 };
 
 exports.getOne = function(req, res, next) {
   Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description','formalization','content','vocabulary'], function (err, theory) {
-    res.send(theory)
+    res.json({data: theory})
   });
 };
 
@@ -54,11 +54,11 @@ exports.update = function(req, res, next) {
   body.lastUpdate = new Date();
   Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
     if (!err && (result.nModified > 0)) {
-      res.status(200).send('Theory updated');
+      res.status(200).json({message: 'Theory updated'});
     } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      res.status(404).send('Theory could not be found');
+      res.status(404).json({err: 'Theory could not be found'});
     } else {
-      res.status(400).send(`Error: ${err}`);
+      res.status(400).json({err: err});
     }
   });
 };
@@ -66,11 +66,11 @@ exports.update = function(req, res, next) {
 exports.delete = function(req, res, next) {
   Theory.deleteOne({ '_id': req.params.theoryId, user: req.user._id }, function (err, result) {
     if (!err && (result.n > 0)) {
-      res.status(200).send('Theory deleted');
+      res.status(200).json({message: 'Theory deleted'});
     } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      res.status(404).send('Theory could not be found');
+      res.status(404).json({err: 'Theory could not be found'});
     } else {
-      res.status(400).send(`Error: ${err}`);
+      res.status(400).json({err: err});
     }
   });
 };
@@ -79,7 +79,7 @@ exports.find = function(req, res, next) {
   var query = req.query.query;
   var search = {$or:[{name:{$regex: query, $options: 'i'}},{description:{$regex: query, $options: 'i'}}]}
   Theory.find(search, ['_id','name','lastUpdate','description'], {"sort": {"_id": 1}}, function (err, theories) {
-    res.send(theories)
+    res.json({data: theories})
   });
 };
 
@@ -91,15 +91,15 @@ exports.clone = function(req, res, next) {
     theory.isNew = true;
     theory.save(function (err, theory) {
       if (err) {
-        res.status(400).send(`Could not clone: ${err}`)
+        res.status(400).json({err: `Could not clone: ${err}`})
       } else {
         User.findById(req.user._id, function(err, user) {
           user.theories.push(theory._id);
           user.save(err => {
             if (err) {
-              res.status(400).send(err);
+              res.status(400).json({err: err});
             } else {
-              res.status(201).json({theory: {_id: theory._id}});
+              res.status(201).json({data: {theory: {_id: theory._id}}});
             }})})}});
   });
 };
@@ -110,16 +110,16 @@ exports.consistency = function(req, res, next) {
       theory.isConsistent(function(code, cons) {
         if (code == 1) { // mleancop ok
           if (cons) {
-            res.status(200).json({"consistent": "true"});
+            res.status(200).json({data: {"consistent": "true"}});
           } else {
-            res.status(200).json({"consistent": "false"});
+            res.status(200).json({data: {"consistent": "false"}});
           }
         } else { //mleancop error
-          res.status(400).send('MleanCoP error: invalid formula');
+          res.status(400).json({err: 'MleanCoP error: invalid formula'});
         }
       })
     } else {
-      res.status(404).send("Cannot find theory");
+      res.status(404).json({err: "Cannot find theory"});
     }
     });
 };

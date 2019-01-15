@@ -28,9 +28,9 @@ exports.create = [
         user.queries.push(query._id);
         user.save(err => {
           if (err) {
-            res.status(400).send(err);
+            res.status(400).json({ err: err});
           } else {
-            res.status(201).json(query);
+            res.status(201).json({"data": query});
           }
       })})});
   }
@@ -38,13 +38,13 @@ exports.create = [
 
 exports.get = function(req, res, next) {
   Query.find({ "user": req.user }, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'], {"sort": {"_id": 1}}, function (err, queries) {
-    res.send(queries)
+    res.json({"data": queries})
   });
 };
 
 exports.getOne = function(req, res, next) {
   Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'], function (err, query) {
-    res.send(query)
+    res.json({"data": query})
   });
 };
 
@@ -53,11 +53,11 @@ exports.update = function(req, res, next) {
   body.lastUpdate = new Date();
   Query.updateOne({ '_id': req.params.queryId, user: req.user._id }, { $set: body}, function (err, result) {
     if (!err && (result.nModified > 0)) {
-      res.status(200).send('Query updated');
+      res.status(200).json({"message": 'Query updated'});
     } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      res.status(404).send('Query could not be found');
+      res.status(404).json({err: 'Query could not be found'});
     } else {
-      res.status(400).send(`Error: ${err}`);
+      res.status(400).json({'err': err});
     }
   });
 };
@@ -65,11 +65,11 @@ exports.update = function(req, res, next) {
 exports.delete = function(req, res, next) {
   Query.deleteOne({ '_id': req.params.queryId, user: req.user._id }, function (err, result) {
     if (!err && (result.n > 0)) {
-      res.status(200).send('Query deleted');
+      res.status(200).json({"message": 'Query deleted'});
     } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      res.status(404).send('Query could not be found');
+      res.status(404).json({err: 'Query could not be found'});
     } else {
-      res.status(400).send(`Error: ${err}`);
+      res.status(400).json({'err': err});
     }
   });
 };
@@ -81,9 +81,9 @@ exports.exec = function(req, res) {
     .exec(function(err, query) {
       query.execQuery(function(theorem, proof) {
         if (theorem) {
-          res.json({"result":theorem,"proof":proof});
+          res.json({"data": {"result":theorem,"proof":proof}});
         } else {
-          res.status(400).send('MleanCoP error: invalid query');
+          res.status(400).json({err: 'MleanCoP error: invalid query'});
         }
     });
   });

@@ -24,7 +24,7 @@ describe("Creation of users",function(){
     server
     .post("/api/signup")
     .send(user)
-		.expect(400, 'User already exists', done);
+		.expect(400, {err: 'User already exists'}, done);
   });
   it("should return code 422 and message if no email was given",function(done){
     var obj = Object.assign({}, user);
@@ -80,18 +80,18 @@ describe("Login",function(){
     server
     .post("/api/login")
 		.send({email: 'unknown@test.com', password: 'test'})
-		.expect(400, [false, {
-			message: 'Incorrect username.'
-		}], done);
+		.expect(400, {data: false,
+			err: 'Incorrect username.'
+		}, done);
   });
 
 	it("should return code 400 on wrong password",function(done){
     server
     .post("/api/login")
 		.send({email: 'test@test.com', password: 'wrong'})
-		.expect(400, [false, {
-			message: 'Incorrect password.'
-		}], done);
+		.expect(400, {data: false,
+			err: 'Incorrect password.'
+		}, done);
   });
 });
 
@@ -119,7 +119,7 @@ describe("Logout",function(){
     server
     .get("/api/logout")
     .set('Authorization', `Bearer ${token.token}`)
-		.expect(200, {
+		.expect(200, { "message": "Logged out."
 		}, done);
   });
   /*it("should fail to access user data after logout",function(done){
@@ -219,7 +219,7 @@ describe("Connecting to API",function(){
 			server
 			.get("/api/users")
       .set('Authorization', `Bearer ${token.token}`)
-			.expect(200, { 'user': {'_id': user._id, 'name': user.name, 'email': user.email, 'theories': [t1, t2], 'queries': [q1,q2] }
+			.expect(200, { data: {'_id': user._id, 'name': user.name, 'email': user.email, 'theories': [t1, t2], 'queries': [q1,q2] }
       },	done);
 		});
 	});

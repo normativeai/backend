@@ -33,9 +33,9 @@ exports.signup = [
       name: req.body.name,
     }, function (err, user) {
         if (err) {
-          res.status(400).send('User already exists');
+          res.status(400).json({err: 'User already exists'});
         } else {
-          res.status(201).json(user);
+          res.status(201).json({data: user});
         }
     });
   }
@@ -53,7 +53,7 @@ exports.login = [
 				return next(err);
 			}
 			if (!user) {
-				return res.status(400).send([user, info])
+				return res.status(400).json({data: user, err: info})
 			}
 			req.login(user, { session : false }, async (error) => {
 				if( error ) return next(error)
@@ -74,7 +74,7 @@ exports.login = [
 exports.logout = function(req, res, next) {
   req.logout();
 
-  return res.status(200).send('Logged out.');
+  return res.status(200).json({message: 'Logged out.'});
 };
 
 exports.user = function(req, res, next) {
@@ -82,7 +82,7 @@ exports.user = function(req, res, next) {
     .populate('theories', ['_id', 'lastUpdate', 'name', 'description'])
     .populate('queries', ['_id', 'lastUpdate', 'name', 'description'])
     .exec(function(err, user) {
-    res.status(200).send({ user: user })
+    res.status(200).json({ data: user })
   })
 };
 
