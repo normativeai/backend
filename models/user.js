@@ -40,10 +40,7 @@ userSchema.methods.isValidPassword = async function(password){
   const user = this;
   //Hashes the password sent by the user for login and checks if the hashed password stored in the
   //database matches the one sent. Returns true if it does else false.
-  console.log(`password: ${password}`);
-  console.log(`user.password: ${user.password}`);
   const compare = await bcrypt.compare(password, user.password);
-  console.log(`compare: ${compare}`);
   return compare;
 }
 
