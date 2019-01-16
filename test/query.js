@@ -8,10 +8,12 @@ const User = require('../models/user');
 const Theory = require('../models/theory');
 const user = require('./fixtures/user.json').User;
 const theory = require('./fixtures/theory.json').Theory;
+const theory4 = require('./fixtures/theory.json').Theory4;
 const Query = require('../models/query');
 const query = require('./fixtures/query.json').Query;
 const query2 = require('./fixtures/query.json').Query2;
 const query3 = require('./fixtures/query.json').Query3;
+const query4 = require('./fixtures/query.json').Query4;
 
 describe("Create query", function(){
 
@@ -71,7 +73,8 @@ describe("Get queries", function(){
 	after(done => {
 		Query.deleteOne({'name': query.name}, function (err) {
 		Query.deleteOne({'name': query2.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})});
+		Theory.deleteOne({'name': theory.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})})});
 	});
 
 	it("should return an array of all queries of connected user", function(done){
@@ -185,18 +188,23 @@ describe("Execute query", function(){
     query.theory = theory._id;
     Query.create(query, function(err, query) {
     query2.theory = theory._id;
-    Query.create(query2, function(err, query) {
+    Query.create(query2, function(err, query2) {
     query3.theory = theory._id;
-    Query.create(query3, function(err, query) {
-    done();})})})})});
+    Query.create(query3, function(err, query3) {
+    Theory.create(theory4, function(err, theory4) {
+    query4.theory = theory4._id;
+    Query.create(query4, function(err, query4) {
+    done();})})})})})})});
 	})});
 
 	after(done => {
 		Query.deleteOne({'name': query.name}, function (err) {
 		Query.deleteOne({'name': query2.name}, function (err) {
 		Query.deleteOne({'name': query3.name}, function (err) {
+		Query.deleteOne({'name': query4.name}, function (err) {
 		Theory.deleteOne({'name': theory.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
+		Theory.deleteOne({'name': theory4.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})})})})})});
 	});
 
   it("should return true and the proof when it is a theorem @slow", function(done){
@@ -221,6 +229,13 @@ describe("Execute query", function(){
 				.get(`/api/queries/${query3._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
         .expect(400, {err: 'MleanCoP error: invalid query'}, done);
+  });
+  it("should return code true and proof for a theorem with empty assumptions @slow", function(done){
+			server
+				.get(`/api/queries/${query4._id}/exec`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(200, {data: {"result": "Theorem", "proof": "[[a : []], [[-(a) : -([])]]]"}
+        },	done);
   });
 
 });

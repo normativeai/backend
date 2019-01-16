@@ -27,6 +27,16 @@
 					"description"   : "Illegal query",
 					"assumptions"   : ["we32e432"],
 					"goal"          : "%$"
+        },
+
+    "Query4":
+        {
+          "_id"           : "4542106d8e147f10f16aceab",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Query 4",
+					"description"   : "No assumptions",
+					"assumptions"   : [],
+					"goal"          : "a"
         }
 
 }
