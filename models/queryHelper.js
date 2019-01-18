@@ -11,7 +11,7 @@ class QueryHelper {
   static mleancop(theory, query, cb) {
     const { execFile } = require('child_process');
     const cmd = `(${theory.toString()}, ${query})`;
-    const child = execFile("ruby", ["-Ctools", "prove1.rb", cmd], {"timeout": 2000}, (error, stdout, stderr) => {
+    const child = execFile("ruby", ["-Ctools", "prove1.rb", cmd], {"timeout": 5000}, (error, stdout, stderr) => {
       QueryHelper.parse(stdout,stderr,cb);
     });
   }
