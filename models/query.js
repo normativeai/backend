@@ -19,7 +19,13 @@ querySchema.methods.execQuery = function(cb) {
 	// in case query is not in cache and cache is not invalidated
   var helper = require('./queryHelper');
 
-  helper.mleancop(this.theory.formalizationAsString(this.assumptions), this.goal, cb);
+  if (!this.theory) {
+    cb(false, false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
+  } else if (!this.goal) {
+    cb(false, false, 'Query has no goal. Please assign goals before trying to execute queries');
+  } else {
+    helper.mleancop(this.theory.formalizationAsString(this.assumptions), this.goal, cb);
+  }
 };
 
 module.exports = mongoose.model('Query', querySchema );

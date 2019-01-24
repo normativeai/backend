@@ -239,3 +239,27 @@ describe("Execute query", function(){
   });
 
 });
+
+describe("Execute query with missing information", function(){
+
+  var token = {token: undefined};
+
+	before(done => {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+    Query.create(query, function(err, query) {
+    done();})})});
+	});
+
+	after(done => {
+		Query.deleteOne({'name': query.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})});
+	});
+
+  it("should return code 400 if theory was not set", function(done){
+			server
+				.get(`/api/queries/${query._id}/exec`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(400, {err: 'Query is not associated with a specific theory. Please set the theory before trying to execute queries'}, done);
+  });
+});

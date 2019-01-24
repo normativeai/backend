@@ -81,12 +81,18 @@ exports.exec = function(req, res) {
   Query.findOne({"_id": req.params.queryId})
     .populate('theory')
     .exec(function(err, query) {
-      query.execQuery(function(theorem, proof) {
-        if (theorem) {
-          res.json({"data": {"result":theorem,"proof":proof}});
-        } else {
-          res.status(400).json({err: 'MleanCoP error: invalid query'});
-        }
-    });
+      if (query) {
+        query.execQuery(function(theorem, proof, error) {
+          if (theorem) {
+            res.json({"data": {"result":theorem,"proof":proof}});
+          } if (error) {
+            res.status(400).json({err: error});
+          } else {
+            res.status(400).json({err: 'MleanCoP error: invalid query'});
+          }
+        });
+      } else {
+        res.status(400).json({err: 'Unknown query ID'});
+      }
   });
 };
