@@ -84,7 +84,7 @@ exports.exec = function(req, res) {
       if (query) {
         query.execQuery(function(theorem, proof, error) {
           if (theorem) {
-            res.json({"data": {"result":theorem,"proof":proof}});
+            res.json({"data": {"result":theorem, "proof":proof}});
           } if (error) {
             res.status(400).json({err: error});
           } else {
