@@ -85,7 +85,7 @@ exports.exec = function(req, res) {
         query.execQuery(function(theorem, proof, error) {
           if (theorem) {
             res.json({"data": {"result":theorem, "proof":proof}});
-          } if (error) {
+          } else if (error) {
             res.status(400).json({err: error});
           } else {
             res.status(400).json({err: 'MleanCoP error: invalid query'});
