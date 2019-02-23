@@ -81,7 +81,7 @@ describe("Login",function(){
     .post("/api/login")
 		.send({email: 'unknown@test.com', password: 'test'})
 		.expect(400, {data: false,
-			err: 'Incorrect username.'
+			err: 'Username and/or password are unknown or incorrect'
 		}, done);
   });
 
@@ -90,7 +90,7 @@ describe("Login",function(){
     .post("/api/login")
 		.send({email: 'test@test.com', password: 'wrong'})
 		.expect(400, {data: false,
-			err: 'Incorrect password.'
+			err: 'Username and/or password are unknown or incorrect'
 		}, done);
   });
 });
