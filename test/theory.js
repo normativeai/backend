@@ -185,6 +185,12 @@ describe("Delete theory", function(){
 
 describe("Find theories", function(){
 
+  const t1 = {
+    _id: theory._id,
+    name: theory.name,
+    description: theory.description,
+    lastUpdate: theory.lastUpdate
+  };
   const t2 = {
     _id: theory2._id,
     name: theory2.name,
@@ -222,6 +228,13 @@ describe("Find theories", function(){
 				.get("/api/theories/find?query=name")
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, {data: [t2]}, done);
+		});
+
+  it("should find all theories when given .*", function(done){
+			server
+				.get("/api/theories/find?query=.*")
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: [t1,t2]}, done);
 		});
 });
 
