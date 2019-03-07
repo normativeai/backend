@@ -38,6 +38,9 @@ router.route('/queries/:queryId')
   .put(queryController.update)
   .delete(queryController.delete)
 
+router.route('/queries/:queryId/consistency')
+  .get(queryController.consistency)
+
 
 
 module.exports = router;

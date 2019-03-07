@@ -37,6 +37,16 @@
 					"description"   : "No assumptions",
 					"assumptions"   : [],
 					"goal"          : "a"
+        },
+
+    "Query5":
+        {
+          "_id"           : "4542106d8e147f10f16aceac",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Query 5",
+					"description"   : "Inconsistent given theory 4",
+					"assumptions"   : ["(~ a)"],
+					"goal"          : "b"
         }
 
 }

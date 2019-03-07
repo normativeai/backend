@@ -96,3 +96,25 @@ exports.exec = function(req, res) {
       }
   });
 };
+
+exports.consistency = function(req, res, next) {
+  Query.findById(req.params.queryId)
+    .populate('theory')
+    .exec(function(err, query) {
+    if (query) {
+      query.isConsistent(function(code, cons) {
+        if (code == 1) { // mleancop ok
+          if (cons) {
+            res.status(200).json({data: {"consistent": "true"}});
+          } else {
+            res.status(200).json({data: {"consistent": "false"}});
+          }
+        } else { //mleancop error
+          res.status(400).json({err: 'MleanCoP error: invalid formula'});
+        }
+      })
+    } else {
+      res.status(404).json({err: "Cannot find query"});
+    }
+    });
+};

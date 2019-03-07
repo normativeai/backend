@@ -14,6 +14,7 @@ const query = require('./fixtures/query.json').Query;
 const query2 = require('./fixtures/query.json').Query2;
 const query3 = require('./fixtures/query.json').Query3;
 const query4 = require('./fixtures/query.json').Query4;
+const query5 = require('./fixtures/query.json').Query5;
 
 describe("Create query", function(){
 
@@ -263,3 +264,50 @@ describe("Execute query with missing information", function(){
         .expect(400, {err: 'Query is not associated with a specific theory. Please set the theory before trying to execute queries'}, done);
   });
 });
+
+describe("Checking a query assumptions for consistency with relation to a theory", function(){
+
+  var token = {token: undefined};
+
+	before(function(done) {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+		theory4.user = user;
+		Theory.create(theory4, function (err) {
+		query4.user = user;
+		query4.theory = theory4._id;
+		Query.create(query4, function (err) {
+		query5.user = user;
+		query5.theory = theory4._id;
+		Query.create(query5, function (err) {
+      done();
+    })})})})});
+	});
+
+	after(done => {
+		Query.deleteOne({'name': query4.name}, function (err) {
+		Query.deleteOne({'name': query5.name}, function (err) {
+		Theory.deleteOne({'name': theory4.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})})});
+	});
+
+	it("should return true in case it is consistent @slow", function(done){
+			server
+				.get(`/api/queries/${query4._id}/consistency`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"consistent": "true"}}, done);
+  });
+  it("should return false in case it is inconsistent @slow", function(done){
+			server
+				.get(`/api/queries/${query5._id}/consistency`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"consistent": "false"}}, done);
+		});
+  it("should return 404 in case it cannot find the query", function(done){
+			server
+				.get('/api/queries/111/consistency')
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(404, { err:  'Cannot find query'  }, done);
+		});
+});
+

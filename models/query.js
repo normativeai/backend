@@ -28,4 +28,17 @@ querySchema.methods.execQuery = function(cb) {
   }
 };
 
+querySchema.methods.isConsistent = function(cb) {
+	// in case the query is not dirty
+  var helper = require('./queryHelper');
+  helper.mleancop(this.theory.formalizationAsString(this.assumptions), "(x, (~ x))", function(theorem, proof) {
+    if (theorem) {
+      cb(1, theorem != 'Theorem');
+    } else {
+      cb(0, proof);
+    }
+  });
+};
+
+
 module.exports = mongoose.model('Query', querySchema );
