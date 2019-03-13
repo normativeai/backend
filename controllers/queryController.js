@@ -102,15 +102,15 @@ exports.consistency = function(req, res, next) {
     .populate('theory')
     .exec(function(err, query) {
     if (query) {
-      query.isConsistent(function(code, cons) {
+      query.isConsistent(function(code, cons, err) {
         if (code == 1) { // mleancop ok
           if (cons) {
-            res.status(200).json({data: {"consistent": "true"}});
+            res.status(200).json({data: {"consistent": true}});
           } else {
-            res.status(200).json({data: {"consistent": "false"}});
+            res.status(200).json({data: {"consistent": false}});
           }
         } else { //mleancop error
-          res.status(400).json({err: 'MleanCoP error: invalid formula'});
+          res.status(400).json({err: err});
         }
       })
     } else {

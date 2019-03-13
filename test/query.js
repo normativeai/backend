@@ -15,6 +15,7 @@ const query2 = require('./fixtures/query.json').Query2;
 const query3 = require('./fixtures/query.json').Query3;
 const query4 = require('./fixtures/query.json').Query4;
 const query5 = require('./fixtures/query.json').Query5;
+const query6 = require('./fixtures/query.json').Query6;
 
 describe("Create query", function(){
 
@@ -280,29 +281,40 @@ describe("Checking a query assumptions for consistency with relation to a theory
 		query5.user = user;
 		query5.theory = theory4._id;
 		Query.create(query5, function (err) {
+		query6.user = user;
+		query6.theory = theory4._id;
+		Query.create(query6, function (err) {
       done();
-    })})})})});
+    })})})})})});
 	});
 
 	after(done => {
 		Query.deleteOne({'name': query4.name}, function (err) {
 		Query.deleteOne({'name': query5.name}, function (err) {
+		Query.deleteOne({'name': query6.name}, function (err) {
 		Theory.deleteOne({'name': theory4.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})})});
+		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
 	});
 
 	it("should return true in case it is consistent @slow", function(done){
 			server
 				.get(`/api/queries/${query4._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": "true"}}, done);
+				.expect(200, {data: {"consistent": true}}, done);
   });
   it("should return false in case it is inconsistent @slow", function(done){
 			server
 				.get(`/api/queries/${query5._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": "false"}}, done);
+				.expect(200, {data: {"consistent": false}}, done);
 		});
+  it("should return false in case it is inconsistent among the assumptions only @slow", function(done){
+			server
+				.get(`/api/queries/${query6._id}/consistency`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"consistent": false}}, done);
+		});
+
   it("should return 404 in case it cannot find the query", function(done){
 			server
 				.get('/api/queries/111/consistency')

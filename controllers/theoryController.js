@@ -110,9 +110,9 @@ exports.consistency = function(req, res, next) {
       theory.isConsistent(function(code, cons) {
         if (code == 1) { // mleancop ok
           if (cons) {
-            res.status(200).json({data: {"consistent": "true"}});
+            res.status(200).json({data: {"consistent": true}});
           } else {
-            res.status(200).json({data: {"consistent": "false"}});
+            res.status(200).json({data: {"consistent": false}});
           }
         } else { //mleancop error
           res.status(400).json({err: 'MleanCoP error: invalid formula'});

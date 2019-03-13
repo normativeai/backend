@@ -305,13 +305,13 @@ describe("Checking a theory for consistency", function(){
 			server
 				.get(`/api/theories/${theory._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": "true"}}, done);
+				.expect(200, {data: {"consistent": true}}, done);
   });
   it("should return false in case it is inconsistent @slow", function(done){
 			server
 				.get(`/api/theories/${theory2._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": "false"}}, done);
+				.expect(200, {data: {"consistent": false}}, done);
 		});
   it("should return 404 in case it cannot find the theory", function(done){
 			server
