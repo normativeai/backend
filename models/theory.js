@@ -16,7 +16,11 @@ var theorySchema = new Schema({
 });
 
 theorySchema.methods.formalizationAsString = function(possibleFurtherAssumtions) {
-  return JSON.stringify(this.formalization.map(f => f.formula).concat(possibleFurtherAssumtions)).replace(/\"/g,"");
+  if (possibleFurtherAssumtions) {
+    return JSON.stringify(this.formalization.map(f => f.formula).concat(possibleFurtherAssumtions)).replace(/\"/g,"");
+  } else {
+    return JSON.stringify(this.formalization.map(f => f.formula)).replace(/\"/g,"");
+  }
 };
 
 theorySchema.methods.isConsistent = function(cb) {
