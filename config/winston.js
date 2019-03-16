@@ -1,14 +1,16 @@
-var appRoot = require('app-root-path');
-var winston = require('winston');
+const { createLogger, format, transports } = require('winston');
 
-var {Loggly} = require('winston-loggly-bulk');
+const level = process.env.LOG_LEVEL || 'debug';
 
-winston.add(new Loggly({
-      token: "707503a7-70fd-4568-8c49-0672bce93910",
-      subdomain: "nai",
-      tags: ["Winston-NodeJS"],
-      json: true
-}));
+const logger = createLogger({
+    transports: [
+        new transports.Console({
+            level: level,
+            timestamp: function () {
+                return (new Date()).toISOString();
+            }
+        })
+    ]
+});
 
-winston.log('info', "Loggly logging started!");
-
+module.exports = logger
