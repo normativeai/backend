@@ -2,7 +2,7 @@ logger = require('../config/winston');
 
 class QueryHelper {
 	static parse(proof, errors, cb) {
-    var mtch = proof.match(/problem\sis\sa\smodal\s\(multi\/const\)\s(Theorem|Non-Theorem)\n(?:.*\n(.*)\n.*)?/);
+    var mtch = proof.match(/problem.*\sis\sa\smodal\s\(multi\/const\)\s(Theorem|Non-Theorem)\n(?:.*\n(.*)\n.*)?/);
     if (mtch) {
       cb(mtch[1],mtch[2]);
     } else {
