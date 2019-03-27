@@ -22,6 +22,7 @@
     "jsonwebtoken": "^8.4.0",
     "mongoose": "^5.4.0",
     "morgan": "~1.9.0",
+    "parsimmon": "^1.12.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
