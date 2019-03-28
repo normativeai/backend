@@ -84,9 +84,17 @@ var lang = P.createLanguage({
 
   po: r => P.seqMap(r.formula.skip(word("P>")), r.formula, function(f1,f2) {return pimp(f1,f2)}),
 
-  atom: r => r.symbol,
+  atom: r => P.alt(r.func, r.constant),
 
-  symbol: () => reg(/[a-z][a-zA-Z\d]*/),
+  vatom: r => P.alt(r.atom, r.variable),
+
+  func: r => P.seq(r.constant, r.lparen, r.arglist, r.rparen).tie(),
+
+  arglist: r => r.vatom.sepBy1(word(",")).tieWith(","),
+
+  constant: () => reg(/[a-z][a-zA-Z\d]*/),
+
+  variable: () => reg(/[A-Z][a-zA-Z\d]*/),
 
   list: r => r.lbracket.then(r.formula.sepBy(r.comma).map(addParents)).skip(r.rbracket),
 
@@ -96,5 +104,5 @@ exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
 
-//console.log(lang.problem.tryParse('([(~  a), (b O> d)],c)'));
+console.log(lang.problem.tryParse('([(f(X) O> g(X)), f(a)], (Ob g(a)))'));
 
