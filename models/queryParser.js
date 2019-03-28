@@ -68,13 +68,15 @@ var lang = P.createLanguage({
 
   formula: r => P.alt(r.unary, r.nbinary, r.binary, r.atom),
 
-  unary: r => P.seq(r.lparen, P.alt(r.neg, r.permitted, r.ought), r.rparen).tie(),
+  unary: r => P.seq(r.lparen, P.alt(r.neg, r.permitted, r.ought, r.ideal), r.rparen).tie(),
 
   neg: r => P.seq(word("~ "), r.formula).tie(),
 
   permitted: r => word("Pm ").then(r.formula).map(f => pm(f)),
 
   ought: r => word("Ob ").then(r.formula).map(f => ob(f)),
+
+  ideal: r => word("Id ").then(r.formula).map(f => o1(f)),
 
   binary: r => P.seq(r.lparen, r.formula, P.alt(word(","), word(";"), word("=>"), word("<=>")), r.formula, r.rparen).tie(),
 
@@ -104,5 +106,5 @@ exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
 
-console.log(lang.problem.tryParse('([(f(X) O> g(X)), f(a)], (Ob g(a)))'));
+console.log(lang.problem.tryParse('([(f(X) O> g(X)), f(a)], (Id (Ob g(a))))'));
 
