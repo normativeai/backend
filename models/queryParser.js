@@ -62,9 +62,9 @@ var lang = P.createLanguage({
 
   problem: r => r.lparen.then(P.alt(r.complexProblem, r.simpleProblem)).skip(r.rparen),
 
-  complexProblem: r => P.seqMap(r.list.skip(r.comma), r.formula, function(list, conc) {return `f(${list} => ${conc}).`}),
+  complexProblem: r => P.seqMap(r.list.skip(r.comma), r.formula, function(list, conc) {return `f((${list} => ${conc})).`}),
 
-  simpleProblem: r => r.formula.map(function(conc) {return `f(${conc}).`}),
+  simpleProblem: r => r.formula.map(function(conc) {return `f((${conc})).`}),
 
   formula: r => P.alt(r.unary, r.nbinary, r.binary, r.atom),
 
@@ -86,7 +86,7 @@ var lang = P.createLanguage({
 
   atom: r => r.symbol,
 
-  symbol: () => reg(/[a-z][a-zA-Z]*/),
+  symbol: () => reg(/[a-z][a-zA-Z\d]*/),
 
   list: r => r.lbracket.then(r.formula.sepBy(r.comma).map(addParents)).skip(r.rbracket),
 
