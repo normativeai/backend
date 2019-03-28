@@ -26,6 +26,7 @@ class QueryHelper {
     } catch (error) {
       logger.info(`Query parsing error. ${error}`);
       cb(null, `Cannot parse your query ${computed_query} - Error: ${error}`);
+      return;
     }
     logger.info(`MleanCoP Query: ${computed_query} ---- Command: ${cmd}`);
     fs.writeFile(`tools/${fileName}`, cmd, function(err, data) {

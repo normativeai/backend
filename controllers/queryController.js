@@ -82,11 +82,11 @@ exports.exec = function(req, res) {
     .populate('theory')
     .exec(function(err, query) {
       if (query) {
-        query.execQuery(function(theorem, proof, error) {
+        query.execQuery(function(theorem, proof) {
           if (theorem) {
             res.json({"data": {"result":theorem, "proof":proof}});
-          } else if (error) {
-            res.status(400).json({err: error});
+          } else if (proof) {
+            res.status(400).json({err: proof});
           } else {
             res.status(400).json({err: 'MleanCoP error: invalid query'});
           }
@@ -102,7 +102,7 @@ exports.consistency = function(req, res, next) {
     .populate('theory')
     .exec(function(err, query) {
     if (query) {
-      query.isConsistent(function(code, cons, err) {
+      query.isConsistent(function(code, cons) {
         if (code == 1) { // mleancop ok
           if (cons) {
             res.status(200).json({data: {"consistent": true}});
@@ -110,7 +110,7 @@ exports.consistency = function(req, res, next) {
             res.status(200).json({data: {"consistent": false}});
           }
         } else { //mleancop error
-          res.status(400).json({err: err});
+          res.status(400).json({err: cons});
         }
       })
     } else {

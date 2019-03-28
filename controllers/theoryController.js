@@ -115,7 +115,7 @@ exports.consistency = function(req, res, next) {
             res.status(200).json({data: {"consistent": false}});
           }
         } else { //mleancop error
-          res.status(400).json({err: 'MleanCoP error: invalid formula'});
+          res.status(400).json({err: cons});
         }
       })
     } else {

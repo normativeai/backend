@@ -229,7 +229,8 @@ describe("Execute query", function(){
 			server
 				.get(`/api/queries/${query3._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(400, {err: 'MleanCoP error: invalid query'}, done);
+        .expect(400)
+        .then(response => {done()});
   });
   it("should return code true and proof for a theorem with empty assumptions @slow", function(done){
 			server
