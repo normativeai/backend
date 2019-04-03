@@ -20,9 +20,9 @@ querySchema.methods.execQuery = function(cb) {
   var helper = require('./queryHelper');
 
   if (!!!this.theory) {
-    cb(false, false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
+    cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
   } else if (!this.goal) {
-    cb(false, false, 'Query has no goal. Please assign goals before trying to execute queries');
+    cb(false, 'Query has no goal. Please assign goals before trying to execute queries');
   } else {
     helper.mleancop(this.theory.formalizationAsString(this.assumptions), this.goal, cb);
   }
@@ -33,7 +33,7 @@ querySchema.methods.isConsistent = function(cb) {
   var helper = require('./queryHelper');
 
   if (!!!this.theory) {
-    cb(false, false, 'Query is not associated with a specific theory. Please set the theory before trying to check for consistency');
+    cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to check for consistency');
   } else {
     helper.mleancop(this.theory.formalizationAsString(this.assumptions), "(x, (~ x))", function(theorem, proof) {
       if (theorem) {
