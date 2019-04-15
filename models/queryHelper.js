@@ -12,23 +12,54 @@ class QueryHelper {
     }
 	}
 
-  static mleancop(theory, query, cb) {
+  static executeQuery(formulas, assumptions, goal, cb) {
+    var cmd = "f(((";
+    for (let i = 0; i < formulas.length; i++) {
+      var f = formulas[i].formula;
+      try {
+        var f_parsed = parser.parseFormula(f);
+        cmd += f_parsed;
+        if (i < formulas.length - 1) {
+          cmd += ", ";
+        }
+      } catch (error) {
+        logger.info(`Cannot parse formula. ${error}`);
+        cb(null, `Cannot parse formula ${i}: ${f} - Error: ${error}`);
+        return;
+      }
+    };
+    for (let i = 0; i < assumptions.length; i++) {
+      var f = assumptions[i];
+      try {
+        var f_parsed = parser.parseFormula(f);
+        cmd += ", ";
+        cmd += f_parsed;
+      } catch (error) {
+        logger.info(`Cannot parse assumption. ${error}`);
+        cb(null, `Cannot parse query assumption ${i}:  ${f} - Error: ${error}`);
+        return;
+      }
+    };
+
+    try {
+      var goal_parsed = parser.parseFormula(goal);
+      cmd += `) => ${goal_parsed})).`
+    } catch (error) {
+      logger.info(`Cannot parse goal. ${error}`);
+      cb(null, `Cannot parse goal ${goal} - Error: ${error}`);
+      return;
+    }
+    logger.info(cmd);
+    QueryHelper.mleancop(cmd,cb);
+  }
+
+  static mleancop(cmd, cb) {
     const { execFile } = require('child_process');
     var path = require('path');
     const fileName = `problem${Math.floor(Math.random() * 10000000)}`
     var cmdPath = path.resolve('tools', './mleancop.sh');
     var filePath = path.resolve('tools', fileName);
     var curDir = path.resolve('tools', '.');
-    const computed_query = `(${theory.toString()}, ${query})`;
-    var cmd = false
-    try {
-      cmd = parser.parse(computed_query);
-    } catch (error) {
-      logger.info(`Query parsing error. ${error}`);
-      cb(null, `Cannot parse your query ${computed_query} - Error: ${error}`);
-      return;
-    }
-    logger.info(`MleanCoP Query: ${computed_query} ---- Command: ${cmd}`);
     fs.writeFile(`tools/${fileName}`, cmd, function(err, data) {
       if (err) {
         logger.error(err)

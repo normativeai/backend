@@ -30,7 +30,7 @@ theorySchema.methods.formalizationAsString = function(possibleFurtherAssumtions)
 theorySchema.methods.isConsistent = function(cb) {
 	// in case the theory is not dirty
   var helper = require('./queryHelper');
-  helper.mleancop(this.formalizationAsString(), "(x, (~ x))", function(theorem, proof) {
+  helper.executeQuery(this.activeFormalization(), [], "(x, (~ x))", function(theorem, proof) {
     if (theorem) {
       cb(1, theorem != 'Theorem');
     } else {

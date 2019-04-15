@@ -213,8 +213,11 @@ describe("Execute query", function(){
 			server
 				.get(`/api/queries/${query._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(200, {data: {"result": "Theorem", "proof": "[[d01 : [], d1 : [(2 ^ d) ^ (2 ^ d) ^ 19 ^ []]], [[-(d01) : -([])]], [[-(d1) : -([(2 ^ d) ^ 19 ^ []]), d1 : [(1 ^ d) ^ 18 ^ []]], [[-(d1) : -([(1 ^ d) ^ (1 ^ d) ^ 18 ^ []]), d01 : []], [[-(d01) : _6635]]]]]"}
-        },	done);
+        .expect(200)
+        .expect(function(res) {
+          if (res.body.data.result != "Theorem") throw new Error(`Expected Theorem by got ${res.body.data.result}`)
+        })
+        .end(done)
   });
 
 	it("should return false and no proof when it is a Non-theorem @slow", function(done){
