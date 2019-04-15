@@ -24,7 +24,7 @@ class QueryHelper {
         }
       } catch (error) {
         logger.info(`Cannot parse formula. ${error}`);
-        cb(null, `Cannot parse formula ${i}: ${f} - Error: ${error}`);
+        cb(null, `Cannot parse formula ${i+1}: ${f} - Error: ${error}`);
         return;
       }
     };
@@ -36,7 +36,7 @@ class QueryHelper {
         cmd += f_parsed;
       } catch (error) {
         logger.info(`Cannot parse assumption. ${error}`);
-        cb(null, `Cannot parse query assumption ${i}:  ${f} - Error: ${error}`);
+        cb(null, `Cannot parse query assumption ${i+1}:  ${f} - Error: ${error}`);
         return;
       }
     };
