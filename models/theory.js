@@ -10,16 +10,20 @@ var theorySchema = new Schema({
     description       : String,
     content           : String,
     vocabulary        : [{symbol: String, original: String}],
-    formalization     : [{original: String, formula: String}],
+    formalization     : [{original: String, formula: String, active: Boolean}],
 		user 							: { type: Schema.Types.ObjectId, ref: 'User' },
     clonedForm        : { type: Schema.Types.ObjectId, ref: 'Theory' }
 });
 
+theorySchema.methods.activeFormalization = function() {
+  return this.formalization.filter(form => !('active' in form.toJSON()) || form.toJSON().active);
+};
+
 theorySchema.methods.formalizationAsString = function(possibleFurtherAssumtions) {
   if (possibleFurtherAssumtions) {
-    return JSON.stringify(this.formalization.map(f => f.formula).concat(possibleFurtherAssumtions)).replace(/\"/g,"");
+    return JSON.stringify(this.activeFormalization().map(f => f.formula).concat(possibleFurtherAssumtions)).replace(/\"/g,"");
   } else {
-    return JSON.stringify(this.formalization.map(f => f.formula)).replace(/\"/g,"");
+    return JSON.stringify(this.activeFormalization().map(f => f.formula)).replace(/\"/g,"");
   }
 };
 

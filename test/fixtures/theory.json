@@ -18,7 +18,7 @@
 					"description"   : "Desc2 blah blah",
 					"content"       : "Content",
 					"vocabulary"    : [{"_id": "4542306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4542306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
-					"formalization" : [{"_id": "4542306d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "(d , (~ d))"}]
+					"formalization" : [{"_id": "4542306d8e148f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "d"},{"_id": "4542306d9e147f10f16aceaa", "original": "Delivery means you should make Insurance 2", "formula": "(~ d)"}]
         },
 
 
@@ -42,6 +42,17 @@
 					"content"       : "Content",
 					"vocabulary"    : [{"_id": "4742306d8e147f10f17acead", "symbol": "a", "original": "Delivery"}],
 					"formalization" : [{"_id": "4742306d8e147f10f18acead", "original": "test", "formula": "a"}]
+        },
+
+    "Theory5":
+        {
+          "_id"           : "4542306d8e147f12f16aceaa",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Test2 name",
+					"description"   : "Desc2 blah blah",
+					"content"       : "Content",
+					"vocabulary"    : [{"_id": "4542306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4542306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"_id": "4542306d8e148f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "e", "active": false},{"_id": "4542306d8e149f10f16aceaa", "original": "Delivery means you should make Insurance 2", "formula": "(~ e)"}]
         }
 
 }

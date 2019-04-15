@@ -11,6 +11,7 @@ const user2 = require('./fixtures/user.json').User2;
 const theory = require('./fixtures/theory.json').Theory;
 const theory2 = require('./fixtures/theory.json').Theory2;
 const theory3 = require('./fixtures/theory.json').Theory3;
+const theory5 = require('./fixtures/theory.json').Theory5;
 
 describe("Create theory", function(){
 
@@ -290,15 +291,18 @@ describe("Checking a theory for consistency", function(){
 		Theory.create(theory2, function (err) {
 		theory3.user = user;
 		Theory.create(theory3, function (err) {
+		theory5.user = user;
+		Theory.create(theory5, function (err) {
       done();
-    })})})})});
+    })})})})})});
 	});
 
 	after(done => {
 		Theory.deleteOne({'name': theory.name}, function (err) {
 		Theory.deleteOne({'name': theory2.name}, function (err) {
 		Theory.deleteOne({'name': theory3.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})})});
+		Theory.deleteOne({'name': theory5.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
 	});
 
 	it("should return true in case it is consistent @slow", function(done){
@@ -313,6 +317,13 @@ describe("Checking a theory for consistency", function(){
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, {data: {"consistent": false}}, done);
 		});
+  it("should return true in case it is inconsistent but the formula is inactive  @slow", function(done){
+			server
+				.get(`/api/theories/${theory5._id}/consistency`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"consistent": true}}, done);
+		});
+
   it("should return 404 in case it cannot find the theory", function(done){
 			server
 				.get('/api/theories/111/consistency')

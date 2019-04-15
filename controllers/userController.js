@@ -1,4 +1,5 @@
 var passport = require('../config/passport');
+var logger = require('../config/winston');
 const jwt = require('jsonwebtoken');
 
 const { body,validationResult } = require('express-validator/check');
@@ -25,6 +26,7 @@ exports.signup = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      logger.info(`Logging for ${req.body.email} with password ${req.body.password} - ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ errors: errors.array() });
     }
     User.create({
@@ -33,8 +35,10 @@ exports.signup = [
       name: req.body.name,
     }, function (err, user) {
         if (err) {
+          logger.info(`Logging for ${req.body.email} with password ${req.body.password} - User already exists`);
           res.status(400).json({err: 'User already exists'});
         } else {
+          logger.info(`Logging for ${req.body.email} with password ${req.body.password} - User successfully created`);
           res.status(201).json({data: user});
         }
     });
