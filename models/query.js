@@ -24,7 +24,7 @@ querySchema.methods.execQuery = function(cb) {
   } else if (!this.goal) {
     cb(false, 'Query has no goal. Please assign goals before trying to execute queries');
   } else {
-    helper.executeQuery(this.theory.activeFormalization(), this.assumptions, this.goal, cb);
+    helper.executeQuery(this.theory.formalization, this.assumptions, this.goal, cb);
   }
 };
 
@@ -35,7 +35,7 @@ querySchema.methods.isConsistent = function(cb) {
   if (!!!this.theory) {
     cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to check for consistency');
   } else {
-    helper.executeQuery(this.theory.activeFormalization(), this.assumptions, "(x, (~ x))", function(theorem, proof) {
+    helper.executeQuery(this.theory.formalization, this.assumptions, "(x, (~ x))", function(theorem, proof) {
       if (theorem) {
         cb(1, theorem != 'Theorem');
       } else {

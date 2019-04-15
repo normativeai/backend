@@ -15,8 +15,8 @@ var theorySchema = new Schema({
     clonedForm        : { type: Schema.Types.ObjectId, ref: 'Theory' }
 });
 
-theorySchema.methods.activeFormalization = function() {
-  return this.formalization.filter(form => !('active' in form.toJSON()) || form.toJSON().active);
+theorySchema.statics.isActive = function(form) {
+  return !('active' in form.toJSON()) || form.toJSON().active;
 };
 
 theorySchema.methods.formalizationAsString = function(possibleFurtherAssumtions) {
@@ -30,7 +30,7 @@ theorySchema.methods.formalizationAsString = function(possibleFurtherAssumtions)
 theorySchema.methods.isConsistent = function(cb) {
 	// in case the theory is not dirty
   var helper = require('./queryHelper');
-  helper.executeQuery(this.activeFormalization(), [], "(x, (~ x))", function(theorem, proof) {
+  helper.executeQuery(this.formalization, [], "(x, (~ x))", function(theorem, proof) {
     if (theorem) {
       cb(1, theorem != 'Theorem');
     } else {
