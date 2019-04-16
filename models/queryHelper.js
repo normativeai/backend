@@ -68,7 +68,7 @@ class QueryHelper {
         logger.error(err)
         cb(null, `Internal server error ${err}`);
       } else {
-        const child = execFile('./mleancop.sh', [fileName], {cwd: curDir, timeout: 5000}, (error, stdout, stderr) => {
+        const child = execFile('./mleancop.sh', [fileName], {cwd: curDir, timeout: 10000}, (error, stdout, stderr) => {
           if (stdout) {
             logger.info(`MleanCoP response: ${stdout} --- stderr: ${stderr}`);
             fs.unlinkSync(`tools/${fileName}`);
