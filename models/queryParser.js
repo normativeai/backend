@@ -1,4 +1,6 @@
-var P = require('parsimmon')
+var P = require('parsimmon');
+var crypto = require('crypto');
+var hash; // used to rename variables within the formula
 
 function o1(f) {
   return `(# 1^d: ${f})`
@@ -100,13 +102,18 @@ var lang = P.createLanguage({
 
   constant: () => reg(/[a-z][a-zA-Z_\d]*/),
 
-  variable: () => reg(/[A-Z][a-zA-Z_\d]*/),
+  /*
+   * Since we use prenex quantification, each formula should use a different variable.
+   * This can be computed by taking the hash of the original sentence and attach it to the variables
+   */
+  variable: () => reg(/[A-Z][a-zA-Z_\d]*/).map(v => v.concat(hash)),
 
   list: r => r.lbracket.then(r.formula.sepBy(r.comma).map(addParents)).skip(r.rbracket),
 
 });
 
 exports.parseFormula = function(str) {
+  hash = crypto.createHash('md5').update(str).digest('hex');
   return lang.formula.tryParse(str);
 }
 
@@ -116,5 +123,5 @@ exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
 
-console.log(lang.problem.tryParse('([(a_1 , b___2)], true)'));
+console.log(exports.parseFormula('(a(X,Y) O> b(X,Y))'));
 
