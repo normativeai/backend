@@ -15,15 +15,17 @@ class QueryHelper {
   static executeQuery(formulas, assumptions, goal, cb) {
     var Theory = require('../models/theory');
     var cmd = "f(((";
+    var hadValue = false;
     for (let i = 0; i < formulas.length; i++) {
       if (Theory.isActive(formulas[i])) {
+        if (hadValue) {
+          cmd += ", ";
+        }
         var f = formulas[i].formula;
         try {
           var f_parsed = parser.parseFormula(f);
           cmd += f_parsed;
-          if (i < formulas.length - 1) {
-            cmd += ", ";
-          }
+          hadValue = true;
         } catch (error) {
           logger.info(`Cannot parse formula. ${error}`);
           cb(null, `Cannot parse formula ${i+1}: ${f} - Error: ${error}`);
