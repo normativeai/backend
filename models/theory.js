@@ -39,4 +39,20 @@ theorySchema.methods.isConsistent = function(cb) {
   });
 };
 
+theorySchema.methods.isIndependent = function(id, cb) {
+  form = this.formalization.id(id);
+  console.log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>${form.formula}`)
+  forms = this.formalization.slice(0)
+  forms.splice(this.formalization.indexOf(form), 1)
+  console.log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>${forms}`)
+  var helper = require('./queryHelper');
+  helper.executeQuery(forms, [], form.formula, function(theorem, proof) {
+    if (theorem) {
+      cb(1, theorem != 'Theorem');
+    } else {
+      cb(0, proof);
+    }
+  });
+};
+
 module.exports = mongoose.model('Theory', theorySchema );

@@ -11,6 +11,7 @@ const user2 = require('./fixtures/user.json').User2;
 const theory = require('./fixtures/theory.json').Theory;
 const theory2 = require('./fixtures/theory.json').Theory2;
 const theory3 = require('./fixtures/theory.json').Theory3;
+const theory4 = require('./fixtures/theory.json').Theory4;
 const theory5 = require('./fixtures/theory.json').Theory5;
 
 describe("Create theory", function(){
@@ -338,5 +339,37 @@ describe("Checking a theory for consistency", function(){
         .expect(400)
         .then(response => {done()});
 		});
+});
+
+describe("Checking a formula in the formalization for independency", function(){
+
+  var token = {token: undefined};
+
+	before(function(done) {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+		theory4.user = user;
+		Theory.create(theory4, function (err) {
+      done();
+    })})});
+	});
+
+	after(done => {
+		Theory.deleteOne({'name': theory4.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})});
+	});
+
+	it("should return true in case it is independent @slow", function(done){
+			server
+				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"independent": true}}, done);
+  });
+  it("should return false in case it is dependent @slow", function(done){
+			server
+				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[1]._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"independent": false}}, done);
+  });
 });
 

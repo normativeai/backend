@@ -41,7 +41,7 @@
 					"description"   : "Desc4 plah plah",
 					"content"       : "Content",
 					"vocabulary"    : [{"_id": "4742306d8e147f10f17acead", "symbol": "a", "original": "Delivery"}],
-					"formalization" : [{"_id": "4742306d8e147f10f18acead", "original": "test", "formula": "a"}]
+					"formalization" : [{"_id": "4742306d8e147f10f18acead", "original": "test", "formula": "a"},{"_id": "2742306d8e147f10f18acead", "original": "test", "formula": "a"}, {"_id": "1742306d8e147f10f18acead", "original": "test", "formula": "b"} ]
         },
 
     "Theory5":

@@ -123,3 +123,23 @@ exports.consistency = function(req, res, next) {
     }
     });
 };
+
+exports.independent = function(req, res, next) {
+  Theory.findById(req.params.theoryId, function (err, theory) {
+    if (theory) {
+      theory.isIndependent(req.params.formId, function(code, cons) {
+        if (code == 1) { // mleancop ok
+          if (cons) {
+            res.status(200).json({data: {"independent": true}});
+          } else {
+            res.status(200).json({data: {"independent": false}});
+          }
+        } else { //mleancop error
+          res.status(400).json({err: cons});
+        }
+      })
+    } else {
+      res.status(404).json({err: "Cannot find theory"});
+    }
+    });
+};

@@ -20,6 +20,9 @@ router.route("/theories/find")
 router.route('/theories/:theoryId/consistency')
   .get(theoryController.consistency)
 
+router.route('/theories/:theoryId/independent/:formId')
+  .get(theoryController.independent)
+
 router.route('/theories/:theoryId')
   .get(theoryController.getOne)
   .post(theoryController.clone)
