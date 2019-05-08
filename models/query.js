@@ -22,7 +22,7 @@ var querySchema = new Schema({
 });
 
 querySchema.methods.execQuery = function(cb) {
-  if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate) {
+  if (true) { //(typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
 
     if (!!!this.theory) {
