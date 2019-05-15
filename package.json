@@ -12,6 +12,7 @@
   "dependencies": {
     "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
+    "cheerio": "^1.0.0-rc.3",
     "cookie-parser": "~1.4.3",
     "cookie-session": "^2.0.0-beta.3",
     "cors": "^2.8.5",
@@ -29,7 +30,8 @@
     "passport-local": "^1.0.0",
     "pug": "^2.0.3",
     "serve-favicon": "~2.4.5",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "chai": "^4.2.0",
