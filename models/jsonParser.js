@@ -1,7 +1,6 @@
 function parseFormula(obj) {
   switch (obj.code) {
     case "Connector":
-      console.log(JSON.stringify(obj));
       return parseConnector(obj.connector);
     case "Term":
       return obj.term;
@@ -11,7 +10,6 @@ function parseFormula(obj) {
 }
 
 function parseConnector(obj) {
-  console.log(obj.connectorCode);
   var formulas = obj.formulas.map(f => parseFormula(f));
   if (isBinary(obj.connectorCode)) {
     if (formulas.length != 2) {

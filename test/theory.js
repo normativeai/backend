@@ -1,4 +1,5 @@
 var supertest = require("supertest");
+const fs = require('fs');
 var assert = require('assert')
 const sinon = require('sinon');
 const userController = require('../controllers/userController');
@@ -13,6 +14,7 @@ const theory2 = require('./fixtures/theory.json').Theory2;
 const theory3 = require('./fixtures/theory.json').Theory3;
 const theory4 = require('./fixtures/theory.json').Theory4;
 const theory5 = require('./fixtures/theory.json').Theory5;
+const theory6 = require('./fixtures/theory.json').Theory6;
 
 describe("Create theory", function(){
 
@@ -26,18 +28,34 @@ describe("Create theory", function(){
 
 	after(done => {
 		Theory.deleteOne({'name': theory.name}, function (err) {
+		Theory.deleteOne({'name': theory6.name}, function (err) {
 		User.deleteOne({'email': user.email}, function (err) {done();})});
-	});
-
-	it("should return the created theory and check it was added to the user", function(done){
+	})});
+  it("should return the created theory and check it was added to the user", function(done){
+    server
+      .post("/api/theories")
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(theory)
+      .expect(201)
+      .then(response => {
+        User.findById(user._id, function(err, user) {
+          assert(user.theories[0]._id == theory._id);
+        });
+        done();
+      })
+  });
+	it("should check that the auto formaliztion were created correctly", function(done){
+      let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
 			server
 				.post("/api/theories")
         .set('Authorization', `Bearer ${token.token}`)
-				.send(theory)
+				.send(theory6)
         .expect(201)
         .then(response => {
-          User.findById(user._id, function(err, user) {
-            assert(user.theories[0]._id == theory._id);
+          Theory.findById(theory6._id, function(err, theory) {
+            console.log(JSON.stringify(theory.autoFormalization[0].json))
+            console.log(JSON.stringify(JSON.parse(json_string)))
+            assert(JSON.stringify(theory.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
           });
           done();
         })
@@ -372,36 +390,3 @@ describe("Checking a formula in the formalization for independency", function(){
 				.expect(200, {data: {"independent": false}}, done);
   });
 });
-
-describe("Saving or updating a theory with annotated content", function(){
-
-  var token = {token: undefined};
-
-	before(function(done) {
-		User.create(user, function (err) {
-    utils.login(server, token, () => {
-		theory4.user = user;
-		Theory.create(theory4, function (err) {
-      done();
-    })})});
-	});
-
-	after(done => {
-		Theory.deleteOne({'name': theory4.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})});
-	});
-
-	it("should parse and store correctly the annotated text as several json objects", function(done){
-			server
-				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"independent": true}}, done);
-  });
-  it("should return correct error if a parsing problem was detected", function(done){
-			server
-				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[1]._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"independent": false}}, done);
-  });
-});
-

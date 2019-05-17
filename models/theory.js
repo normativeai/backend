@@ -29,17 +29,23 @@ theorySchema.methods.getFormalization = function() {
 
 theorySchema.methods.computeAutomaticFormalization = function() {
     var xmlParser = require('./xmlParser');
-    return xmlParser.parse(this.content)
+    return xmlParser.parse(this.content).map(function(obj) {
+      return {
+        original: obj.text,
+        json: obj
+      }
+    })
 }
 
 theorySchema.pre('save', function() {
   // we generate the automatic formalization as well
-  this.autoFormalization = computeAutomaticFormalization()
+  console.log(this.computeAutomaticFormalization())
+  this.autoFormalization = this.computeAutomaticFormalization()
 })
 
 theorySchema.pre('update', function() {
   // we update the query
-  this.update({},{ $set: computeAutomaticFormalization() });
+  this.update({},{ $set: this.computeAutomaticFormalization() });
 })
 
 
