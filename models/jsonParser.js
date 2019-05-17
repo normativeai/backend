@@ -1,35 +1,50 @@
 function parseFormula(obj) {
-  switch (obj.code) {
-    case "Connector":
-      return parseConnector(obj.connector);
-    case "Term":
-      return obj.term;
-    default:
-      throw {error: `Frontend error: The formula type ${obj.code} is not known.`};
+  if (obj.hasOwnProperty('connective')){
+    return parseConnector(obj.connective);
+  } else if (obj.hasOwnProperty('term')){
+    return obj.term.name;
+  } else {
+    throw {error: `Frontend error: The formula type ${obj.code} is not known.`};
   }
 }
 
 function parseConnector(obj) {
   var formulas = obj.formulas.map(f => parseFormula(f));
-  if (isBinary(obj.connectorCode)) {
-    if (formulas.length != 2) {
-      throw {error: `The sentence ${obj.text} contains the binary connective ${obj.name} but the number of operands is ${formulas.length}.`}
-    }
+  var argsNum = expectedArgs(obj.code);
+  if (argsNum < 0 && formulas.length < 2) {
+    throw {error: `The sentence ${obj.text} contains the connective ${obj.name} which expectes at least two operands, but ${formulas.length} were given.`}
   }
-  switch (obj.connectorCode) {
-    case "ObOnIf":
+  if (argsNum >= 0 && formulas.length != argsNum) {
+    throw {error: `The sentence ${obj.text} contains the connective ${obj.name} which expectes ${argsNum} operands, but ${formulas.length} were given.`}
+  }
+  switch (obj.code) {
+    case "obonif":
       return `(${formulas[1]} O> ${formulas[0]})`;
+    case "defonif":
+      return `(${formulas[1]} => ${formulas[0]})`;
+    case "eq":
+      return `true`; // TODO implement equality
+    case "neg":
+      return `(~ ${formulas[0]})`;
+    case "or":
+      return formulas.slice(1).reduce(function(acc, val) {
+        return `(${acc} ; ${val})`
+      }, formulas[0]);
     default:
-      throw {error: `Frontend error: Connective ${obj.connectorCode} is not known.`};
+      throw {error: `Frontend error: Connective ${obj.code} is not known.`};
   }
 }
 
-function isBinary(conCode) {
+function expectedArgs(conCode) {
   switch (conCode) {
-    case "ObOnIf":
-      return true;
+    case "obonif":
+    case "defonif":
+    case "eq":
+      return 2
+    case "neg":
+      return 1
     default:
-      return false;
+      return -1
   }
 }
 

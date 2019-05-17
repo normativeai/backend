@@ -29,38 +29,42 @@ theorySchema.methods.getFormalization = function() {
 
 theorySchema.methods.computeAutomaticFormalization = function() {
     var xmlParser = require('./xmlParser');
+    var jsonParser = require('./jsonParser');
     return xmlParser.parse(this.content).map(function(obj) {
       return {
         original: obj.text,
-        json: obj
+        json: obj,
+        formula: jsonParser.parseFormula(obj)
       }
     })
 }
 
 theorySchema.pre('save', function() {
   // we generate the automatic formalization as well
-  console.log(this.computeAutomaticFormalization())
-  this.autoFormalization = this.computeAutomaticFormalization()
-})
+  try {
+    this.autoFormalization = this.computeAutomaticFormalization()
+  } catch(error) {
+      console.error(error);
+  }})
 
-theorySchema.pre('update', function() {
-  // we update the query
-  this.update({},{ $set: this.computeAutomaticFormalization() });
-})
+  theorySchema.pre('update', function() {
+    // we update the query
+    this.update({},{ $set: this.computeAutomaticFormalization() });
+  })
 
 
-theorySchema.statics.isActive = function(form) {
-  return !('active' in form.toJSON()) || form.toJSON().active;
-};
+  theorySchema.statics.isActive = function(form) {
+    return !('active' in form.toJSON()) || form.toJSON().active;
+  };
 
-theorySchema.methods.isConsistent = function(cb) {
-  if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate) {
-    var helper = require('./queryHelper');
-    var obj = this
-    helper.executeQuery(this.getFormalization(), [], "(x, (~ x))", function(theorem, proof) {
-      if (theorem) {
-        obj.lastConsistency = (theorem != 'Theorem');
-        obj.lastConsistencyDate = new Date();
+  theorySchema.methods.isConsistent = function(cb) {
+    if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate) {
+      var helper = require('./queryHelper');
+      var obj = this
+      helper.executeQuery(this.getFormalization(), [], "(x, (~ x))", function(theorem, proof) {
+        if (theorem) {
+          obj.lastConsistency = (theorem != 'Theorem');
+          obj.lastConsistencyDate = new Date();
         obj.save(function (err) {
           logger.error(`Cannot save consistency state. ${err}`);
         });

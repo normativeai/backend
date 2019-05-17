@@ -53,9 +53,9 @@ describe("Create theory", function(){
         .expect(201)
         .then(response => {
           Theory.findById(theory6._id, function(err, theory) {
-            console.log(JSON.stringify(theory.autoFormalization[0].json))
-            console.log(JSON.stringify(JSON.parse(json_string)))
+            console.log(theory.autoFormalization[0].formula)
             assert(JSON.stringify(theory.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
+            assert(theory.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
           });
           done();
         })
