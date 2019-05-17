@@ -373,3 +373,35 @@ describe("Checking a formula in the formalization for independency", function(){
   });
 });
 
+describe("Saving or updating a theory with annotated content", function(){
+
+  var token = {token: undefined};
+
+	before(function(done) {
+		User.create(user, function (err) {
+    utils.login(server, token, () => {
+		theory4.user = user;
+		Theory.create(theory4, function (err) {
+      done();
+    })})});
+	});
+
+	after(done => {
+		Theory.deleteOne({'name': theory4.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})});
+	});
+
+	it("should parse and store correctly the annotated text as several json objects", function(done){
+			server
+				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"independent": true}}, done);
+  });
+  it("should return correct error if a parsing problem was detected", function(done){
+			server
+				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[1]._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(200, {data: {"independent": false}}, done);
+  });
+});
+

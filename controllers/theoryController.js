@@ -44,7 +44,7 @@ exports.get = function(req, res, next) {
 };
 
 exports.getOne = function(req, res, next) {
-  Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description','formalization','content','vocabulary'], function (err, theory) {
+  Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description','formalization','autoFormalization', 'content','vocabulary'], function (err, theory) {
     res.json({data: theory})
   });
 };

@@ -9,32 +9,49 @@ var theorySchema = new Schema({
     lastUpdate        : Date,
     name 		          : String,
     description       : String,
-    content           : String,
+    content           : String, // annotated XML
     vocabulary        : [{symbol: String, original: String}],
-    formalization     : [{original: String, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
+    formalization     : [{original: String, json: Object, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
+    autoFormalization : [{original: String, json: Object, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
 		user 							: { type: Schema.Types.ObjectId, ref: 'User' },
     clonedForm        : { type: Schema.Types.ObjectId, ref: 'Theory' },
     lastConsistency   : Boolean,
     lastConsistencyDate: Date
 });
 
+
+theorySchema.methods.getFormalization = function() {
+  return this.formalization.concat(this.autoFormalization)
+}
+
+// TODO add objects to the formalization to store the json objects. We also need to store the generated formulas
+// Maybe original will be the text?
+
+theorySchema.methods.computeAutomaticFormalization = function() {
+    var xmlParser = require('./xmlParser');
+    return xmlParser.parse(this.content)
+}
+
+theorySchema.pre('save', function() {
+  // we generate the automatic formalization as well
+  this.autoFormalization = computeAutomaticFormalization()
+})
+
+theorySchema.pre('update', function() {
+  // we update the query
+  this.update({},{ $set: computeAutomaticFormalization() });
+})
+
+
 theorySchema.statics.isActive = function(form) {
   return !('active' in form.toJSON()) || form.toJSON().active;
-};
-
-theorySchema.methods.formalizationAsString = function(possibleFurtherAssumtions) {
-  if (possibleFurtherAssumtions) {
-    return JSON.stringify(this.activeFormalization().map(f => f.formula).concat(possibleFurtherAssumtions)).replace(/\"/g,"");
-  } else {
-    return JSON.stringify(this.activeFormalization().map(f => f.formula)).replace(/\"/g,"");
-  }
 };
 
 theorySchema.methods.isConsistent = function(cb) {
   if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate) {
     var helper = require('./queryHelper');
     var obj = this
-    helper.executeQuery(this.formalization, [], "(x, (~ x))", function(theorem, proof) {
+    helper.executeQuery(this.getFormalization(), [], "(x, (~ x))", function(theorem, proof) {
       if (theorem) {
         obj.lastConsistency = (theorem != 'Theorem');
         obj.lastConsistencyDate = new Date();
@@ -52,10 +69,11 @@ theorySchema.methods.isConsistent = function(cb) {
 };
 
 theorySchema.methods.isIndependent = function(id, cb) {
-  form = this.formalization.id(id);
-  if (typeof form.lastIndependentiDate === 'undefined' || this.lastUpdate > form.lastIndependentDate) {
-    forms = this.formalization.slice(0)
-    forms.splice(this.formalization.indexOf(form), 1)
+  forms = this.getFormalization();
+  form = forms.find(f => f._id == id);
+  if (typeof form.lastIndependentDate === 'undefined' || this.lastUpdate > form.lastIndependentDate) {
+    forms = forms.slice(0)
+    forms.splice(forms.indexOf(form), 1)
     var helper = require('./queryHelper');
     helper.executeQuery(forms, [], form.formula, function(theorem, proof) {
       if (theorem) {
