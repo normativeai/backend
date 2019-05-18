@@ -31,7 +31,7 @@ querySchema.methods.execQuery = function(cb) {
       cb(false, 'Query has no goal. Please assign goals before trying to execute queries');
     } else {
       var obj = this
-      helper.executeQuery(this.theory.formalization, this.assumptions, this.goal, function(theorem, proof) {
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions, this.goal, function(theorem, proof) {
         obj.lastQueryTheorem = theorem;
         obj.lastQueryProof = proof;
         obj.lastQueryDate = new Date();
@@ -54,7 +54,7 @@ querySchema.methods.isConsistent = function(cb) {
       cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to check for consistency');
     } else {
       var obj = this
-      helper.executeQuery(this.theory.formalization, this.assumptions, "(x, (~ x))", function(theorem, proof) {
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions, "(x, (~ x))", function(theorem, proof) {
         if (theorem) {
         obj.lastConsistency = (theorem != 'Theorem');
         obj.lastConsistencyDate = new Date();

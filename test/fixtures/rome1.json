@@ -1,0 +1,21 @@
+{
+  "text": "A contract shall be governed by the law chosen by the parties.",
+  "connective": {
+    "name": "Obligation Only If",
+    "code": "obonif",
+    "formulas": [
+      {
+        "text": "A contract",
+        "term": {
+          "name": "contract(Law,Part)"
+        }
+      },
+      {
+        "text": "the law chosen by the parties",
+        "term": {
+          "name": "validChoice(Law,Part)"
+        }
+      }
+    ]
+  }
+}

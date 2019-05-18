@@ -117,11 +117,7 @@ exports.parseFormula = function(str) {
   return lang.formula.tryParse(str);
 }
 
-console.log(lang.problem.tryParse('([(a_1 , b___2)], true)'));
-
 exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
-
-console.log(exports.parseFormula('(a(X,Y) O> b(X,Y))'));
 

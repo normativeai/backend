@@ -1,4 +1,5 @@
 var supertest = require("supertest");
+const fs = require('fs');
 var assert = require('assert')
 const sinon = require('sinon');
 const userController = require('../controllers/userController');
@@ -13,6 +14,7 @@ const theory2 = require('./fixtures/theory.json').Theory2;
 const theory3 = require('./fixtures/theory.json').Theory3;
 const theory4 = require('./fixtures/theory.json').Theory4;
 const theory5 = require('./fixtures/theory.json').Theory5;
+const theory6 = require('./fixtures/theory.json').Theory6;
 
 describe("Create theory", function(){
 
@@ -26,18 +28,33 @@ describe("Create theory", function(){
 
 	after(done => {
 		Theory.deleteOne({'name': theory.name}, function (err) {
+		Theory.deleteOne({'name': theory6.name}, function (err) {
 		User.deleteOne({'email': user.email}, function (err) {done();})});
-	});
-
-	it("should return the created theory and check it was added to the user", function(done){
+	})});
+  it("should return the created theory and check it was added to the user", function(done){
+    server
+      .post("/api/theories")
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(theory)
+      .expect(201)
+      .then(response => {
+        User.findById(user._id, function(err, user) {
+          assert(user.theories[0]._id == theory._id);
+        });
+        done();
+      })
+  });
+	it("should check that the auto formaliztion were created correctly", function(done){
+      let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
 			server
 				.post("/api/theories")
         .set('Authorization', `Bearer ${token.token}`)
-				.send(theory)
+				.send(theory6)
         .expect(201)
         .then(response => {
-          User.findById(user._id, function(err, user) {
-            assert(user.theories[0]._id == theory._id);
+          Theory.findById(theory6._id, function(err, theory) {
+            assert(JSON.stringify(theory.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
+            assert(theory.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
           });
           done();
         })
@@ -98,7 +115,7 @@ describe("Get theories", function(){
           assert(JSON.stringify(theory.vocabulary) == JSON.stringify(t.vocabulary));
           done();
         }).catch(err => {
-          console.log(err);
+          //console.log(err);
         })
 		});
 });
@@ -111,7 +128,6 @@ describe("Update theory", function(){
 		User.create(user, function (err) {
 		utils.login(server, token, () => {
 		theory.user = user;
-    theory.user = user;
 		Theory.create(theory, function (err) {done();})})});
 	});
 
@@ -120,7 +136,7 @@ describe("Update theory", function(){
 		User.deleteOne({'email': user.email}, function (err) {done();})});
 	});
 
-	it("should return 200 on success", function(done){
+	it("should return 200 on successfull update", function(done){
       const t = Object.assign({}, theory);
       t.name = "temp";
 			server
@@ -147,7 +163,25 @@ describe("Update theory", function(){
         .expect(404, { err:  'Theory could not be found'
         },	done);
   });
-
+  it("should check that the auto formaliztion were updated correctly", function(done){
+      const t = Object.assign({}, theory);
+      t.content = theory6.content
+      let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
+      // update theory
+      server
+        .put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t).end(function() {
+          server
+            .get(`/api/theories/${t._id}`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .expect(200)
+            .then(response => {
+              const t = response.body.data;
+              assert(JSON.stringify(t.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
+              assert(t.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
+              done();
+  })})})
 });
 
 describe("Delete theory", function(){
@@ -372,4 +406,3 @@ describe("Checking a formula in the formalization for independency", function(){
 				.expect(200, {data: {"independent": false}}, done);
   });
 });
-
