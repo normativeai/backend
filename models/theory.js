@@ -29,7 +29,7 @@ theorySchema.methods.getFormalization = function() {
 
 // this is static since update pre hooks are problematic
 theorySchema.statics.computeAutomaticFormalization = function (content) {
-  if (content.includes("html")) {
+  if (content != null && content.includes("html")) {
     var xmlParser = require('./xmlParser');
     var jsonParser = require('./jsonParser');
     return xmlParser.parse(content).map(function(obj) {
