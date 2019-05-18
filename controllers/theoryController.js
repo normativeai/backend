@@ -14,26 +14,30 @@ exports.create = [
         return res.status(422).json({ errors: errors.array() });
     }
 
-    Theory.create({
-      _id: req.body._id,
-      name: req.body.name,
-      lastUpdate: new Date(),
-      user: req.user,
-      description: req.body.description,
-      content: req.body.content,
-      vocabulary: req.body.vocabulary,
-      formalization: req.body.formalization,
-      creator: req.body.creator
-    }).then(theory => {
-      User.findById(req.user._id, function(err, user) {
-        user.theories.push(theory._id);
-        user.save(err => {
-          if (err) {
-            res.status(400).json({err: err});
-          } else {
-            res.status(201).json({data: theory});
-          }
-      })})});
+    try {
+      Theory.create({
+        _id: req.body._id,
+        name: req.body.name,
+        lastUpdate: new Date(),
+        user: req.user,
+        description: req.body.description,
+        content: req.body.content,
+        vocabulary: req.body.vocabulary,
+        formalization: req.body.formalization,
+        creator: req.body.creator
+      }).then(theory => {
+        User.findById(req.user._id, function(err, user) {
+          user.theories.push(theory._id);
+          user.save(err => {
+            if (err) {
+              res.status(400).json({err: err});
+            } else {
+              res.status(201).json({data: theory});
+            }
+        })})});
+    } catch (error) {
+      res.status(400).json({err: `Cannot parse annotated content - ${error}`});
+    }
   }
 ]
 
@@ -52,15 +56,21 @@ exports.getOne = function(req, res, next) {
 exports.update = function(req, res, next) {
   var body = req.body;
   body.lastUpdate = new Date();
-  Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
-    if (!err && (result.nModified > 0)) {
-      res.status(200).json({message: 'Theory updated'});
-    } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      res.status(404).json({err: 'Theory could not be found'});
-    } else {
-      res.status(400).json({err: err});
-    }
-  });
+  try {
+    body.autoFormalization = Theory.computeAutomaticFormalization(body.content)
+    Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
+      if (!err && (result.nModified > 0)) {
+        res.status(200).json({message: 'Theory updated'});
+      } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
+        res.status(404).json({err: 'Theory could not be found'});
+      } else {
+        res.status(400).json({err: err});
+      }
+    });
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({err: `Cannot parse annotated content - ${error}`});
+  }
 };
 
 exports.delete = function(req, res, next) {

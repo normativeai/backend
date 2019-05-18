@@ -27,35 +27,32 @@ theorySchema.methods.getFormalization = function() {
 // TODO add objects to the formalization to store the json objects. We also need to store the generated formulas
 // Maybe original will be the text?
 
-theorySchema.methods.computeAutomaticFormalization = function() {
+// this is static since update pre hooks are problematic
+theorySchema.statics.computeAutomaticFormalization = function (content) {
+  if (content.includes("html")) {
     var xmlParser = require('./xmlParser');
     var jsonParser = require('./jsonParser');
-    return xmlParser.parse(this.content).map(function(obj) {
-      return {
+    return xmlParser.parse(content).map(function(obj) {
+       return {
         original: obj.text,
         json: obj,
         formula: jsonParser.parseFormula(obj)
       }
     })
+  } else {
+    return []
+  }
 }
 
+// we call only on save/create and not on update since the update hook doest have access to the document and methods
 theorySchema.pre('save', function() {
   // we generate the automatic formalization as well
-  try {
-    this.autoFormalization = this.computeAutomaticFormalization()
-  } catch(error) {
-      console.error(error);
-  }})
+  this.autoFormalization = theorySchema.statics.computeAutomaticFormalization(this.content)
+})
 
-  theorySchema.pre('update', function() {
-    // we update the query
-    this.update({},{ $set: this.computeAutomaticFormalization() });
-  })
-
-
-  theorySchema.statics.isActive = function(form) {
-    return !('active' in form.toJSON()) || form.toJSON().active;
-  };
+theorySchema.statics.isActive = function(form) {
+  return !('active' in form.toJSON()) || form.toJSON().active;
+};
 
   theorySchema.methods.isConsistent = function(cb) {
     if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate) {

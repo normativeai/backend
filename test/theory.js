@@ -53,7 +53,6 @@ describe("Create theory", function(){
         .expect(201)
         .then(response => {
           Theory.findById(theory6._id, function(err, theory) {
-            console.log(theory.autoFormalization[0].formula)
             assert(JSON.stringify(theory.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
             assert(theory.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
           });
@@ -116,7 +115,7 @@ describe("Get theories", function(){
           assert(JSON.stringify(theory.vocabulary) == JSON.stringify(t.vocabulary));
           done();
         }).catch(err => {
-          console.log(err);
+          //console.log(err);
         })
 		});
 });
@@ -129,7 +128,6 @@ describe("Update theory", function(){
 		User.create(user, function (err) {
 		utils.login(server, token, () => {
 		theory.user = user;
-    theory.user = user;
 		Theory.create(theory, function (err) {done();})})});
 	});
 
@@ -138,7 +136,7 @@ describe("Update theory", function(){
 		User.deleteOne({'email': user.email}, function (err) {done();})});
 	});
 
-	it("should return 200 on success", function(done){
+	it("should return 200 on successfull update", function(done){
       const t = Object.assign({}, theory);
       t.name = "temp";
 			server
@@ -165,7 +163,25 @@ describe("Update theory", function(){
         .expect(404, { err:  'Theory could not be found'
         },	done);
   });
-
+  it("should check that the auto formaliztion were updated correctly", function(done){
+      const t = Object.assign({}, theory);
+      t.content = theory6.content
+      let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
+      // update theory
+      server
+        .put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t).end(function() {
+          server
+            .get(`/api/theories/${t._id}`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .expect(200)
+            .then(response => {
+              const t = response.body.data;
+              assert(JSON.stringify(t.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
+              assert(t.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
+              done();
+  })})})
 });
 
 describe("Delete theory", function(){
