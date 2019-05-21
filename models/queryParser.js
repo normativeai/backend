@@ -2,36 +2,40 @@ var P = require('parsimmon');
 var crypto = require('crypto');
 var hash; // used to rename variables within the formula
 
-function o1(f) {
-  return `(# 1^d: ${f})`
+function norm(n,pos) {
+  return n * 2 + pos
 }
 
-function o2(f) {
-  return `(# 2^d: ~ ${f})`
+function o1(f,n) {
+  return `(# ${norm(n,1)}^d: ${f})`
 }
 
-function ob(f) {
-  return `(${o1(f)}, ${o2(f)})`
+function o2(f,n) {
+  return `(# ${norm(n,2)}^d: ~ ${f})`
 }
 
-function p1(f) {
-  return `(* 1^d: ${f})`
+function ob(f,n) {
+  return `(${o1(f,n)}, ${o2(f,n)})`
 }
 
-function p2(f) {
-  return `(* 2^d: ~ ${f})`
+function p1(f,n) {
+  return `(* ${norm(n,1)}^d: ${f})`
 }
 
-function pm(f) {
-  return `(${p1(f)}, ${p2(f)})`
+function p2(f,n) {
+  return `(* ${norm(n,2)}^d: ~ ${f})`
 }
 
-function pimp(f1,f2) {
-  return `((${f1} => ${pm(f2)}),(${o1(pm(f1))} => ${o1(pm(f2))}))`
+function pm(f,n) {
+  return `(${p1(f,n)}, ${p2(f,n)})`
 }
 
-function oimp(f1,f2) {
-  return `((${f1} => ${ob(f2)}),(${o1(ob(f1))} => ${o1(ob(f2))}))`
+function pimp(f1,f2,n) {
+  return `((${f1} => ${pm(f2,n)}),(${o1(pm(f1,n),n)} => ${o1(pm(f2,n),n)}))`
+}
+
+function oimp(f1,f2,n) {
+  return `((${f1} => ${ob(f2,n)}),(${o1(ob(f1,n),n)} => ${o1(ob(f2,n),n)}))`
 }
 
 let whitespace = P.regexp(/\s*/m);
@@ -74,19 +78,19 @@ var lang = P.createLanguage({
 
   neg: r => P.seq(word("~ "), r.formula).tie(),
 
-  permitted: r => word("Pm ").then(r.formula).map(f => pm(f)),
+  permitted: r => P.seqMap(word("Pm^").then(r.integer).or(word("Pm ").map(_ => 0)), r.formula, function(n,f) {return  pm(f,n)}),
 
-  ought: r => word("Ob ").then(r.formula).map(f => ob(f)),
+  ought: r => P.seqMap(word("Ob^").then(r.integer).or(word("Ob ").map(_ => 0)), r.formula, function(n,f) {return  ob(f,n)}),
 
-  ideal: r => word("Id ").then(r.formula).map(f => o1(f)),
+  ideal: r => P.seqMap(word("Id^").then(r.integer).or(word("Id ").map(_ => 0)), r.formula, function(n,f) {return  o1(f,n)}),
 
   binary: r => P.seq(r.lparen, r.formula, P.alt(word(","), word(";"), word("=>"), word("<=>")), r.formula, r.rparen).tie(),
 
   nbinary: r => P.seq(r.lparen, P.alt(r.no,r.po), r.rparen).tie(),
 
-  no: r => P.seqMap(r.formula.skip(word("O>")), r.formula, function(f1,f2) {return oimp(f1,f2)}),
+  no: r => P.seqMap(r.formula, word("O>^").then(r.integer).or(word("O>").map(_ => 0)), r.formula, function(f1,n,f2) {return oimp(f1,f2,n)}),
 
-  po: r => P.seqMap(r.formula.skip(word("P>")), r.formula, function(f1,f2) {return pimp(f1,f2)}),
+  po: r => P.seqMap(r.formula, word("P").skip(word(">^")).then(r.integer).or(word("P>").map(_ => 0)), r.formula, function(f1,n,f2) {return pimp(f1,f2,n)}),
 
   atom: r => P.alt(r.tre, r.fls, r.func, r.constant),
 
@@ -99,6 +103,8 @@ var lang = P.createLanguage({
   func: r => P.seq(r.constant, r.lparen, r.arglist, r.rparen).tie(),
 
   arglist: r => r.vatom.sepBy1(word(",")).tieWith(","),
+
+  integer: () => reg(/[0-9]+/),
 
   constant: () => reg(/[a-z][a-zA-Z_\d]*/),
 
