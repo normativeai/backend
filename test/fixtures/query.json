@@ -6,7 +6,7 @@
 					"name"          : "Query 1",
 					"description"   : "Desc plah plah query",
 					"assumptions"   : ["d01"],
-					"goal"          : "(Ob d1)"
+					"goal"          : "(Ob^1 d1)"
         },
 
     "Query2":
@@ -16,7 +16,7 @@
 					"name"          : "Query 2",
 					"description"   : "Desc plah plah query",
 					"assumptions"   : ["d01"],
-					"goal"          : "(Ob d2)"
+					"goal"          : "(Ob^1 d2)"
         },
 
     "Query3":
