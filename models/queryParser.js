@@ -44,7 +44,7 @@ function oimp(f1,f2,n) {
 }
 
 function fimp(f1,f2,n) {
-  throw "F> not implemented"
+  return `((${f1} => ${fb(f2,n)}),(${o1(fb(f1,n),n)} => ${o1(fb(f2,n),n)}))`
 }
 
 let whitespace = P.regexp(/\s*/m);
