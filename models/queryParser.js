@@ -30,12 +30,21 @@ function pm(f,n) {
   return `(${p1(f,n)}, ${p2(f,n)})`
 }
 
+function fb(f,n) {
+  var nf = `(~ ${f})`
+  return `(~ ${ob(nf,n)})`
+}
+
 function pimp(f1,f2,n) {
   return `((${f1} => ${pm(f2,n)}),(${o1(pm(f1,n),n)} => ${o1(pm(f2,n),n)}))`
 }
 
 function oimp(f1,f2,n) {
   return `((${f1} => ${ob(f2,n)}),(${o1(ob(f1,n),n)} => ${o1(ob(f2,n),n)}))`
+}
+
+function fimp(f1,f2,n) {
+  throw "F> not implemented"
 }
 
 let whitespace = P.regexp(/\s*/m);
@@ -74,11 +83,13 @@ var lang = P.createLanguage({
 
   formula: r => P.alt(r.unary, r.nbinary, r.binary, r.atom),
 
-  unary: r => P.seq(r.lparen, P.alt(r.neg, r.permitted, r.ought, r.ideal), r.rparen).tie(),
+  unary: r => P.seq(r.lparen, P.alt(r.neg, r.permitted, r.forbidden, r.ought, r.ideal), r.rparen).tie(),
 
   neg: r => P.seq(word("~ "), r.formula).tie(),
 
   permitted: r => P.seqMap(word("Pm^").then(r.integer).or(word("Pm ").map(_ => 0)), r.formula, function(n,f) {return  pm(f,n)}),
+
+  forbidden: r => P.seqMap(word("Fb^").then(r.integer).or(word("Fb ").map(_ => 0)), r.formula, function(n,f) {return  fb(f,n)}),
 
   ought: r => P.seqMap(word("Ob^").then(r.integer).or(word("Ob ").map(_ => 0)), r.formula, function(n,f) {return  ob(f,n)}),
 
@@ -86,11 +97,13 @@ var lang = P.createLanguage({
 
   binary: r => P.seq(r.lparen, r.formula, P.alt(word(","), word(";"), word("=>"), word("<=>")), r.formula, r.rparen).tie(),
 
-  nbinary: r => P.seq(r.lparen, P.alt(r.no,r.po), r.rparen).tie(),
+  nbinary: r => P.seq(r.lparen, P.alt(r.no,r.po,r.fo), r.rparen).tie(),
 
   no: r => P.seqMap(r.formula, word("O>^").then(r.integer).or(word("O>").map(_ => 0)), r.formula, function(f1,n,f2) {return oimp(f1,f2,n)}),
 
-  po: r => P.seqMap(r.formula, word("P").skip(word(">^")).then(r.integer).or(word("P>").map(_ => 0)), r.formula, function(f1,n,f2) {return pimp(f1,f2,n)}),
+  po: r => P.seqMap(r.formula, word("P>^").then(r.integer).or(word("P>").map(_ => 0)), r.formula, function(f1,n,f2) {return pimp(f1,f2,n)}),
+
+  fo: r => P.seqMap(r.formula, word("F>^").then(r.integer).or(word("F>").map(_ => 0)), r.formula, function(f1,n,f2) {return fimp(f1,f2,n)}),
 
   atom: r => P.alt(r.tre, r.fls, r.func, r.constant),
 
