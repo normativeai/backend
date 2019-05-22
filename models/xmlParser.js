@@ -1,11 +1,22 @@
 const cheerio = require('cheerio');
 
 const names = {
-  "obonif": "Obligation Only If",
+  "neg": "Negation",
   "or": "Or",
-  "defonif": "Definitional Only If",
   "and": "And",
-  "eq": "Term Equality"
+  "eq": "Term Equality",
+  "defif": "Definitional If",
+  "defonif": "Definitional Only If",
+  "ob": "Obligation",
+  "pm": "Permission",
+  "fb": "Forbidden",
+  "id": "Ideally",
+  "obif": "Obligation If",
+  "obonif": "Obligation Only If",
+  "pmif": "Permission If",
+  "pmonif": "Permission Only If",
+  "fbif": "Forbidden If",
+  "fbonif": "Forbidden Only If"
 }
 
 function parse(html) {
@@ -55,4 +66,4 @@ function parseTerm($, spanElem) {
   }
 }
 
-module.exports  = { "parse": parse };
+module.exports  = { "parse": parse, "ops": names };

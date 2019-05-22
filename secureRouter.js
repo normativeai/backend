@@ -3,6 +3,7 @@ var router = express.Router();
 var theoryController = require('./controllers/theoryController')
 var queryController = require('./controllers/queryController')
 var userController = require('./controllers/userController')
+var generalController = require('./controllers/generalController')
 
 router.route("/users")
 	.get(userController.user)
@@ -44,6 +45,7 @@ router.route('/queries/:queryId')
 router.route('/queries/:queryId/consistency')
   .get(queryController.consistency)
 
-
+router.route('/general/connectives')
+  .get(generalController.connectives)
 
 module.exports = router;
