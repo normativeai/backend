@@ -14,7 +14,6 @@ exports.create = [
         return res.status(422).json({ errors: errors.array() });
     }
 
-    try {
       Theory.create({
         _id: req.body._id,
         name: req.body.name,
@@ -34,10 +33,9 @@ exports.create = [
             } else {
               res.status(201).json({data: theory});
             }
-        })})});
-    } catch (error) {
-      res.status(400).json({err: `Cannot parse annotated content - ${error}`});
-    }
+        })})}).catch(function(error) {
+          res.status(400).json(error);
+        });
   }
 ]
 
@@ -68,8 +66,7 @@ exports.update = function(req, res, next) {
       }
     });
   } catch (error) {
-    console.log(error)
-    res.status(400).json({err: `Cannot parse annotated content - ${error}`});
+    res.status(400).json(error);
   }
 };
 

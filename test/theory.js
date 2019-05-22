@@ -15,6 +15,7 @@ const theory3 = require('./fixtures/theory.json').Theory3;
 const theory4 = require('./fixtures/theory.json').Theory4;
 const theory5 = require('./fixtures/theory.json').Theory5;
 const theory6 = require('./fixtures/theory.json').Theory6;
+const theory7 = require('./fixtures/theory.json').Theory7;
 
 describe("Create theory", function(){
 
@@ -29,7 +30,8 @@ describe("Create theory", function(){
 	after(done => {
 		Theory.deleteOne({'name': theory.name}, function (err) {
 		Theory.deleteOne({'name': theory6.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})});
+		Theory.deleteOne({'name': theory7.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})});
 	})});
   it("should return the created theory and check it was added to the user", function(done){
     server
@@ -55,9 +57,16 @@ describe("Create theory", function(){
           Theory.findById(theory6._id, function(err, theory) {
             assert(JSON.stringify(theory.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
             assert(theory.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
+            done();
           });
-          done();
         })
+  });
+  it("should report correct errors if the auto formaliztion were not created correctly", function(done){
+			server
+				.post("/api/theories")
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(theory7)
+        .expect(400, {"error": 'Frontend error: Connective band is not known.'}, done)
 		});
 });
 
@@ -182,6 +191,16 @@ describe("Update theory", function(){
               assert(t.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
               done();
   })})})
+  it("should report correct errors if the auto formaliztion were not updated correctly", function(done){
+      const t = Object.assign({}, theory);
+      t.content = theory7.content
+      // update theory
+      server
+        .put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t)
+        .expect(400, {"error": 'Frontend error: Connective band is not known.'}, done)
+  })
 });
 
 describe("Delete theory", function(){

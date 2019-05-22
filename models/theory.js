@@ -45,9 +45,14 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
 }
 
 // we call only on save/create and not on update since the update hook doest have access to the document and methods
-theorySchema.pre('save', function() {
+theorySchema.pre('save', function(next) {
   // we generate the automatic formalization as well
-  this.autoFormalization = theorySchema.statics.computeAutomaticFormalization(this.content)
+  try {
+    this.autoFormalization = theorySchema.statics.computeAutomaticFormalization(this.content)
+    next()
+  } catch (error) {
+    next(error)
+  }
 })
 
 theorySchema.statics.isActive = function(form) {
