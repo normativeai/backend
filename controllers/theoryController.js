@@ -46,7 +46,7 @@ exports.get = function(req, res, next) {
 };
 
 exports.getOne = function(req, res, next) {
-  Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description','formalization','autoFormalization', 'content','vocabulary'], function (err, theory) {
+  Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description','formalization','autoFormalization', 'content','vocabulary', 'autoVocabulary'], function (err, theory) {
     res.json({data: theory})
   });
 };
@@ -56,6 +56,7 @@ exports.update = function(req, res, next) {
   body.lastUpdate = new Date();
   try {
     body.autoFormalization = Theory.computeAutomaticFormalization(body.content)
+    body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoFormalization.map(x => x.json))
     Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
       if (!err && (result.nModified > 0)) {
         res.status(200).json({message: 'Theory updated'});

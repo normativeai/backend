@@ -46,8 +46,10 @@ describe("Create theory", function(){
         done();
       })
   });
-	it("should check that the auto formaliztion were created correctly", function(done){
+	it("should check that the auto formaliztion and vocabulary were created correctly", function(done){
       let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
+      let voc0 = {"symbol": "contract", "original": "A contract", "full": "contract(Law,Part)" }
+      let voc1 = {"symbol": "validChoice", "original": "the law chosen by the parties", "full": "validChoice(Law,Part)" }
 			server
 				.post("/api/theories")
         .set('Authorization', `Bearer ${token.token}`)
@@ -57,6 +59,12 @@ describe("Create theory", function(){
           Theory.findById(theory6._id, function(err, theory) {
             assert(JSON.stringify(theory.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
             assert(theory.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
+            const vocdb0 = theory.autoVocabulary[0]
+            const vocobj0 = {'symbol': vocdb0.symbol, 'original': vocdb0.original, 'full': vocdb0.full}
+            assert(JSON.stringify(vocobj0) == JSON.stringify(voc0));
+            const vocdb1 = theory.autoVocabulary[1]
+            const vocobj1 = {'symbol': vocdb1.symbol, 'original': vocdb1.original, 'full': vocdb1.full}
+            assert(JSON.stringify(vocobj1) == JSON.stringify(voc1));
             done();
           });
         })
@@ -176,6 +184,8 @@ describe("Update theory", function(){
       const t = Object.assign({}, theory);
       t.content = theory6.content
       let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
+      let voc0 = {"symbol": "contract", "original": "A contract", "full": "contract(Law,Part)" }
+      let voc1 = {"symbol": "validChoice", "original": "the law chosen by the parties", "full": "validChoice(Law,Part)" }
       // update theory
       server
         .put(`/api/theories/${t._id}`)
@@ -189,6 +199,12 @@ describe("Update theory", function(){
               const t = response.body.data;
               assert(JSON.stringify(t.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
               assert(t.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
+              const vocdb0 = t.autoVocabulary[0]
+              const vocobj0 = {'symbol': vocdb0.symbol, 'original': vocdb0.original, 'full': vocdb0.full}
+              assert(JSON.stringify(vocobj0) == JSON.stringify(voc0));
+              const vocdb1 = t.autoVocabulary[1]
+              const vocobj1 = {'symbol': vocdb1.symbol, 'original': vocdb1.original, 'full': vocdb1.full}
+              assert(JSON.stringify(vocobj1) == JSON.stringify(voc1));
               done();
   })})})
   it("should report correct errors if the auto formaliztion were not updated correctly", function(done){

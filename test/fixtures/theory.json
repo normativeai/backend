@@ -6,7 +6,7 @@
 					"name"          : "Test title",
 					"description"   : "Desc plah plah",
 					"content"       : "Content",
-					"vocabulary"    : [{"_id": "4342306d8e147f10f17aceaa", "symbol": "D0.1", "original": "the contract requires the seller to take care of the carriage of goods"}, {"_id": "4342306d8e147f10f16aceab", "symbol": "D1", "original": "the goods are handed over to the first carrier"}],
+					"vocabulary"    : [{"_id": "4342306d8e147f10f17aceaa",  "full": "", "symbol": "D0.1", "original": "the contract requires the seller to take care of the carriage of goods"}, { "_id": "4342306d8e147f10f16aceab", "full": "", "symbol": "D1", "original": "the goods are handed over to the first carrier"}],
 					"formalization" : [{"_id": "4342306d8e147f10f18aceaa", "original": "31(a) if the contract of sale involves carriage of the goods – in handing the goods over to the first carrier for transmission to the buyer", "formula": "(d01 O>^1 d1)"}]
         },
 

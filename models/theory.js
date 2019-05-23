@@ -10,7 +10,8 @@ var theorySchema = new Schema({
     name 		          : String,
     description       : String,
     content           : String, // annotated XML
-    vocabulary        : [{symbol: String, original: String}],
+    vocabulary        : [{symbol: String, original: String, full: String}],
+    autoVocabulary    : [{symbol: String, original: String, full: String}],
     formalization     : [{original: String, json: Object, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
     autoFormalization : [{original: String, json: Object, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
 		user 							: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -27,7 +28,7 @@ theorySchema.methods.getFormalization = function() {
 // TODO add objects to the formalization to store the json objects. We also need to store the generated formulas
 // Maybe original will be the text?
 
-// this is static since update pre hooks are problematic
+// this is static since update pre hooks are problematic so we call it from the controller and the doc is not read yet
 theorySchema.statics.computeAutomaticFormalization = function (content) {
   if (content != null && content.includes("html")) {
     var xmlParser = require('./xmlParser');
@@ -44,11 +45,37 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
   }
 }
 
+function parseTerm(obj) {
+  var term = obj.term.name
+  return {
+    'symbol': term.substring(0,term.indexOf('(')),
+    'original': obj.text,
+    'full': term,
+  }
+}
+function extractVocabulary(acc, val) {
+  // connective or term
+  if ("connective" in val) {
+   val.connective.formulas.forEach(form => extractVocabulary(acc, form))
+  } else if ("term" in val) {
+    acc.push(parseTerm(val))
+  } else
+    throw "Illegal JSON formalization - object contains no connective or term"
+}
+theorySchema.statics.computeAutomaticVocabulary = function (jsons) {
+  var acc = []
+  jsons.forEach(function(val) {
+    extractVocabulary(acc,val)
+  })
+  return acc
+}
+
 // we call only on save/create and not on update since the update hook doest have access to the document and methods
 theorySchema.pre('save', function(next) {
   // we generate the automatic formalization as well
   try {
     this.autoFormalization = theorySchema.statics.computeAutomaticFormalization(this.content)
+    this.autoVocabulary = theorySchema.statics.computeAutomaticVocabulary(this.autoFormalization.map(x => x.json))
     next()
   } catch (error) {
     next(error)
