@@ -16,7 +16,8 @@ const names = {
   "pmif": "Permission If",
   "pmonif": "Permission Only If",
   "fbif": "Forbidden If",
-  "fbonif": "Forbidden Only If"
+  "fbonif": "Forbidden Only If",
+  "equiv": "Equivalence"
 }
 
 function parse(html) {

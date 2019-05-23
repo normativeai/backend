@@ -54,6 +54,8 @@ function parseConnector(obj) {
       return `(${formulas[0]} F> ${formulas[1]})`;
     case "fbonif":
       return `(${formulas[1]} F> ${formulas[0]})`;
+    case "equiv":
+      return `(${formulas[0]} <=> ${formulas[1]})`;
     default:
       throw {error: `Frontend error: Connective ${obj.code} is not known.`};
   }
@@ -70,6 +72,7 @@ function expectedArgs(conCode) {
     case "fbonif":
     case "fbif":
     case "eq":
+    case "equiv":
       return 2
     case "neg":
     case "ob":
