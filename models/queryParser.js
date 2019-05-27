@@ -122,22 +122,31 @@ var lang = P.createLanguage({
   constant: () => reg(/[a-z][a-zA-Z_\d]*/),
 
   /*
+   * Not any longer
    * Since we use prenex quantification, each formula should use a different variable.
    * This can be computed by taking the hash of the original sentence and attach it to the variables
    */
-  variable: () => reg(/[A-Z][a-zA-Z_\d]*/).map(v => v.concat(hash)),
+  //variable: () => reg(/[A-Z][a-zA-Z_\d]*/).map(v => v.concat(hash)),
+  variable: () => reg(/[A-Z][a-zA-Z_\d]*/).map(v => v.concat('__var')),
 
   list: r => r.lbracket.then(r.formula.sepBy(r.comma).map(addParents)).skip(r.rbracket),
 
 });
 
 exports.parseFormula = function(str) {
-  hash = crypto.createHash('md5').update(str).digest('hex');
-  return lang.formula.tryParse(str);
+  if (str.includes('__var'))
+    throw 'DL* formulae must not contain "__var"'
+  //hash = crypto.createHash('md5').update(str).digest('hex');
+  var form = lang.formula.tryParse(str);
+  var vars = form.match(/[A-Z][a-zA-Z_\d]*__var/g)
+  if (vars)
+    return '(' + vars.map(x => `all ${x}:`).join('') + form + ')'
+  else
+    return form
 }
 
 exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
 
-console.log(exports.parseFormula('(~ d11)'))
+console.log(exports.parseFormula('(p(X) => q(Y))'))
