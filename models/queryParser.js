@@ -81,7 +81,7 @@ var lang = P.createLanguage({
 
   simpleProblem: r => r.formula.map(function(conc) {return `f((${conc})).`}),
 
-  formula: r => P.alt(r.unary, r.nbinary, r.binary, r.atom),
+  formula: r => P.alt(r.unary, r.nbinary, r.binary, r.vatom),
 
   unary: r => P.seq(r.lparen, P.alt(r.neg, r.permitted, r.forbidden, r.ought, r.ideal), r.rparen).tie(),
 
@@ -140,3 +140,4 @@ exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
 
+console.log(exports.parseFormula('(~ d11)'))
