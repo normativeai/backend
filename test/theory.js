@@ -207,6 +207,18 @@ describe("Update theory", function(){
               assert(JSON.stringify(vocobj1) == JSON.stringify(voc1));
               done();
   })})})
+  it("should check that the auto formaliztion were updated correctly 2", function(done){
+      const t = Object.assign({}, theory);
+      t.content = "<!doctype html>  <html><body> <h2>Article 3 - Freedom of choice</h2> <p><br></p> <ol>   <li>     <span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\">       <span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span>       shall be governed by       <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"valid_choice(Law,Part)\">the law chosen by the parties</span>.     </span>     The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract.   </li>  </ol></body></html>"
+      // update theory
+      server
+        .put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t)
+        .expect(200)
+        .then(response => {
+          done();
+  })})
   it("should report correct errors if the auto formaliztion were not updated correctly", function(done){
       const t = Object.assign({}, theory);
       t.content = theory7.content

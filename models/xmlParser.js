@@ -29,7 +29,7 @@ function parse(html) {
 }
 
 function parseFormula($,spanElem) {
-  const code = $(spanElem).attr("class").substring(10)
+  const code = $(spanElem).attr("class").split(" ").find(word => word.startsWith("annotator-")).substring(10)
   const text = $(spanElem).contents().text();
   switch (code) {
     case 'connective':
@@ -44,7 +44,7 @@ function parseFormula($,spanElem) {
       }
       return parseTerm($,spanElem)
     default:
-      raise `Cannot parse XML. Unknown annotator value: ${code}`
+      throw `Cannot parse XML. Unknown annotator value: ${code}`
   }
 }
 
