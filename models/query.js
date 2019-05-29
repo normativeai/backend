@@ -36,7 +36,8 @@ querySchema.methods.execQuery = function(cb) {
         obj.lastQueryProof = proof;
         obj.lastQueryDate = new Date();
         obj.save(function (err) {
-          logger.error(`Cannot save query state. ${err}`);
+          if (err)
+            logger.error(`Cannot save query state. ${err}`);
         });
         cb(theorem, proof);
       });
@@ -59,7 +60,8 @@ querySchema.methods.isConsistent = function(cb) {
         obj.lastConsistency = (theorem != 'Theorem');
         obj.lastConsistencyDate = new Date();
         obj.save(function (err) {
-          logger.error(`Cannot save consistency state. ${err}`);
+          if (err)
+            logger.error(`Cannot save consistency state. ${err}`);
         });
           cb(1, theorem != 'Theorem');
         } else {

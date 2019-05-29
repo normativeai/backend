@@ -95,7 +95,8 @@ theorySchema.statics.isActive = function(form) {
           obj.lastConsistency = (theorem != 'Theorem');
           obj.lastConsistencyDate = new Date();
         obj.save(function (err) {
-          logger.error(`Cannot save consistency state. ${err}`);
+          if (err)
+            logger.error(`Cannot save consistency state. ${err}`);
         });
         cb(1, theorem != 'Theorem');
       } else {
@@ -119,7 +120,8 @@ theorySchema.methods.isIndependent = function(id, cb) {
         form.lastIndependent = (theorem != 'Theorem');
         form.lastIndependentDate = new Date();
         form.parent().save(function (err) {
-          logger.error(`Cannot save independence state. ${err}`);
+          if (err)
+            logger.error(`Cannot save independence state. ${err}`);
         });
         cb(1, theorem != 'Theorem');
       } else {
