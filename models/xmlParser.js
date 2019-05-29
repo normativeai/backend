@@ -42,7 +42,6 @@ function parseFormula($,spanElem) {
         "text": text,
         "term": parseTerm($,spanElem)
       }
-      return parseTerm($,spanElem)
     default:
       throw `Cannot parse XML. Unknown annotator value: ${code}`
   }
