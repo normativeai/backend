@@ -41,7 +41,7 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
         formula: form
       }
     })
-    logger.info(`Converted content ${content} into formalization ${JSON.stringify(ret)}.`);
+    //logger.info(`Converted content ${content} into formalization ${JSON.stringify(ret)}.`);
     return ret
   } else {
     return []
