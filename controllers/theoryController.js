@@ -55,11 +55,8 @@ exports.update = function(req, res, next) {
   var body = req.body;
   body.lastUpdate = new Date();
   try {
-  console.log(`1>>>>>>>>>>>>>>>>>${body.content}`)
     body.autoFormalization = Theory.computeAutomaticFormalization(body.content)
-  console.log(`2>>>>>>>>>>>>>>>>>${body.autoFormalization}`)
     body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoFormalization.map(x => x.json))
-  console.log(`3>>>>>>>>>>>>>>>>>${body.autoVocabulary}`)
     Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
       if (!err && (result.nModified > 0)) {
         res.status(200).json({message: 'Theory updated'});
@@ -70,7 +67,6 @@ exports.update = function(req, res, next) {
       }
     });
   } catch (error) {
-  console.log(`Error>>>>>>>>>>>>>>>>>${error}`)
     res.status(400).json(error);
   }
 };
