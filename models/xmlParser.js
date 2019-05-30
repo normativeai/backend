@@ -1,4 +1,5 @@
 const cheerio = require('cheerio');
+var logger = require('../config/winston');
 
 const names = {
   "neg": "Negation",
@@ -22,7 +23,7 @@ const names = {
 
 function parse(html) {
   const $ = cheerio.load(html);
-  const forms = Array.from($("li > span").map(function(i, elem) {
+  const forms = Array.from($("span").not("span span").map(function(i, elem) {
     return parseFormula($,elem)
   }));
   return forms
