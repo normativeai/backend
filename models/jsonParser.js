@@ -1,6 +1,6 @@
 function parseFormula(obj) {
   if (obj.hasOwnProperty('connective')){
-    return parseConnector(obj.connective);
+    return parseConnector(obj);
   } else if (obj.hasOwnProperty('term')){
     return obj.term.name;
   } else {
@@ -9,15 +9,15 @@ function parseFormula(obj) {
 }
 
 function parseConnector(obj) {
-  var formulas = obj.formulas.map(f => parseFormula(f));
-  var argsNum = expectedArgs(obj.code);
+  var formulas = obj.connective.formulas.map(f => parseFormula(f));
+  var argsNum = expectedArgs(obj.connective.code);
   if (argsNum < 0 && formulas.length < 2) {
-    throw {error: `The sentence ${obj.text} contains the connective ${obj.name} which expectes at least two operands, but ${formulas.length} were given.`}
+    throw {error: `The sentence ${obj.text} contains the connective ${obj.connective.name} which expectes at least two operands, but ${formulas.length} were given.`}
   }
   if (argsNum >= 0 && formulas.length != argsNum) {
-    throw {error: `The sentence ${obj.text} contains the connective ${obj.name} which expectes ${argsNum} operands, but ${formulas.length} were given.`}
+    throw {error: `The sentence ${obj.text} contains the connective ${obj.connective.name} which expectes ${argsNum} operands, but ${formulas.length} were given.`}
   }
-  switch (obj.code) {
+  switch (obj.connective.code) {
     case "neg":
       return `(~ ${formulas[0]})`;
     case "or":
@@ -57,7 +57,7 @@ function parseConnector(obj) {
     case "equiv":
       return `(${formulas[0]} <=> ${formulas[1]})`;
     default:
-      throw {error: `Frontend error: Connective ${obj.code} is not known.`};
+      throw {error: `Frontend error: Connective ${obj.connective.code} is not known.`};
   }
 }
 

@@ -229,6 +229,16 @@ describe("Update theory", function(){
         .send(t)
         .expect(400, {"error": 'Frontend error: Connective band is not known.'}, done)
   })
+  it("should report correct errors if the auto formaliztion were not updated correctly 2", function(done){
+      const t = Object.assign({}, theory);
+      t.content = "<h2>Article 3 - Freedom of choice</h2> <p><br></p> <ol>   <li>     <span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\">       <span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span>       shall be <span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1012\" data-term=\"error\">governed</span> by       <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"valid_choice(Law,Part)\">the law chosen by the parties</span>.     </span>     The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract.   </li>  </ol>"
+      // update theory
+      server
+        .put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t)
+        .expect(400, {"error": 'The sentence        A contract       shall be governed by       the law chosen by the parties.      contains the connective Obligation Only If which expectes 2 operands, but 3 were given.'}, done)
+  })
 });
 
 describe("Delete theory", function(){
