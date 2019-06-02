@@ -27,8 +27,8 @@ class QueryHelper {
           cmd += f_parsed;
           hadValue = true;
         } catch (error) {
-          logger.info(`Cannot parse formula ${i+1}: ${f} - Error: ${error}`);
-          cb(null, `Cannot parse formula ${i+1}: ${f} - Error: ${error}`);
+          logger.info(`Cannot parse formula ${i+1} out of ${formulas.length} formulae: ${f} - Error: ${error}`);
+          cb(null, `Cannot parse formula ${i+1} out of ${formulas.length} formulae: ${f} - Error: ${error}`);
           return;
         }
       }
@@ -40,8 +40,8 @@ class QueryHelper {
         cmd += ", ";
         cmd += f_parsed;
       } catch (error) {
-        logger.info(`Cannot parse query assumption ${i+1}: ${f} - Error: ${error}`);
-        cb(null, `Cannot parse query assumption ${i+1}:  ${f} - Error: ${error}`);
+        logger.info(`Cannot parse query assumption ${i+1} out of ${assumptions.length} formulae: ${f} - Error: ${error}`);
+        cb(null, `Cannot parse query assumption ${i+1} out of ${assumptions.length} formulae:  ${f} - Error: ${error}`);
         return;
       }
     };
