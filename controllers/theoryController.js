@@ -96,6 +96,7 @@ exports.clone = function(req, res, next) {
     theory.user = req.user._id;
     theory.clonedForm = theory._id;
     theory._id = undefined;
+    theory.name = theory.name + " (Clone)";
     theory.isNew = true;
     theory.save(function (err, theory) {
       if (err) {

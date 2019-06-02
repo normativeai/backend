@@ -335,7 +335,7 @@ describe("Clone a theory", function(){
 
   var token = {token: undefined};
 
-	before(function(done) {
+	beforeEach(function(done) {
 		User.create(user, function (err) {
     utils.login(server, token, () => {
 		User.create(user2, function (err) {
@@ -347,7 +347,7 @@ describe("Clone a theory", function(){
     })})})})});
 	});
 
-	after(done => {
+	afterEach(done => {
 		Theory.deleteOne({'name': theory.name}, function (err) {
 		Theory.deleteOne({'name': theory2.name}, function (err) {
 		Theory.deleteOne({'name': theory3.name}, function (err) {
@@ -363,6 +363,19 @@ describe("Clone a theory", function(){
         .then(response => {
           User.findById(user._id, function(err, user) {
             assert(user.theories[0]._id == response.body.data.theory._id);
+          });
+          done();
+        })
+
+		});
+    it("should change the theory name into <name> (Clone)", function(done){
+			server
+				.post(`/api/theories/${theory3._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.expect(201)
+        .then(response => {
+          Theory.findById(response.body.data.theory._id, function(err, theory) {
+            assert(theory.name == (theory3.name + " (Clone)"));
           });
           done();
         })
