@@ -41,7 +41,7 @@ describe("Create theory", function(){
       .expect(201)
       .then(response => {
         User.findById(user._id, function(err, user) {
-          assert(user.theories[0]._id == theory._id);
+          assert.equal(user.theories[0]._id, theory._id);
         });
         done();
       })
@@ -57,14 +57,14 @@ describe("Create theory", function(){
         .expect(201)
         .then(response => {
           Theory.findById(theory6._id, function(err, theory) {
-            assert(JSON.stringify(theory.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
-            assert(theory.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
+            assert.equal(JSON.stringify(theory.autoFormalization[0].json), JSON.stringify(JSON.parse(json_string)));
+            assert.equal(theory.autoFormalization[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
             const vocdb0 = theory.autoVocabulary[0]
             const vocobj0 = {'symbol': vocdb0.symbol, 'original': vocdb0.original, 'full': vocdb0.full}
-            assert(JSON.stringify(vocobj0) == JSON.stringify(voc0));
+            assert.equal(JSON.stringify(vocobj0), JSON.stringify(voc0));
             const vocdb1 = theory.autoVocabulary[1]
             const vocobj1 = {'symbol': vocdb1.symbol, 'original': vocdb1.original, 'full': vocdb1.full}
-            assert(JSON.stringify(vocobj1) == JSON.stringify(voc1));
+            assert.equal(JSON.stringify(vocobj1), JSON.stringify(voc1));
             done();
           });
         })
@@ -125,11 +125,11 @@ describe("Get theories", function(){
         .expect(200)
         .then(response => {
           const t = response.body.data;
-          assert(theory.name == t.name);
-          assert(theory.description == t.description);
-          assert(JSON.stringify(theory.formalization) == JSON.stringify(t.formalization));
-          assert(theory.content == t.content);
-          assert(JSON.stringify(theory.vocabulary) == JSON.stringify(t.vocabulary));
+          assert.equal(theory.name, t.name);
+          assert.equal(theory.description, t.description);
+          assert.equal(JSON.stringify(theory.formalization), JSON.stringify(t.formalization));
+          assert.equal(theory.content, t.content);
+          assert.equal(JSON.stringify(theory.vocabulary),JSON.stringify(t.vocabulary));
           done();
         }).catch(err => {
           //console.log(err);
@@ -197,14 +197,14 @@ describe("Update theory", function(){
             .expect(200)
             .then(response => {
               const t = response.body.data;
-              assert(JSON.stringify(t.autoFormalization[0].json) == JSON.stringify(JSON.parse(json_string)));
-              assert(t.autoFormalization[0].formula == "(validChoice(Law,Part) O> contract(Law,Part))");
+              assert.equal(JSON.stringify(t.autoFormalization[0].json), JSON.stringify(JSON.parse(json_string)));
+              assert.equal(t.autoFormalization[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
               const vocdb0 = t.autoVocabulary[0]
               const vocobj0 = {'symbol': vocdb0.symbol, 'original': vocdb0.original, 'full': vocdb0.full}
-              assert(JSON.stringify(vocobj0) == JSON.stringify(voc0));
+              assert.equal(JSON.stringify(vocobj0), JSON.stringify(voc0));
               const vocdb1 = t.autoVocabulary[1]
               const vocobj1 = {'symbol': vocdb1.symbol, 'original': vocdb1.original, 'full': vocdb1.full}
-              assert(JSON.stringify(vocobj1) == JSON.stringify(voc1));
+              assert.equal(JSON.stringify(vocobj1), JSON.stringify(voc1));
               done();
   })})})
   it("should check that the auto formaliztion were updated correctly 2", function(done){
@@ -362,7 +362,7 @@ describe("Clone a theory", function(){
 				.expect(201)
         .then(response => {
           User.findById(user._id, function(err, user) {
-            assert(user.theories[0]._id == response.body.data.theory._id);
+            assert.equal(user.theories[0]._id, response.body.data.theory._id);
           });
           done();
         })
@@ -375,7 +375,7 @@ describe("Clone a theory", function(){
 				.expect(201)
         .then(response => {
           Theory.findById(response.body.data.theory._id, function(err, theory) {
-            assert(theory.name == (theory3.name + " (Clone)"));
+            assert.equal(theory.name, (theory3.name + " (Clone)"));
           });
           done();
         })
@@ -474,5 +474,31 @@ describe("Checking a formula in the formalization for independency", function(){
 				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[1]._id}`)
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, {data: {"independent": false}}, done);
+  });
+});
+
+describe("Checking theory static computeAutomaticVocabulary", function(){
+
+	it("should parse correctly terms with parentheses", function(done){
+    let voc = {"symbol": "contract", "original": "A contract", "full": "contract(Law,Part)" }
+    let json = {
+        "text": "A contract",
+        "term": {
+          "name": "contract(Law,Part)"
+        }
+      }
+    assert.equal(JSON.stringify(Theory.computeAutomaticVocabulary([json])),JSON.stringify([voc]))
+    done()
+  });
+  it("should parse correctly atomic terms", function(done){
+    let voc = {"symbol": "contract", "original": "A contract", "full": "contract" }
+    let json = {
+        "text": "A contract",
+        "term": {
+          "name": "contract"
+        }
+      }
+    assert.equal(JSON.stringify(Theory.computeAutomaticVocabulary([json])),JSON.stringify([voc]))
+    done()
   });
 });

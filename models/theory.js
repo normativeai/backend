@@ -50,8 +50,11 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
 
 function parseTerm(obj) {
   var term = obj.term.name
+  var index = term.indexOf('(')
+  if (index < 0)
+    index = term.length
   return {
-    'symbol': term.substring(0,term.indexOf('(')),
+    'symbol': term.substring(0,index),
     'original': obj.text,
     'full': term,
   }
@@ -65,6 +68,7 @@ function extractVocabulary(acc, val) {
   } else
     throw "Illegal JSON formalization - object contains no connective or term"
 }
+
 theorySchema.statics.computeAutomaticVocabulary = function (jsons) {
   var acc = []
   jsons.forEach(function(val) {

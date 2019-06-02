@@ -44,7 +44,7 @@ describe("Create query", function(){
         .expect(201)
         .then(response => {
           User.findById(user._id, function(err, user) {
-            assert(user.queries[0]._id == query._id);
+            assert.equal(user.queries[0]._id, query._id);
           });
           done();
         })
@@ -93,11 +93,11 @@ describe("Get queries", function(){
         .expect(200)
         .then(response => {
           const t = response.body.data;
-          assert(query.name == t.name);
-          assert(query.description == t.description);
-          assert(JSON.stringify(query.assumptions) == JSON.stringify(t.assumptions));
-          assert(query.goal == t.goal);
-          assert(query.theory._id == t.theory._id);
+          assert.equal(query.name, t.name);
+          assert.equal(query.description, t.description);
+          assert.equal(JSON.stringify(query.assumptions), JSON.stringify(t.assumptions));
+          assert.equal(query.goal, t.goal);
+          assert.equal(query.theory._id, t.theory._id);
           done();
         }).catch(err => {
           console.log(err);
