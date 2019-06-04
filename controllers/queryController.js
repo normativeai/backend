@@ -57,7 +57,13 @@ exports.update = function(req, res, next) {
     if (!err && (result.nModified > 0)) {
       res.status(200).json({"message": 'Query updated'});
     } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      res.status(404).json({err: 'Query could not be found'});
+      Query.findById(req.params.queryId, ['writeProtected'], function (err, query) {
+        if (query && query.writeProtected) {
+          res.status(400).json({"error": 'Query cannot be updated since it is write protected'});
+        } else {
+          res.status(404).json({err: 'Query could not be found'});
+        }
+      });
     } else {
       res.status(400).json({'err': err});
     }

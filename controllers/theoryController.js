@@ -61,7 +61,14 @@ exports.update = function(req, res, next) {
       if (!err && (result.nModified > 0)) {
         res.status(200).json({message: 'Theory updated'});
       } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-        res.status(404).json({err: 'Theory could not be found'});
+        Theory.findById(req.params.theoryId, ['writeProtected'], function (err, theory) {
+          if (theory && theory.writeProtected) {
+            res.status(400).json({"error": 'Theory cannot be updated since it is write protected'});
+          } else {
+            res.status(404).json({err: 'Theory could not be found'});
+          }
+        });
+
       } else {
         res.status(400).json({err: err});
       }

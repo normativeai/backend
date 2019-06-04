@@ -18,7 +18,13 @@ var querySchema = new Schema({
     lastQueryTheorem  : String,
     lastQueryProof    : String,
     lastConsistencyDate : Date,
-    lastConsistency   : Boolean
+    lastConsistency   : Boolean,
+    writeProtected    : Boolean
+});
+
+querySchema.pre('updateOne', function(next) {
+    this.updateOne({$or: [{writeProtected: {$exists: false}}, {writeProtected: false}] },{});
+    next()
 });
 
 querySchema.methods.execQuery = function(cb) {

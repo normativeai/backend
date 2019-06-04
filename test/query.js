@@ -16,6 +16,7 @@ const query3 = require('./fixtures/query.json').Query3;
 const query4 = require('./fixtures/query.json').Query4;
 const query5 = require('./fixtures/query.json').Query5;
 const query6 = require('./fixtures/query.json').Query6;
+const query7 = require('./fixtures/query.json').Query7;
 
 describe("Create query", function(){
 
@@ -113,12 +114,15 @@ describe("Update query", function(){
 		User.create(user, function (err) {
 		utils.login(server, token, () => {
 		query.user = user;
-		Query.create(query, function (err) {done();})})});
+		Query.create(query, function (err) {;
+		query7.user = user;
+		Query.create(query7, function (err) {done();})})})});
 	});
 
 	after(done => {
 		Query.deleteOne({"name": "temp"}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})});
+		Query.deleteOne({"name": "Query 7"}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})});
 	});
 
 	it("should return 200 on success", function(done){
@@ -138,6 +142,16 @@ describe("Update query", function(){
         .set('Authorization', `Bearer ${token.token}`)
 				.send(query)
         .expect(404, { err: 'Query could not be found'
+        },	done);
+  });
+  it("should return 400 and correct message on an update of a write protected query", function(done){
+      const t = Object.assign({}, query7);
+      t.name = "temp";
+			server
+				.put(`/api/queries/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(t)
+        .expect(400, { "error": 'Query cannot be updated since it is write protected'
         },	done);
   });
 

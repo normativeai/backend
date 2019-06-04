@@ -16,6 +16,7 @@ const theory4 = require('./fixtures/theory.json').Theory4;
 const theory5 = require('./fixtures/theory.json').Theory5;
 const theory6 = require('./fixtures/theory.json').Theory6;
 const theory7 = require('./fixtures/theory.json').Theory7;
+const theory8 = require('./fixtures/theory.json').Theory8;
 
 describe("Create theory", function(){
 
@@ -145,12 +146,15 @@ describe("Update theory", function(){
 		User.create(user, function (err) {
 		utils.login(server, token, () => {
 		theory.user = user;
-		Theory.create(theory, function (err) {done();})})});
+		Theory.create(theory, function (err) {;
+		theory8.user = user;
+		Theory.create(theory8, function (err) {done();})})})});
 	});
 
 	after(done => {
 		Theory.deleteOne({"name": "temp"}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})});
+		Theory.deleteOne({"name": "Test8"}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})});
 	});
 
 	it("should return 200 on successfull update", function(done){
@@ -239,6 +243,17 @@ describe("Update theory", function(){
         .send(t)
         .expect(400, {"error": 'The sentence        A contract       shall be governed by       the law chosen by the parties.      contains the connective Obligation Only If which expectes 2 operands, but 3 were given.'}, done)
   })
+  it("should return 400 and correct message on an update of a write protected theory", function(done){
+      const t = Object.assign({}, theory8);
+      t.name = "temp";
+			server
+				.put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(t)
+        .expect(400, { "error": 'Theory cannot be updated since it is write protected'
+        },	done);
+  });
+
 });
 
 describe("Delete theory", function(){

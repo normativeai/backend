@@ -90,5 +90,7 @@ exports.user = function(req, res, next) {
   })
 };
 
+// IMPORTANT!! If adding update for users, make sure to take into account write protection!
+
 
 

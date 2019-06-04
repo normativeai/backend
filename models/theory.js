@@ -17,7 +17,8 @@ var theorySchema = new Schema({
 		user 							: { type: Schema.Types.ObjectId, ref: 'User' },
     clonedForm        : { type: Schema.Types.ObjectId, ref: 'Theory' },
     lastConsistency   : Boolean,
-    lastConsistencyDate: Date
+    lastConsistencyDate: Date,
+    writeProtected    : Boolean
 });
 
 
@@ -77,6 +78,12 @@ theorySchema.statics.computeAutomaticVocabulary = function (jsons) {
   return acc
 }
 
+theorySchema.statics.onModification = function (writeProtected) {
+  if (writeProtected) {
+    throw {"error": 'Theory cannot updated since it is non-modifiable'}
+  }
+}
+
 // we call only on save/create and not on update since the update hook doest have access to the document and methods
 theorySchema.pre('save', function(next) {
   // we generate the automatic formalization as well
@@ -88,6 +95,11 @@ theorySchema.pre('save', function(next) {
     next(error)
   }
 })
+
+theorySchema.pre('updateOne', function(next) {
+    this.updateOne({$or: [{writeProtected: {$exists: false}}, {writeProtected: false}] },{});
+    next()
+});
 
 theorySchema.statics.isActive = function(form) {
   return !('active' in form.toJSON()) || form.toJSON().active;

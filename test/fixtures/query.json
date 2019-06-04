@@ -56,8 +56,17 @@
 					"description"   : "Inconsistent assumptions",
 					"assumptions"   : ["(~ p)", "p"],
 					"goal"          : "b"
+        },
+  "Query7":
+        {
+          "_id"           : "4542101d8e147f10f16acead",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Query 7",
+					"description"   : "Write protected",
+					"assumptions"   : [],
+					"goal"          : "",
+          "writeProtected": true
         }
-
 
 }
 
