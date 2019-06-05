@@ -66,8 +66,8 @@ describe("Create query", function(){
           Query.findById(query._id, function(err, query) {
             assert.equal(JSON.stringify(query.autoAssumptions[0].json), JSON.stringify(JSON.parse(json_string)[0]));
             assert.equal(query.autoAssumptions[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
-            assert.equal(JSON.stringify(query.goal.json), JSON.stringify(JSON.parse(json_string)[1]));
-            assert.equal(query.goal.formula, "contract(Law,Part)");
+            assert.equal(JSON.stringify(query.autoGoal.json), JSON.stringify(JSON.parse(json_string)[1]));
+            assert.equal(query.autoGoal.formula, "contract(Law,Part)");
             done();
           });
         })
@@ -89,6 +89,8 @@ describe("Get queries", function(){
 
   const q1 = Object.assign({}, query);
   const q2 = Object.assign({}, query2);
+  q1.autoAssumptions = []
+  q2.autoAssumptions = []
 
 	before(function(done) {
 		User.create(user, function (err) {

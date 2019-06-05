@@ -11,7 +11,8 @@ var querySchema = new Schema({
     assumptions       : [String],
     content           : String, // annotated XML
     autoAssumptions   : [{original: String, json: Object, formula: String}],
-    goal              : {original: String, json: Object, formula: String},
+    autoGoal          : {original: String, json: Object, formula: String},
+    goal              : String,
     description       : String,
 		cached_result			: String,
 		theory						: { type: Schema.Types.ObjectId, ref: 'Theory' },
@@ -55,7 +56,7 @@ querySchema.pre('save', function(next) {
   try {
     var res = querySchema.statics.computeAutomaticFormalization(this.content)
     this.autoAssumptions = res[0]
-    this.goal = res[1]
+    this.autoGoal = res[1]
     next()
   } catch (error) {
     next(error)

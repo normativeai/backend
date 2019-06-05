@@ -44,13 +44,13 @@ exports.create = [
 ]
 
 exports.get = function(req, res, next) {
-  Query.find({ "user": req.user }, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'], {"sort": {"_id": 1}}, function (err, queries) {
+  Query.find({ "user": req.user }, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'autoAssumptions', 'goal', 'autoGoal'], {"sort": {"_id": 1}}, function (err, queries) {
     res.json({"data": queries})
   });
 };
 
 exports.getOne = function(req, res, next) {
-  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'])
+  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'autoAssumptions', 'goal', 'autoGoal'])
     .populate('theory', ['_id', 'lastUpdate', 'name', 'description', 'vocabulary', 'autoVocabulary'])
     .exec(function(err, query) {
       res.json({"data": query});
