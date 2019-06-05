@@ -62,22 +62,29 @@ exports.update = function(req, res, next) {
     res.status(400).json({"error": 'Query cannot be updated since the user is write protected'});
   } else {
     var body = req.body;
-    body.lastUpdate = new Date();
-    Query.updateOne({ '_id': req.params.queryId, user: req.user._id }, { $set: body}, function (err, result) {
-      if (!err && (result.nModified > 0)) {
-        res.status(200).json({"message": 'Query updated'});
-      } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-        Query.findById(req.params.queryId, ['writeProtected'], function (err, query) {
-          if (query && query.writeProtected) {
-            res.status(400).json({"error": 'Query cannot be updated since it is write protected'});
-          } else {
-            res.status(404).json({err: 'Query could not be found'});
-          }
-        });
-      } else {
-        res.status(400).json({'err': err});
-      }
-    });
+    try {
+      var vals = Query.computeAutomaticFormalization(body.content);
+      body.autoAssumptions = vals[0]
+      body.autoGoal = vals[1]
+      body.lastUpdate = new Date();
+      Query.updateOne({ '_id': req.params.queryId, user: req.user._id }, { $set: body}, function (err, result) {
+        if (!err && (result.nModified > 0)) {
+          res.status(200).json({"message": 'Query updated'});
+        } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
+          Query.findById(req.params.queryId, ['writeProtected'], function (err, query) {
+            if (query && query.writeProtected) {
+              res.status(400).json({"error": 'Query cannot be updated since it is write protected'});
+            } else {
+              res.status(404).json({err: 'Query could not be found'});
+            }
+          });
+        } else {
+          res.status(400).json({'err': err});
+        }
+      });
+    } catch (error) {
+      res.status(400).json(error);
+    }
   }
 };
 

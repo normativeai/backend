@@ -188,6 +188,40 @@ describe("Update query", function(){
         .expect(400, { "error": 'Query cannot be updated since it is write protected'
         },	done);
   });
+  it("should check that the auto assumptions were updated correctly", function(done){
+      const t = Object.assign({}, query);
+      let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
+      t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li> <li><span id=\"some-id\" class=\"annotator-goal\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1016\" data-term=\"contract(Law,Part)\">A contract</span></span></li></ol>"
+      // update theory
+      server
+        .put(`/api/queries/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t).end(function() {
+          server
+            .get(`/api/queries/${t._id}`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .expect(200)
+            .then(response => {
+              Query.findById(query._id, function(err, query) {
+                assert.equal(JSON.stringify(query.autoAssumptions[0].json), JSON.stringify(JSON.parse(json_string)[0]));
+                assert.equal(query.autoAssumptions[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
+                assert.equal(JSON.stringify(query.autoGoal.json), JSON.stringify(JSON.parse(json_string)[1]));
+                assert.equal(query.autoGoal.formula, "contract(Law,Part)");
+                done();
+              });
+            })
+  })})
+  it("should report correct errors if the auto formaliztion were not updated correctly", function(done){
+      const t = Object.assign({}, query);
+      let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
+      t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li></ol>"
+      // update theory
+      server
+        .put(`/api/queries/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t)
+        .expect(400, {"error": 'Queries must contain goals.'}, done)
+  })
 
 });
 
