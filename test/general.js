@@ -12,7 +12,7 @@ describe("Requesting the connectives", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
     done();})});
 	});
 

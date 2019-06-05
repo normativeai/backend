@@ -100,7 +100,7 @@ describe("Logout",function(){
   var token = {token: undefined};
 	before(done => {
 		User.create(user, function (err) {
-    utils.login(server,token, done)});
+    utils.login(server,token, user, done)});
 	});
 
 	after(done => {
@@ -189,7 +189,7 @@ describe("Connecting to API",function(){
     var token = {token: undefined};
 
     before(function(done) {
-      utils.login(server, token, () => {
+      utils.login(server, token, user, () => {
       theory.user = u;
       Theory.create(theory, function (err) {
       theory2.user = u;

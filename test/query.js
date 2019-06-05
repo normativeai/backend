@@ -7,6 +7,7 @@ const utils = require('./utils.js');
 const User = require('../models/user');
 const Theory = require('../models/theory');
 const user = require('./fixtures/user.json').User;
+const user3 = require('./fixtures/user.json').User3;
 const theory = require('./fixtures/theory.json').Theory;
 const theory4 = require('./fixtures/theory.json').Theory4;
 const Query = require('../models/query');
@@ -24,7 +25,7 @@ describe("Create query", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
     theory.user = user;
     Theory.create(theory, function(err) {
       query.theory = theory._id;
@@ -61,7 +62,7 @@ describe("Get queries", function(){
 
 	before(function(done) {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
     theory.user = user;
     Theory.create(theory, function(err) {
 		query.user = user;
@@ -112,7 +113,7 @@ describe("Update query", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-		utils.login(server, token, () => {
+		utils.login(server, token, user, () => {
 		query.user = user;
 		Query.create(query, function (err) {;
 		query7.user = user;
@@ -165,7 +166,7 @@ describe("Delete query", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-		utils.login(server, token, () => {
+		utils.login(server, token, user, () => {
 		query.user = user;
     t.user = user;
 		Query.create(query, function (err) {done();})})});
@@ -198,7 +199,7 @@ describe("Execute query", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
     theory.user = user;
     Theory.create(theory, function(err, theory) {
     query.theory = theory._id;
@@ -265,7 +266,7 @@ describe("Execute query with missing information", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
     Query.create(query, function(err, query) {
     done();})})});
 	});
@@ -289,7 +290,7 @@ describe("Checking a query assumptions for consistency with relation to a theory
 
 	before(function(done) {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
 		theory4.user = user;
 		Theory.create(theory4, function (err) {
 		query4.user = user;
@@ -340,3 +341,41 @@ describe("Checking a query assumptions for consistency with relation to a theory
 		});
 });
 
+describe("Changing queries of write protected user", function(){
+
+  var token = {token: undefined};
+
+	before(done => {
+		User.create(user3, function (err) {
+		utils.login(server, token, user3, () => {
+		query.user = user3;
+		Query.create(query, function (err) {;
+      done();})});
+	})});
+
+	after(done => {
+		Query.deleteOne({"name": query.name}, function (err) {
+		User.deleteOne({'email': user3.email}, function (err) {done();})});
+	});
+
+  it("should check that a query cannot be created", function(done){
+    server
+      .post("/api/queries")
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(query)
+      .expect(400, {error: "Query cannot be created since the user is write protected"}, done);
+  });
+  it("should check that a query cannot be updated", function(done){
+    server
+      .put(`/api/queries/${query._id}`)
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(query)
+      .expect(400, {error: "Query cannot be updated since the user is write protected"}, done);
+  });
+  it("should check that a query cannot be deleted", function(done){
+    server
+      .delete(`/api/queries/${query._id}`)
+      .set('Authorization', `Bearer ${token.token}`)
+      .expect(400, {error: "Query cannot be deleted since the user is write protected"}, done);
+  });
+})

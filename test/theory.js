@@ -9,6 +9,7 @@ const User = require('../models/user');
 const Theory = require('../models/theory');
 const user = require('./fixtures/user.json').User;
 const user2 = require('./fixtures/user.json').User2;
+const user3 = require('./fixtures/user.json').User3;
 const theory = require('./fixtures/theory.json').Theory;
 const theory2 = require('./fixtures/theory.json').Theory2;
 const theory3 = require('./fixtures/theory.json').Theory3;
@@ -24,7 +25,7 @@ describe("Create theory", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
       done();});
 	})});
 
@@ -76,7 +77,7 @@ describe("Create theory", function(){
         .set('Authorization', `Bearer ${token.token}`)
 				.send(theory7)
         .expect(400, {"error": 'Frontend error: Connective band is not known.'}, done)
-		});
+  });
 });
 
 describe("Get theories", function(){
@@ -97,7 +98,7 @@ describe("Get theories", function(){
 
 	before(function(done) {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
 		theory.user = user;
 		Theory.create(theory, function (err) {
 		theory2.user = user;
@@ -144,7 +145,7 @@ describe("Update theory", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-		utils.login(server, token, () => {
+		utils.login(server, token, user, () => {
 		theory.user = user;
 		Theory.create(theory, function (err) {;
 		theory8.user = user;
@@ -253,7 +254,16 @@ describe("Update theory", function(){
         .expect(400, { "error": 'Theory cannot be updated since it is write protected'
         },	done);
   });
-
+  it("should return 400 and correct message on an update of a theory of a write protected user", function(done){
+      const t = Object.assign({}, theory8);
+      t.name = "temp";
+			server
+				.put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(t)
+        .expect(400, { "error": 'Theory cannot be updated since it is write protected'
+        },	done);
+  });
 });
 
 describe("Delete theory", function(){
@@ -264,7 +274,7 @@ describe("Delete theory", function(){
 
 	before(done => {
 		User.create(user, function (err) {
-		utils.login(server, token, () => {
+		utils.login(server, token, user, () => {
 		theory.user = user;
     t.user = user;
 		Theory.create(theory, function (err) {done();})})});
@@ -309,7 +319,7 @@ describe("Find theories", function(){
 
 	before(function(done) {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
 		theory.user = user;
 		Theory.create(theory, function (err) {
 		theory2.user = user;
@@ -352,7 +362,7 @@ describe("Clone a theory", function(){
 
 	beforeEach(function(done) {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
 		User.create(user2, function (err) {
 		theory.user = user;
 		Theory.create(theory, function (err) {
@@ -404,7 +414,7 @@ describe("Checking a theory for consistency", function(){
 
 	before(function(done) {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
 		theory.user = user;
 		Theory.create(theory, function (err) {
 		theory2.user = user;
@@ -466,7 +476,7 @@ describe("Checking a formula in the formalization for independency", function(){
 
 	before(function(done) {
 		User.create(user, function (err) {
-    utils.login(server, token, () => {
+    utils.login(server, token, user, () => {
 		theory4.user = user;
 		Theory.create(theory4, function (err) {
       done();
@@ -517,3 +527,48 @@ describe("Checking theory static computeAutomaticVocabulary", function(){
     done()
   });
 });
+
+describe("Changing theories of write protected user", function(){
+
+  var token = {token: undefined};
+
+	before(done => {
+		User.create(user3, function (err) {
+		utils.login(server, token, user3, () => {
+		theory.user = user3;
+		Theory.create(theory, function (err) {;
+      done();})});
+	})});
+
+	after(done => {
+		Theory.deleteOne({"name": "temp"}, function (err) {
+		User.deleteOne({'email': user3.email}, function (err) {done();})});
+	});
+
+  it("should check that a theory cannot be created", function(done){
+    server
+      .post("/api/theories")
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(theory)
+      .expect(400, {error: "Theory cannot be created since the user is write protected"}, done);
+  });
+  it("should check that a theory cannot be updated", function(done){
+    server
+      .put(`/api/theories/${theory._id}`)
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(theory)
+      .expect(400, {error: "Theory cannot be updated since the user is write protected"}, done);
+  });
+  it("should check that a theory cannot be deleted", function(done){
+    server
+      .delete(`/api/theories/${theory._id}`)
+      .set('Authorization', `Bearer ${token.token}`)
+      .expect(400, {error: "Theory cannot be deleted since the user is write protected"}, done);
+  });
+  it("should check that a theory cannot be cloned", function(done){
+    server
+      .post(`/api/theories/${theory._id}`)
+      .set('Authorization', `Bearer ${token.token}`)
+      .expect(400, {error: "Theory cannot be cloned since the user is write protected"}, done);
+  });
+})

@@ -63,7 +63,7 @@ exports.login = [
 				if( error ) return next(error)
 				//We don't want to store the sensitive information such as the
 				//user password in the token so we pick only the email and id
-				const body = { _id : user._id, email : user.email };
+				const body = { _id : user._id, email : user.email, writeProtected: user.writeProtected };
 				//Sign the JWT token and populate the payload with the user email and id
 				const token = jwt.sign({ user : body },'top_secret');
 				//Send back the token to the user

@@ -8,31 +8,35 @@ exports.create = [
   sanitizeBody('name').trim().escape(),
 
   function(req, res, next) {
-    const errors = validationResult(req);
+    if (req.user.writeProtected) {
+      res.status(400).json({"error": 'Query cannot be created since the user is write protected'});
+    } else {
+      const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+      if (!errors.isEmpty()) {
+          return res.status(422).json({ errors: errors.array() });
+      }
+
+      Query.create({
+        _id: req.body._id,
+        name: req.body.name,
+        lastUpdate: new Date(),
+        user: req.user,
+        theory: req.body.theory,
+        description: req.body.description,
+        assumptions: req.body.assumptions,
+        goal: req.body.goal
+      }).then(query => {
+        User.findById(req.user._id, function(err, user) {
+          user.queries.push(query._id);
+          user.save(err => {
+            if (err) {
+              res.status(400).json({ err: err});
+            } else {
+              res.status(201).json({"data": query});
+            }
+        })})});
     }
-
-    Query.create({
-      _id: req.body._id,
-      name: req.body.name,
-      lastUpdate: new Date(),
-      user: req.user,
-      theory: req.body.theory,
-      description: req.body.description,
-      assumptions: req.body.assumptions,
-      goal: req.body.goal
-    }).then(query => {
-      User.findById(req.user._id, function(err, user) {
-        user.queries.push(query._id);
-        user.save(err => {
-          if (err) {
-            res.status(400).json({ err: err});
-          } else {
-            res.status(201).json({"data": query});
-          }
-      })})});
   }
 ]
 
@@ -51,35 +55,43 @@ exports.getOne = function(req, res, next) {
 };
 
 exports.update = function(req, res, next) {
-  var body = req.body;
-  body.lastUpdate = new Date();
-  Query.updateOne({ '_id': req.params.queryId, user: req.user._id }, { $set: body}, function (err, result) {
-    if (!err && (result.nModified > 0)) {
-      res.status(200).json({"message": 'Query updated'});
-    } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      Query.findById(req.params.queryId, ['writeProtected'], function (err, query) {
-        if (query && query.writeProtected) {
-          res.status(400).json({"error": 'Query cannot be updated since it is write protected'});
-        } else {
-          res.status(404).json({err: 'Query could not be found'});
-        }
-      });
-    } else {
-      res.status(400).json({'err': err});
-    }
-  });
+  if (req.user.writeProtected) {
+    res.status(400).json({"error": 'Query cannot be updated since the user is write protected'});
+  } else {
+    var body = req.body;
+    body.lastUpdate = new Date();
+    Query.updateOne({ '_id': req.params.queryId, user: req.user._id }, { $set: body}, function (err, result) {
+      if (!err && (result.nModified > 0)) {
+        res.status(200).json({"message": 'Query updated'});
+      } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
+        Query.findById(req.params.queryId, ['writeProtected'], function (err, query) {
+          if (query && query.writeProtected) {
+            res.status(400).json({"error": 'Query cannot be updated since it is write protected'});
+          } else {
+            res.status(404).json({err: 'Query could not be found'});
+          }
+        });
+      } else {
+        res.status(400).json({'err': err});
+      }
+    });
+  }
 };
 
 exports.delete = function(req, res, next) {
-  Query.deleteOne({ '_id': req.params.queryId, user: req.user._id }, function (err, result) {
-    if (!err && (result.n > 0)) {
-      res.status(200).json({"message": 'Query deleted'});
-    } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-      res.status(404).json({err: 'Query could not be found'});
-    } else {
-      res.status(400).json({'err': err});
-    }
-  });
+  if (req.user.writeProtected) {
+    res.status(400).json({"error": 'Query cannot be deleted since the user is write protected'});
+  } else {
+    Query.deleteOne({ '_id': req.params.queryId, user: req.user._id }, function (err, result) {
+      if (!err && (result.n > 0)) {
+        res.status(200).json({"message": 'Query deleted'});
+      } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
+        res.status(404).json({err: 'Query could not be found'});
+      } else {
+        res.status(400).json({'err': err});
+      }
+    });
+  }
 };
 
 // Execute query.

@@ -4,7 +4,6 @@
 
  var config = require('../config/development');
  var mongoose = require('mongoose');
-const user = require('./fixtures/user.json').User;
 
  before(function (done) {
 
@@ -32,7 +31,7 @@ const user = require('./fixtures/user.json').User;
    return done();
  });
 
-function login(server, token, done) {
+function login(server, token, user, done) {
 	server
     .post("/api/login")
     .send(user)
