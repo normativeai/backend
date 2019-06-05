@@ -100,6 +100,7 @@ describe("Get queries", function(){
           assert.equal(JSON.stringify(query.assumptions), JSON.stringify(t.assumptions));
           assert.equal(query.goal, t.goal);
           assert.equal(query.theory._id, t.theory._id);
+          assert.equal(JSON.stringify(query.theory.vocabulary), JSON.stringify(t.theory.vocabulary));
           done();
         }).catch(err => {
           console.log(err);

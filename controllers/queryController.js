@@ -48,7 +48,7 @@ exports.get = function(req, res, next) {
 
 exports.getOne = function(req, res, next) {
   Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'goal'])
-    .populate('theory', ['_id', 'lastUpdate', 'name', 'description'])
+    .populate('theory', ['_id', 'lastUpdate', 'name', 'description', 'vocabulary', 'autoVocabulary'])
     .exec(function(err, query) {
       res.json({"data": query});
     });
