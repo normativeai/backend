@@ -43,6 +43,11 @@ function parseFormula($,spanElem) {
         "text": text,
         "term": parseTerm($,spanElem)
       }
+    case 'goal':
+      return {
+        "text": text,
+        "goal": parseGoal($,spanElem)
+      }
     default:
       throw `Cannot parse XML. Unknown annotator value: ${code}`
   }
@@ -60,6 +65,17 @@ function parseConnective($,spanElem) {
   }
 }
 
+function parseGoal($,spanElem) {
+  const forms = Array.from($(spanElem).children().map(function(i, elem) {
+    return parseFormula($,elem)
+  }));
+  if (forms.length != 1) {
+    throw {error: 'A goal must contain one connective or term only'}
+  }
+  return {
+    "formula": forms[0]
+  }
+}
 function parseTerm($, spanElem) {
   const term = $(spanElem).attr("data-term")
   return {

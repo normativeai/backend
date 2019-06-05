@@ -3,9 +3,15 @@ function parseFormula(obj) {
     return parseConnector(obj);
   } else if (obj.hasOwnProperty('term')){
     return obj.term.name;
+  } else if (obj.hasOwnProperty('goal')){
+    return parseGoal(obj);
   } else {
     throw {error: `Frontend error: The formula type ${obj.code} is not known.`};
   }
+}
+
+function parseGoal(obj) {
+  return parseFormula(obj.goal.formula);
 }
 
 function parseConnector(obj) {

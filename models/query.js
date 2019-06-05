@@ -9,7 +9,9 @@ var querySchema = new Schema({
     lastUpdate        : Date,
     name 		          : String,
     assumptions       : [String],
-    goal              : String,
+    content           : String, // annotated XML
+    autoAssumptions   : [{original: String, json: Object, formula: String}],
+    goal              : {original: String, json: Object, formula: String},
     description       : String,
 		cached_result			: String,
 		theory						: { type: Schema.Types.ObjectId, ref: 'Theory' },
@@ -21,6 +23,45 @@ var querySchema = new Schema({
     lastConsistency   : Boolean,
     writeProtected    : Boolean
 });
+
+// this is static since update pre hooks are problematic so we call it from the controller and the doc is not read yet
+querySchema.statics.computeAutomaticFormalization = function (content) {
+  if (content != null) {
+    var xmlParser = require('./xmlParser');
+    var jsonParser = require('./jsonParser');
+    var ret = xmlParser.parse(content).map(function(obj) {
+      var form = jsonParser.parseFormula(obj)
+       return {
+        original: obj.text,
+        json: obj,
+        formula: form
+      }
+    })
+    //logger.info(`Converted content ${content} into formalization ${JSON.stringify(ret)}.`);
+    var index = ret.findIndex(function(x) { return x.json.hasOwnProperty('goal')})
+    if (index < 0)
+      throw {error: 'Queries must contain goals.'}
+    var goal = ret[index]
+    return [ret.splice(index-1,1),goal]
+  } else {
+    return []
+  }
+}
+
+
+// we call only on save/create and not on update since the update hook doest have access to the document and methods
+querySchema.pre('save', function(next) {
+  // we generate the automatic formalization as well
+  try {
+    var res = querySchema.statics.computeAutomaticFormalization(this.content)
+    this.autoAssumptions = res[0]
+    this.goal = res[1]
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 querySchema.pre('updateOne', function(next) {
     this.updateOne({$or: [{writeProtected: {$exists: false}}, {writeProtected: false}] },{});

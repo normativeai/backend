@@ -78,12 +78,6 @@ theorySchema.statics.computeAutomaticVocabulary = function (jsons) {
   return acc
 }
 
-theorySchema.statics.onModification = function (writeProtected) {
-  if (writeProtected) {
-    throw {"error": 'Theory cannot updated since it is non-modifiable'}
-  }
-}
-
 // we call only on save/create and not on update since the update hook doest have access to the document and methods
 theorySchema.pre('save', function(next) {
   // we generate the automatic formalization as well

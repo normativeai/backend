@@ -25,6 +25,7 @@ exports.create = [
         theory: req.body.theory,
         description: req.body.description,
         assumptions: req.body.assumptions,
+        content: req.body.content,
         goal: req.body.goal
       }).then(query => {
         User.findById(req.user._id, function(err, user) {
@@ -35,7 +36,9 @@ exports.create = [
             } else {
               res.status(201).json({"data": query});
             }
-        })})});
+        })})}).catch(function(error) {
+            res.status(400).json(error);
+          });
     }
   }
 ]
