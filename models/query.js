@@ -40,10 +40,13 @@ querySchema.statics.computeAutomaticFormalization = function (content) {
     })
     //logger.info(`Converted content ${content} into formalization ${JSON.stringify(ret)}.`);
     var index = ret.findIndex(function(x) { return x.json.hasOwnProperty('goal')})
-    if (index < 0)
-      throw {error: 'Queries must contain goals.'}
-    var goal = ret[index]
-    return [ret.splice(index-1,1),goal]
+    if (index < 0) {
+      // no goal
+      return [ret,{}]
+    } else {
+      var goal = ret[index]
+      return [ret.splice(index-1,1),goal]
+    }
   } else {
     return []
   }
@@ -70,16 +73,19 @@ querySchema.pre('updateOne', function(next) {
 });
 
 querySchema.methods.execQuery = function(cb) {
-  if (true) { //(typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate) {
+  if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
 
     if (!!!this.theory) {
       cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
-    } else if (!this.goal) {
+    } else if (!this.goal && !this.autoGoal.formula) {
       cb(false, 'Query has no goal. Please assign goals before trying to execute queries');
     } else {
       var obj = this
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions, this.goal, function(theorem, proof) {
+      if (!this.autoGoal.formula) {
+        this.autoGoal.formula = this.goal
+      }
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, function(theorem, proof) {
         obj.lastQueryTheorem = theorem;
         obj.lastQueryProof = proof;
         obj.lastQueryDate = new Date();

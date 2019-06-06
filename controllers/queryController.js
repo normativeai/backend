@@ -75,11 +75,11 @@ exports.update = function(req, res, next) {
             if (query && query.writeProtected) {
               res.status(400).json({"error": 'Query cannot be updated since it is write protected'});
             } else {
-              res.status(404).json({err: 'Query could not be found'});
+              res.status(404).json({'error': 'Query could not be found'});
             }
           });
         } else {
-          res.status(400).json({'err': err});
+          res.status(400).json({'error': err});
         }
       });
     } catch (error) {
@@ -96,9 +96,9 @@ exports.delete = function(req, res, next) {
       if (!err && (result.n > 0)) {
         res.status(200).json({"message": 'Query deleted'});
       } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-        res.status(404).json({err: 'Query could not be found'});
+        res.status(404).json({'error': 'Query could not be found'});
       } else {
-        res.status(400).json({'err': err});
+        res.status(400).json({'error': err});
       }
     });
   }
@@ -114,13 +114,13 @@ exports.exec = function(req, res) {
           if (theorem) {
             res.json({"data": {"result":theorem, "proof":proof}});
           } else if (proof) {
-            res.status(400).json({err: proof});
+            res.status(400).json({'error': proof});
           } else {
-            res.status(400).json({err: 'MleanCoP error: invalid query'});
+            res.status(400).json({'error': 'MleanCoP error: invalid query'});
           }
         });
       } else {
-        res.status(400).json({err: 'Unknown query ID'});
+        res.status(400).json({'error': 'Unknown query ID'});
       }
   });
 };

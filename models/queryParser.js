@@ -148,5 +148,3 @@ exports.parseFormula = function(str) {
 exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
-
-console.log(exports.parseFormula('(p(X) => q(Y))'))
