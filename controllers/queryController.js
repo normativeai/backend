@@ -37,6 +37,7 @@ exports.create = [
               res.status(201).json({"data": query});
             }
         })})}).catch(function(error) {
+          console.log(error)
             res.status(400).json(error);
           });
     }
@@ -44,13 +45,13 @@ exports.create = [
 ]
 
 exports.get = function(req, res, next) {
-  Query.find({ "user": req.user }, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'autoAssumptions', 'goal', 'autoGoal'], {"sort": {"_id": 1}}, function (err, queries) {
+  Query.find({ "user": req.user }, ['_id', 'lastUpdate', 'name', 'description'], {"sort": {"_id": 1}}, function (err, queries) {
     res.json({"data": queries})
   });
 };
 
 exports.getOne = function(req, res, next) {
-  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'assumptions', 'autoAssumptions', 'goal', 'autoGoal'])
+  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'content', 'assumptions', 'autoAssumptions', 'goal', 'autoGoal'])
     .populate('theory', ['_id', 'lastUpdate', 'name', 'description', 'vocabulary', 'autoVocabulary'])
     .exec(function(err, query) {
       res.json({"data": query});

@@ -20,6 +20,7 @@ const query5 = require('./fixtures/query.json').Query5;
 const query6 = require('./fixtures/query.json').Query6;
 const query7 = require('./fixtures/query.json').Query7;
 const query8 = require('./fixtures/query.json').Query8;
+const query9 = require('./fixtures/query.json').Query9;
 
 describe("Create query", function(){
 
@@ -30,14 +31,14 @@ describe("Create query", function(){
     utils.login(server, token, user, () => {
     theory.user = user;
     Theory.create(theory, function(err) {
-      query.theory = theory._id;
       done();})});
 	})});
 
 	afterEach(done => {
 		Query.deleteOne({'name': query.name}, function (err) {
+		Query.deleteOne({'name': query9.name}, function (err) {
 		Theory.deleteOne({'name': theory.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})});
+		User.deleteOne({'email': user.email}, function (err) {done();})})})});
 	});
 
 	it("should return the created query and check it was added to the user", function(done){
@@ -53,7 +54,6 @@ describe("Create query", function(){
         done();
       })
   });
-
   it("should check that the auto assumptions were created correctly", function(done){
       const t = Object.assign({}, query);
       let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
@@ -65,6 +65,24 @@ describe("Create query", function(){
         .expect(201)
         .then(response => {
           Query.findById(query._id, function(err, query) {
+            assert.equal(JSON.stringify(query.autoAssumptions[0].json), JSON.stringify(JSON.parse(json_string)[0]));
+            assert.equal(query.autoAssumptions[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
+            assert.equal(JSON.stringify(query.autoGoal.json), JSON.stringify(JSON.parse(json_string)[1]));
+            assert.equal(query.autoGoal.formula, "contract(Law,Part)");
+            done();
+          });
+        })
+  });
+  it("should check that the auto assumptions were created correctly 2", function(done){
+      const t = Object.assign({}, query9);
+      let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
+			server
+				.post("/api/queries")
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(t)
+        .expect(201)
+        .then(response => {
+          Query.findById(t._id, function(err, query) {
             assert.equal(JSON.stringify(query.autoAssumptions[0].json), JSON.stringify(JSON.parse(json_string)[0]));
             assert.equal(query.autoAssumptions[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
             assert.equal(JSON.stringify(query.autoGoal.json), JSON.stringify(JSON.parse(json_string)[1]));
@@ -111,11 +129,6 @@ describe("Get queries", function(){
 
   var token = {token: undefined};
 
-  const q1 = Object.assign({}, query);
-  const q2 = Object.assign({}, query2);
-  q1.autoAssumptions = []
-  q2.autoAssumptions = []
-
 	before(function(done) {
 		User.create(user, function (err) {
     utils.login(server, token, user, () => {
@@ -126,25 +139,37 @@ describe("Get queries", function(){
 		Query.create(query, function (err) {
 		query2.user = user;
 		Query.create(query2, function (err) {
+		Query.create(query9, function (err) {
       done();
-    })})})})});
+    })})})})})});
 	});
 
 	after(done => {
 		Query.deleteOne({'name': query.name}, function (err) {
 		Query.deleteOne({'name': query2.name}, function (err) {
+		Query.deleteOne({'name': query9.name}, function (err) {
 		Theory.deleteOne({'name': theory.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})})});
+		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
 	});
 
 	it("should return an array of all queries of connected user", function(done){
 			server
 				.get("/api/queries")
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {"data": [q1, q2]}, done);
+				.expect(200)
+        .then(response => {
+          var arr = JSON.parse(response.text).data
+          assert.equal(arr[0].name, query.name)
+          assert.equal(arr[1].name, query2.name)
+          assert.equal(arr[0].lastUpdate, query.lastUpdate)
+          assert.equal(arr[1].lastUpdate, query2.lastUpdate)
+          assert.equal(arr[0].description, query.description)
+          assert.equal(arr[1].description, query2.description)
+          done()
+        })
 		});
 
-  it("should return a chosen query of connected user with all information", function(done){
+  it("should return a chosen query of connected user with all information if it is manual only", function(done){
 			server
 				.get(`/api/queries/${query._id}`)
         .set('Authorization', `Bearer ${token.token}`)
@@ -157,6 +182,22 @@ describe("Get queries", function(){
           assert.equal(query.goal, t.goal);
           assert.equal(query.theory._id, t.theory._id);
           assert.equal(JSON.stringify(query.theory.vocabulary), JSON.stringify(t.theory.vocabulary));
+          done();
+        }).catch(err => {
+          console.log(err);
+        })
+		});
+
+    it("should return a chosen query of connected user with all information if it is automatic only", function(done){
+			server
+				.get(`/api/queries/${query9._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(200)
+        .then(response => {
+          const t = response.body.data;
+          assert.equal(query9.name, t.name);
+          assert.equal(query9.description, t.description);
+          assert.equal(JSON.stringify(query9.content), JSON.stringify(t.content));
           done();
         }).catch(err => {
           console.log(err);

@@ -73,6 +73,14 @@
           "lastUpdate"    : "2018-12-30T08:19:57.681Z",
 					"name"          : "Query 8",
 					"description"   : "No manual data"
+        },
+  "Query9":
+        {
+          "_id"           : "2542101d8e147f10f16acead",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Query 9",
+					"description"   : "Only automatic data",
+          "content"       : "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li> <li><span id=\"some-id\" class=\"annotator-goal\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1016\" data-term=\"contract(Law,Part)\">A contract</span></span></li></ol>"
         }
 }
 
