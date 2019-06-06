@@ -302,6 +302,29 @@ describe("Update query", function(){
               });
             })
   })})
+  it("should check that the auto assumptions were updated correctly when only a goal is annotated", function(done){
+      const t = Object.assign({}, query8);
+      let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
+      t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol>The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li> <li><span id=\"some-id\" class=\"annotator-goal\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1016\" data-term=\"contract(Law,Part)\">A contract</span></span></li></ol>"
+      // update theory
+      server
+        .put(`/api/queries/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .send(t).end(function() {
+          server
+            .get(`/api/queries/${t._id}`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .expect(200)
+            .then(response => {
+              Query.findById(query8._id, function(err, query) {
+                assert.equal(query.autoAssumptions.length, 0);
+                assert.equal(JSON.stringify(query.autoGoal.json), JSON.stringify(JSON.parse(json_string)[1]));
+                assert.equal(query.autoGoal.formula, "contract(Law,Part)");
+                done();
+              });
+            })
+  })})
+
   it("should report correct errors if the auto formaliztion were not updated correctly", function(done){
       const t = Object.assign({}, query);
       let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");

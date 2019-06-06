@@ -43,6 +43,10 @@ querySchema.statics.computeAutomaticFormalization = function (content) {
     if (index < 0) {
       // no goal
       return [ret,{}]
+    } else if (ret.length == 1) {
+      // only goal
+      var goal = ret[index]
+      return [[],goal]
     } else {
       var goal = ret[index]
       return [ret.splice(index-1,1),goal]
