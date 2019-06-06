@@ -64,7 +64,7 @@ exports.update = function(req, res, next) {
   } else {
     var body = req.body;
     try {
-      var vals = Query.computeAutomaticFormalization(body.content);
+      var vals = Query.computeAutomaticFormalization(body.content, body.goal);
       body.autoAssumptions = vals[0]
       body.autoGoal = vals[1]
       body.lastUpdate = new Date();

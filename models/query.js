@@ -26,7 +26,8 @@ var querySchema = new Schema({
 });
 
 // this is static since update pre hooks are problematic so we call it from the controller and the doc is not read yet
-querySchema.statics.computeAutomaticFormalization = function (content) {
+// It uses goal in case there is no automatic goal
+querySchema.statics.computeAutomaticFormalization = function (content, goal) {
   if (content != null) {
     var xmlParser = require('./xmlParser');
     var jsonParser = require('./jsonParser');
@@ -42,17 +43,17 @@ querySchema.statics.computeAutomaticFormalization = function (content) {
     var index = ret.findIndex(function(x) { return x.json.hasOwnProperty('goal')})
     if (index < 0) {
       // no goal
-      return [ret,{}]
+      return [ret,{"formula": goal}]
     } else if (ret.length == 1) {
       // only goal
-      var goal = ret[index]
-      return [[],goal]
+      var agoal = ret[index]
+      return [[],agoal]
     } else {
-      var goal = ret[index]
-      return [ret.splice(index-1,1),goal]
+      var agoal = ret[index]
+      return [ret.splice(index-1,1),agoal]
     }
   } else {
-    return []
+    return [[], {"formula": goal}]
   }
 }
 
@@ -61,7 +62,7 @@ querySchema.statics.computeAutomaticFormalization = function (content) {
 querySchema.pre('save', function(next) {
   // we generate the automatic formalization as well
   try {
-    var res = querySchema.statics.computeAutomaticFormalization(this.content)
+    var res = querySchema.statics.computeAutomaticFormalization(this.content, this.goal)
     this.autoAssumptions = res[0]
     this.autoGoal = res[1]
     next()
