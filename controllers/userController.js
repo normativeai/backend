@@ -26,7 +26,7 @@ exports.signup = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.info(`Logging for ${req.body.email} with password ${req.body.password} - ${JSON.stringify(errors.array())}`);
+      logger.error(`Logging for ${req.body.email} with password ${req.body.password} - ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ errors: errors.array() });
     }
     User.create({
@@ -35,7 +35,7 @@ exports.signup = [
       name: req.body.name,
     }, function (err, user) {
         if (err) {
-          logger.info(`Logging for ${req.body.email} with password ${req.body.password} - User already exists`);
+          logger.error(`Logging for ${req.body.email} with password ${req.body.password} - User already exists`);
           res.status(400).json({error: 'User already exists'});
         } else {
           logger.info(`Logging for ${req.body.email} with password ${req.body.password} - User successfully created`);
@@ -57,6 +57,7 @@ exports.login = [
 				return next(err);
 			}
 			if (!user) {
+        logger.error(`User ${JSON.stringify(user)} cannot be logged in: ${info}`);
 				return res.status(400).json({data: user, err: info})
 			}
 			req.login(user, { session : false }, async (error) => {
@@ -78,6 +79,7 @@ exports.login = [
 exports.logout = function(req, res, next) {
   req.logout();
 
+  logger.info(`User ${JSON.stringify(req.user)} logged out`);
   return res.status(200).json({message: 'Logged out.'});
 };
 
