@@ -1,3 +1,5 @@
+var logger = require('../config/winston');
+
 function parseFormula(obj) {
   if (obj.hasOwnProperty('connective')){
     return parseConnector(obj);
