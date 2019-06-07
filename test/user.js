@@ -24,7 +24,7 @@ describe("Creation of users",function(){
     server
     .post("/api/signup")
     .send(user)
-		.expect(400, {err: 'User already exists'}, done);
+		.expect(400, {error: 'User already exists'}, done);
   });
   it("should return code 422 and message if no email was given",function(done){
     var obj = Object.assign({}, user);

@@ -72,12 +72,12 @@ exports.update = function(req, res, next) {
             if (theory && theory.writeProtected) {
               res.status(400).json({"error": 'Theory cannot be updated since it is write protected'});
             } else {
-              res.status(404).json({err: 'Theory could not be found'});
+              res.status(404).json({error: 'Theory could not be found'});
             }
           });
 
         } else {
-          res.status(400).json({err: err});
+          res.status(400).json({error: err});
         }
       });
     } catch (error) {
@@ -94,9 +94,9 @@ exports.delete = function(req, res, next) {
       if (!err && (result.n > 0)) {
         res.status(200).json({message: 'Theory deleted'});
       } else if ((result && result.nModified < 1) || (err && err.name == 'CastError')) {
-        res.status(404).json({err: 'Theory could not be found'});
+        res.status(404).json({error: 'Theory could not be found'});
       } else {
-        res.status(400).json({err: err});
+        res.status(400).json({error: err});
       }
     });
   }
@@ -122,13 +122,13 @@ exports.clone = function(req, res, next) {
       theory.isNew = true;
       theory.save(function (err, theory) {
         if (err) {
-          res.status(400).json({err: `Could not clone: ${err}`})
+          res.status(400).json({error: `Could not clone: ${err}`})
         } else {
           User.findById(req.user._id, function(err, user) {
             user.theories.push(theory._id);
             user.save(err => {
               if (err) {
-                res.status(400).json({err: err});
+                res.status(400).json({error: err});
               } else {
                 res.status(201).json({data: {theory: {_id: theory._id}}});
               }})})}});
@@ -147,7 +147,7 @@ exports.consistency = function(req, res, next) {
             res.status(200).json({data: {"consistent": false}});
           }
         } else { //mleancop error
-          res.status(400).json({err: cons});
+          res.status(400).json({error: cons});
         }
       })
     } else {
@@ -167,11 +167,11 @@ exports.independent = function(req, res, next) {
             res.status(200).json({data: {"independent": false}});
           }
         } else { //mleancop error
-          res.status(400).json({err: cons});
+          res.status(400).json({error: cons});
         }
       })
     } else {
-      res.status(404).json({err: "Cannot find theory"});
+      res.status(404).json({error: "Cannot find theory"});
     }
     });
 };

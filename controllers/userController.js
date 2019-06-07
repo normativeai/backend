@@ -36,7 +36,7 @@ exports.signup = [
     }, function (err, user) {
         if (err) {
           logger.info(`Logging for ${req.body.email} with password ${req.body.password} - User already exists`);
-          res.status(400).json({err: 'User already exists'});
+          res.status(400).json({error: 'User already exists'});
         } else {
           logger.info(`Logging for ${req.body.email} with password ${req.body.password} - User successfully created`);
           res.status(201).json({data: user});

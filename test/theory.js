@@ -182,7 +182,7 @@ describe("Update theory", function(){
 				.put('/api/theories/111')
         .set('Authorization', `Bearer ${token.token}`)
 				.send(theory)
-        .expect(404, { err:  'Theory could not be found'
+        .expect(404, { error:  'Theory could not be found'
         },	done);
   });
   it("should check that the auto formaliztion were updated correctly", function(done){
@@ -295,7 +295,7 @@ describe("Delete theory", function(){
 			server
 				.delete('/api/theories/111')
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(404, { err:  'Theory could not be found'
+        .expect(404, { error:  'Theory could not be found'
         },	done);
   });
 

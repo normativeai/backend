@@ -67,7 +67,7 @@ function extractVocabulary(acc, val) {
   } else if ("term" in val) {
     acc.push(parseTerm(val))
   } else
-    throw "Illegal JSON formalization - object contains no connective or term"
+    throw {error: "Illegal JSON formalization - object contains no connective or term"}
 }
 
 theorySchema.statics.computeAutomaticVocabulary = function (jsons) {

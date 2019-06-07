@@ -32,7 +32,7 @@ exports.create = [
           user.queries.push(query._id);
           user.save(err => {
             if (err) {
-              res.status(400).json({ err: err});
+              res.status(400).json({ error: err});
             } else {
               res.status(201).json({"data": query});
             }
