@@ -23,7 +23,7 @@ const names = {
 
 function parse(html) {
   const $ = cheerio.load(html);
-  const forms = Array.from($("span").not("span span").map(function(i, elem) {
+  const forms = Array.from($("span[class]").not("span span").map(function(i, elem) {
     return parseFormula($,elem)
   }));
   return forms
