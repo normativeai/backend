@@ -21,10 +21,20 @@ const names = {
   "equiv": "Equivalence"
 }
 
+function isAnnotationElement(spanElem) {
+  var cls = spanElem.attr("class")
+  if (cls) {
+    return cls.split(" ").some(word => word.startsWith("annotator-"))
+  } else {
+    return false
+  }
+}
+
 function parse(html) {
   const $ = cheerio.load(html);
-  const forms = Array.from($("span[class]").not("span span").map(function(i, elem) {
-    return parseFormula($,elem)
+  const forms = Array.from($("span").not("span span").filter(function(i,x) { return isAnnotationElement($(x))}).map(function(i, elem) {
+    const ret = parseFormula($,elem)
+    return ret
   }));
   return forms
 }
@@ -53,11 +63,27 @@ function parseFormula($,spanElem) {
   }
 }
 
+function findAnnotationNonDirectChildren($,spanElem) {
+  var children = []
+  $(spanElem).children().each(function(i,e) {
+    if (isAnnotationElement($(e))) {
+      children.push(e)
+    } else {
+      children.push(findAnnotationNonDirectChildren($,e))
+    }
+  })
+  return children
+}
+
 function parseConnective($,spanElem) {
   const connective = $(spanElem).attr("data-connective")
-  const forms = Array.from($(spanElem).children().map(function(i, elem) {
+  /*const forms = Array.from($(spanElem).find($("span")).filter(function(i,x) {return isAnnotationElement($(x))}).map(function(i, elem) {
     return parseFormula($,elem)
-  }));
+  }));*/
+  const children = findAnnotationNonDirectChildren($,spanElem)
+  const forms = children.map(function(elem) {
+    return parseFormula($,elem)
+  });
   return {
     "name": names[connective],
     "code": connective,
