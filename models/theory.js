@@ -125,6 +125,7 @@ theorySchema.statics.isActive = function(form) {
 
 theorySchema.methods.isIndependent = function(id, cb) {
   forms = this.getFormalization();
+  logger.info(`Looking for id ${id} in ${forms}`)
   form = forms.find(f => f._id == id);
   if (typeof form.lastIndependentDate === 'undefined' || this.lastUpdate > form.lastIndependentDate) {
     forms = forms.slice(0)
