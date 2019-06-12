@@ -184,6 +184,7 @@ exports.independent = function(req, res, next) {
   Theory.findById(req.params.theoryId, function (err, theory) {
     if (theory) {
       logger.info(`Checking theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} for independency of ${req.params.formId}`);
+      logger.info(theory.getFormalization())
       theory.isIndependent(req.params.formId, function(code, cons) {
         if (code == 1) { // mleancop ok
           if (cons) {

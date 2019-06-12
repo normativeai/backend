@@ -500,6 +500,18 @@ describe("Checking a formula in the formalization for independency", function(){
         .set('Authorization', `Bearer ${token.token}`)
 				.expect(200, {data: {"independent": false}}, done);
   });
+  it("should return true in case it is independent and is being called twice @slow", function(done){
+			server
+				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(200, {data: {"independent": true}}, done)
+        .end(function() {
+          server
+            .get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .expect(200, {data: {"independent": true}}, done);
+        })
+  });
 });
 
 describe("Checking theory static computeAutomaticVocabulary", function(){
