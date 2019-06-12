@@ -8,7 +8,7 @@ class QueryHelper {
     if (mtch) {
       cb(mtch[1],mtch[2]);
     } else {
-      cb(null,`MleanCoP error: ${errors}`, 0);
+      cb(null,`MleanCoP error: ${errors}`);
     }
 	}
 
@@ -28,7 +28,7 @@ class QueryHelper {
           hadValue = true;
         } catch (error) {
           logger.info(`Cannot parse formula ${i+1} out of ${formulas.length} formulae: ${f} - Error: ${error}`);
-          cb(null, `Cannot parse formula ${i+1} out of ${formulas.length} formulae: ${f} - Error: ${error}`, 0);
+          cb(null, `Cannot parse formula ${i+1} out of ${formulas.length} formulae: ${f} - Error: ${error}`);
           return;
         }
       }
@@ -41,7 +41,7 @@ class QueryHelper {
         cmd += f_parsed;
       } catch (error) {
         logger.info(`Cannot parse query assumption ${i+1} out of ${assumptions.length} formulae: ${f} - Error: ${error}`);
-        cb(null, `Cannot parse query assumption ${i+1} out of ${assumptions.length} formulae:  ${f} - Error: ${error}`, 0);
+        cb(null, `Cannot parse query assumption ${i+1} out of ${assumptions.length} formulae:  ${f} - Error: ${error}`);
         return;
       }
     };
@@ -51,7 +51,7 @@ class QueryHelper {
       cmd += `) => ${goal_parsed})).`
     } catch (error) {
       logger.info(`Cannot parse goal ${goal} - Error: ${error}`);
-      cb(null, `Cannot parse goal ${goal} - Error: ${error}`, 0);
+      cb(null, `Cannot parse goal ${goal} - Error: ${error}`);
       return;
     }
     logger.info(cmd);
@@ -68,7 +68,7 @@ class QueryHelper {
     fs.writeFile(`tools/${fileName}`, cmd, function(err, data) {
       if (err) {
         logger.error(err)
-        cb(null, `Internal server error ${err}`, 0);
+        cb(null, `Internal server error ${err}`);
       } else {
         const child = execFile('./mleancop.sh', [fileName], {cwd: curDir, timeout: 10000}, (error, stdout, stderr) => {
           if (stdout) {
@@ -76,9 +76,9 @@ class QueryHelper {
             fs.unlinkSync(`tools/${fileName}`);
             QueryHelper.parse(stdout,stderr,cb);
           } else {
-            logger.error(`MleanCoP timeout: ${error}`);
+            logger.error(`Internal server error: ${error}`);
             fs.unlinkSync(`tools/${fileName}`);
-            cb(null, `MleanCoP timeout ${error}`, 2); // 2 stands for timeout
+            cb(null, `Internal server error ${error}`);
           }
         });
       }
