@@ -183,13 +183,14 @@ exports.consistency = function(req, res, next) {
 exports.independent = function(req, res, next) {
   Theory.findById(req.params.theoryId, function (err, theory) {
     if (theory) {
+      logger.info(`Checking theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} for independency of ${req.params.formId}`);
       theory.isIndependent(req.params.formId, function(code, cons) {
         if (code == 1) { // mleancop ok
           if (cons) {
-            logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is independent`);
+            logger.info(`Norm ${req.params.formId} of theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is independent`);
             res.status(200).json({data: {"independent": true}});
           } else {
-            logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is not independent`);
+            logger.info(`Norm ${req.params.formId} of theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is not independent`);
             res.status(200).json({data: {"independent": false}});
           }
         } else { //mleancop error
