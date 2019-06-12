@@ -81,7 +81,8 @@ theorySchema.statics.computeAutomaticVocabulary = function (jsons) {
 }
 
 // we call only on save/create and not on update since the update hook doest have access to the document and methods
-theorySchema.pre('save', function(next) {
+// was moved to controller as it is sometimes called not on purpose, for example when last date is updated
+/*theorySchema.pre('save', function(next) {
   // we generate the automatic formalization as well
   try {
     this.autoFormalization = theorySchema.statics.computeAutomaticFormalization(this.content)
@@ -90,7 +91,7 @@ theorySchema.pre('save', function(next) {
   } catch (error) {
     next(error)
   }
-})
+})*/
 
 theorySchema.pre('updateOne', function(next) {
     this.updateOne({$or: [{writeProtected: {$exists: false}}, {writeProtected: false}] },{});

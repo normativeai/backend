@@ -19,7 +19,9 @@ exports.create = [
           logger.error(`Theory of user ${JSON.stringify(req.user)} cannot be created: ${errors.array()}`);
           return res.status(422).json({ errors: errors.array() });
       }
-
+      try {
+        var autoForm = Theory.computeAutomaticFormalization(req.body.content)
+        var autoVoc = Theory.computeAutomaticVocabulary(autoForm.map(x => x.json))
         Theory.create({
           _id: req.body._id,
           name: req.body.name,
@@ -29,7 +31,9 @@ exports.create = [
           content: req.body.content,
           vocabulary: req.body.vocabulary,
           formalization: req.body.formalization,
-          creator: req.body.creator
+          creator: req.body.creator,
+          autoFormalization: autoForm,
+          autoVocabulary: autoVoc
         }).then(theory => {
           User.findById(req.user._id, function(err, user) {
             user.theories.push(theory._id);
@@ -45,6 +49,10 @@ exports.create = [
             logger.error(`Theory of user ${JSON.stringify(req.user)} cannot be created: ${error}`);
             res.status(400).json(error);
           });
+      } catch (error) {
+        logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be created: ${error}`);
+        res.status(400).json(error);
+      }
     }
   }
 ]
