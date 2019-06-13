@@ -82,27 +82,31 @@ querySchema.methods.execQuery = function(cb) {
     var helper = require('./queryHelper');
 
     if (!!!this.theory) {
-      cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
+      cb(0, false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
     } else if (!this.goal && !this.autoGoal.formula) {
-      cb(false, 'Query has no goal. Please assign goals before trying to execute queries');
+      cb(0, false, 'Query has no goal. Please assign goals before trying to execute queries');
     } else {
       var obj = this
       if (!this.autoGoal.formula) {
         this.autoGoal.formula = this.goal
       }
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, function(theorem, proof) {
-        obj.lastQueryTheorem = theorem;
-        obj.lastQueryProof = proof;
-        obj.lastQueryDate = new Date();
-        obj.save(function (err) {
-          if (err)
-            logger.error(`Cannot save query state. ${err}`);
-        });
-        cb(theorem, proof);
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, function(theorem, proof, additionalCode) {
+        if (theorem) {
+          obj.lastQueryTheorem = theorem;
+          obj.lastQueryProof = proof;
+          obj.lastQueryDate = new Date();
+          obj.save(function (err) {
+            if (err)
+              logger.error(`Cannot save query state. ${err}`);
+          });
+          cb(1, theorem, proof);
+        } else {
+          cb(additionalCode, theorem, proof);
+        }
       });
     }
   } else {
-    cb(this.lastQueryTheorem, this.lastQueryProof);
+    cb(1, this.lastQueryTheorem, this.lastQueryProof);
   }
 };
 
@@ -114,17 +118,17 @@ querySchema.methods.isConsistent = function(cb) {
       cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to check for consistency');
     } else {
       var obj = this
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions, "(x, (~ x))", function(theorem, proof) {
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions, "(x, (~ x))", function(theorem, proof, additionalCode) {
         if (theorem) {
-        obj.lastConsistency = (theorem != 'Theorem');
-        obj.lastConsistencyDate = new Date();
-        obj.save(function (err) {
-          if (err)
-            logger.error(`Cannot save consistency state. ${err}`);
-        });
+          obj.lastConsistency = (theorem != 'Theorem');
+          obj.lastConsistencyDate = new Date();
+          obj.save(function (err) {
+            if (err)
+              logger.error(`Cannot save consistency state. ${err}`);
+          });
           cb(1, theorem != 'Theorem');
         } else {
-          cb(0, proof);
+          cb(additionalCode, proof);
         }
       });
     }

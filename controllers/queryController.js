@@ -126,16 +126,24 @@ exports.exec = function(req, res) {
     .populate('theory')
     .exec(function(err, query) {
       if (query) {
-        query.execQuery(function(theorem, proof) {
-          if (theorem) {
-            logger.info(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} is a ${theorem}`);
-            res.json({"data": {"result":theorem, "proof":proof}});
-          } else if (proof) {
+        query.execQuery(function(code, theorem, proof) {
+          if (code == 1) { //mleancop ok
+            if (theorem) {
+              logger.info(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} is a ${theorem}`);
+              res.json({"data": {"result":theorem, "proof":proof}});
+            } else if (proof) {
+              logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be executed: ${proof}`);
+              res.status(400).json({'error': proof});
+            } else {
+              logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be executed since it is invalid`);
+              res.status(400).json({'error': 'MleanCoP error: invalid query'});
+            }
+          } else if (code == 2) { //timeout
+            logger.info(`Goal of query ${req.params.queryId} of user ${JSON.stringify(req.user)} probably follows from assumptions and legislation`);
+            res.status(206).json({message: 'Backend prover could not resolve the validity of the query. This normally means (but not always) that the goal does not follow from the assumptions and legislation!', type: 'warning'});
+          } else {
             logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be executed: ${proof}`);
             res.status(400).json({'error': proof});
-          } else {
-            logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be executed since it is invalid`);
-            res.status(400).json({'error': 'MleanCoP error: invalid query'});
           }
         });
       } else {
@@ -159,6 +167,9 @@ exports.consistency = function(req, res, next) {
             logger.info(`The assumptions of query ${req.params.queryId} of user ${JSON.stringify(req.user)} are not consistent`);
             res.status(200).json({data: {"consistent": false}});
           }
+        } else if (code == 2) { //timeout
+            logger.info(`Assumptions of query ${req.params.queryId} of user ${JSON.stringify(req.user)} are probably consistent`);
+            res.status(206).json({message: 'Backend prover could not resolve the consistency of the assumptions. This normally means (but not always) that the assumptions are consistent!', type: 'warning'});
         } else { //mleancop error
           logger.error(`The assumptions of query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be checked for consistency: ${cons}`);
           res.status(400).json({err: cons});
