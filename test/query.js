@@ -361,7 +361,7 @@ describe("Update query", function(){
   })
   it("should check that the auto formaliztion were updated correctly even when some contain complex formulae", function(done){
       const t = Object.assign({}, query);
-      t.content = '<span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"(~ validChoice(Law,Part))\">the law chosen by the parties</span>'
+      t.content = '<p><span class=\"annotator-term\" id=\"a8f391d0-469c-4eb8-a83d-f2312a0d48b0\" data-term=\"(~ validChoice(X,Y))\" title=\"(~ validChoice(X,Y))\">The choice was not made</span> and <span class=\"annotator-term\" id=\"b4285291-4b35-49b9-99c2-8719de7703e4\" data-term=\"saleOfGoods\" title=\"saleOfGoods\">it is a contract for the sale of goods</span>.</p><p><br></p><p>Answer: <span class=\"annotator-goal\" id=\"d5ed9a14-f949-40a8-9bc6-8144ef3614f3\" title=\"Goal\"><span class=\"connective-depth-1 annotator-connective\" id=\"f25a4561-5d72-4db9-98fe-ce280aef067d\" data-connective=\"ob\" title=\"Obligation\"><span class=\"annotator-term\" id=\"19148cad-c4c2-4eed-a214-bd1cb9ff16e8\" data-term=\"contract(habitualResidenceSeller,Y)\" title=\"contract(habitualResidenceSeller,Y)\">The applicable law is the law of habitual residence of the seller</span></span></span>.</p>'
       // update theory
       server
 				.put(`/api/queries/${t._id}`)
@@ -373,14 +373,14 @@ describe("Update query", function(){
             .set('Authorization', `Bearer ${token.token}`)
             .then(response => {
               var autoAssumptions = JSON.parse(response.text).data.autoAssumptions
-              assert.equal(autoAssumptions.length, 1)
-              assert.equal(autoAssumptions[0].formula, '(~ validChoice(Law,Part))')
+              assert.equal(autoAssumptions.length, 2)
+              assert.equal(autoAssumptions[0].formula, '(~ validChoice(X,Y))')
+              assert.equal(autoAssumptions[1].formula, 'saleOfGoods')
               done()
             })
 
         })
   })
-
 });
 
 describe("Delete query", function(){

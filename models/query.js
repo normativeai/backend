@@ -52,7 +52,8 @@ querySchema.statics.computeAutomaticFormalization = function (content, goal) {
       return [[],agoal]
     } else {
       var agoal = ret[index]
-      return [ret.splice(index-1,1),agoal]
+      ret.splice(index,1)
+      return [ret,agoal]
     }
   } else {
     return [[], {"formula": goal}]
