@@ -359,19 +359,27 @@ describe("Update query", function(){
         .expect(200, { "message": 'Query updated'
         },	done);
   })
- /*it("should check that the auto vocabulary were updated correctly when they are not part of the theory", function(done){
+  it("should check that the auto formaliztion were updated correctly even when some contain complex formulae", function(done){
       const t = Object.assign({}, query);
-      t.content = '<p>   <span class="connective-depth-1 annotator-connective" id="2f889ffb-9f47-4df4-b912-1362944e050b" data-connective="or" title="Or">     a     <span class="annotator-term" id="588b8d7c-02eb-40a3-8944-93e2974997e5" data-term="aaa" title="aaa">sdia sidja</span>     dja sdjia js     <span class="annotator-term" id="c912f84c-60c6-41de-86fd-a90c783792a3" data-term="aaa" title="aaa">doija dj</span>     as   </span>   id </p> <p>   aij   <span class="annotator-goal" id="d2cfc40e-5e16-43df-b784-c274de39cfaa" title="Goal">     d oi     <span class="connective-depth-1 annotator-connective" id="723949b3-0997-44eb-a6ed-ece47ff9c13c" data-connective="and" title="And">       <span class="annotator-term" id="8873cab2-8e8f-49a9-a153-d0c145f1a142" data-term="aaa" title="aaa">ad</span>       sj       <span class="annotator-term" id="2b0cb2b0-abe8-47c2-80ff-f6b769639fda" data-term="asdasd" title="asdasd">ai s</span>     </span>     dia   </span>   jds asd   <span class="annotator-term" id="718d8b97-3ba9-47aa-af8f-ec95121e5def" data-term="xaz" title="xaz">as</span>   d </p>'
-      let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
-      t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li></ol>"
+      t.content = '<span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"(~ validChoice(Law,Part))\">the law chosen by the parties</span>'
       // update theory
       server
 				.put(`/api/queries/${t._id}`)
         .set('Authorization', `Bearer ${token.token}`)
 				.send(t)
-        .expect(200, { "message": 'Query updated'
-        },	done);
-  })*/
+        .end(function() {
+          server
+            .get(`/api/queries/${t._id}`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .then(response => {
+              var autoAssumptions = JSON.parse(response.text).data.autoAssumptions
+              assert.equal(autoAssumptions.length, 1)
+              assert.equal(autoAssumptions[0].formula, '(~ validChoice(Law,Part))')
+              done()
+            })
+
+        })
+  })
 
 });
 
