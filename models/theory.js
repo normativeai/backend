@@ -106,7 +106,7 @@ theorySchema.statics.isActive = function(form) {
     if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate) {
       var helper = require('./queryHelper');
       var obj = this
-      helper.executeQuery(this.getFormalization(), [], "(x, (~ x))", function(theorem, proof) {
+      helper.executeQuery(this.getFormalization(), [], "(x, (~ x))", function(theorem, proof, additionalCode) {
         if (theorem) {
           obj.lastConsistency = (theorem != 'Theorem');
           obj.lastConsistencyDate = new Date();
@@ -116,7 +116,7 @@ theorySchema.statics.isActive = function(form) {
         });
         cb(1, theorem != 'Theorem');
       } else {
-        cb(0, proof);
+        cb(additionalCode, proof);
       }
     });
   } else {
@@ -131,7 +131,7 @@ theorySchema.methods.isIndependent = function(id, cb) {
     forms = forms.slice(0)
     forms.splice(forms.indexOf(form), 1)
     var helper = require('./queryHelper');
-    helper.executeQuery(forms, [], form.formula, function(theorem, proof) {
+    helper.executeQuery(forms, [], form.formula, function(theorem, proof, additionalCode) {
       if (theorem) {
         form.lastIndependent = (theorem != 'Theorem');
         form.lastIndependentDate = new Date();
@@ -141,7 +141,7 @@ theorySchema.methods.isIndependent = function(id, cb) {
         });
         cb(1, theorem != 'Theorem');
       } else {
-        cb(0, proof);
+        cb(additionalCode, proof);
       }
     });
   } else {
