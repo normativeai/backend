@@ -381,6 +381,29 @@ describe("Update query", function(){
 
         })
   })
+  it("should check that the auto vocabulary was updated correctly", function(done){
+      const t = Object.assign({}, query);
+      t.content = '<p><span class=\"annotator-term\" id=\"a8f391d0-469c-4eb8-a83d-f2312a0d48b0\" data-term=\"(~ validChoice(X,Y))\" title=\"(~ validChoice(X,Y))\">The choice was not made</span> and <span class=\"annotator-term\" id=\"b4285291-4b35-49b9-99c2-8719de7703e4\" data-term=\"saleOfGoods\" title=\"saleOfGoods\">it is a contract for the sale of goods</span>.</p><p><br></p><p>Answer: <span class=\"annotator-goal\" id=\"d5ed9a14-f949-40a8-9bc6-8144ef3614f3\" title=\"Goal\"><span class=\"connective-depth-1 annotator-connective\" id=\"f25a4561-5d72-4db9-98fe-ce280aef067d\" data-connective=\"ob\" title=\"Obligation\"><span class=\"annotator-term\" id=\"19148cad-c4c2-4eed-a214-bd1cb9ff16e8\" data-term=\"contract(habitualResidenceSeller,Y)\" title=\"contract(habitualResidenceSeller,Y)\">The applicable law is the law of habitual residence of the seller</span></span></span>.</p>'
+      // update theory
+      server
+				.put(`/api/queries/${t._id}`)
+        .set('Authorization', `Bearer ${token.token}`)
+				.send(t)
+        .end(function() {
+          server
+            .get(`/api/queries/${t._id}`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .then(response => {
+              var autoVocabulary = JSON.parse(response.text).data.autoVocabulary
+              assert.equal(autoVocabulary.length, 3)
+              assert.equal(autoVocabulary[0].full, '(~ validChoice(X,Y))')
+              assert.equal(autoVocabulary[1].full, 'saleOfGoods')
+              assert.equal(autoVocabulary[2].full, 'contract(habitualResidenceSeller,Y)')
+              done()
+            })
+
+        })
+  })
 });
 
 describe("Delete query", function(){

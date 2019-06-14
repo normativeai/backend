@@ -11,6 +11,7 @@ var querySchema = new Schema({
     assumptions       : [String],
     content           : String, // annotated XML
     autoAssumptions   : [{original: String, json: Object, formula: String}],
+    autoVocabulary    : [{symbol: String, original: String, full: String}],
     autoGoal          : {original: String, json: Object, formula: String},
     goal              : String,
     description       : String,

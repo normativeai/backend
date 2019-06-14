@@ -1,4 +1,5 @@
 var Query = require('../models/query');
+var Theory = require('../models/theory');
 var User= require('../models/user');
 var logger = require('../config/winston');
 const { body,validationResult } = require('express-validator/check');
@@ -56,7 +57,7 @@ exports.get = function(req, res, next) {
 };
 
 exports.getOne = function(req, res, next) {
-  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'content', 'assumptions', 'autoAssumptions', 'goal', 'autoGoal'])
+  Query.findById(req.params.queryId, ['_id', 'lastUpdate', 'name', 'description', 'content', 'assumptions', 'autoAssumptions', 'goal', 'autoGoal', 'autoVocabulary'])
     .populate('theory', ['_id', 'lastUpdate', 'name', 'description', 'vocabulary', 'autoVocabulary'])
     .exec(function(err, query) {
       res.json({"data": query});
@@ -73,6 +74,12 @@ exports.update = function(req, res, next) {
       var vals = Query.computeAutomaticFormalization(body.content, body.goal);
       body.autoAssumptions = vals[0]
       body.autoGoal = vals[1]
+      if (body.autoGoal.json) { // the auto goal contains an auto goal and not something else, like a normal goal
+        console.log(JSON.stringify(body.autoGoal.json.goal.formula))
+        body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoAssumptions.map(x => x.json).concat([body.autoGoal.json.goal.formula]))
+      } else {
+        body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoAssumptions.map(x => x.json))
+      }
       body.lastUpdate = new Date();
       Query.updateOne({ '_id': req.params.queryId, user: req.user._id }, { $set: body}, function (err, result) {
         if (!err && (result.nModified > 0)) {
