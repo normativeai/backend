@@ -20,32 +20,45 @@ exports.create = [
           logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${errors.array()}`);
           return res.status(422).json({ errors: errors.array() });
       }
+      try {
+        var vals = Query.computeAutomaticFormalization(body.content, body.goal);
+        var voc = (vals[1].json) ? // the auto goal contains an auto goal and not something else, like a normal goal
+           Theory.computeAutomaticVocabulary(vals[0].map(x => x.json).concat([vals[1].json.goal.formula]))
+           :
+           Theory.computeAutomaticVocabulary(vals[0].map(x => x.json))
 
-      Query.create({
-        _id: req.body._id,
-        name: req.body.name,
-        lastUpdate: new Date(),
-        user: req.user,
-        theory: req.body.theory,
-        description: req.body.description,
-        assumptions: req.body.assumptions,
-        content: req.body.content,
-        goal: req.body.goal
-      }).then(query => {
-        User.findById(req.user._id, function(err, user) {
-          user.queries.push(query._id);
-          user.save(err => {
-            if (err) {
-              logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${err}`);
-              res.status(400).json({ error: err});
-            } else {
-              logger.info(`Query of user ${JSON.stringify(req.user)} created`);
-              res.status(201).json({"data": query});
-            }
-        })})}).catch(function(error) {
-            logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${error}`);
-            res.status(400).json(error);
-          });
+        Query.create({
+          _id: req.body._id,
+          name: req.body.name,
+          lastUpdate: new Date(),
+          user: req.user,
+          theory: req.body.theory,
+          description: req.body.description,
+          assumptions: req.body.assumptions,
+          content: req.body.content,
+          goal: req.body.goal,
+          autoGoal: vals[1],
+          autoAssumptions: vals[0],
+          autoVocabulary: voc
+        }).then(query => {
+          User.findById(req.user._id, function(err, user) {
+            user.queries.push(query._id);
+            user.save(err => {
+              if (err) {
+                logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${err}`);
+                res.status(400).json({ error: err});
+              } else {
+                logger.info(`Query of user ${JSON.stringify(req.user)} created`);
+                res.status(201).json({"data": query});
+              }
+          })})}).catch(function(error) {
+              logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${error}`);
+              res.status(400).json(error);
+            });
+      } catch (error) {
+        logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${error}`);
+        res.status(400).json(error);
+      }
     }
   }
 ]
@@ -75,7 +88,6 @@ exports.update = function(req, res, next) {
       body.autoAssumptions = vals[0]
       body.autoGoal = vals[1]
       if (body.autoGoal.json) { // the auto goal contains an auto goal and not something else, like a normal goal
-        console.log(JSON.stringify(body.autoGoal.json.goal.formula))
         body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoAssumptions.map(x => x.json).concat([body.autoGoal.json.goal.formula]))
       } else {
         body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoAssumptions.map(x => x.json))
