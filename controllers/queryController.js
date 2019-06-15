@@ -149,7 +149,11 @@ exports.exec = function(req, res) {
           if (code == 1) { //mleancop ok
             if (theorem) {
               logger.info(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} is a ${theorem}`);
-              res.json({"data": {"result":theorem, "proof":proof}});
+              if (theorem == "Theorem") {
+                res.status(200).json({message: "The query is valid. The goal logically follows from the assumptions and legislation", type: "success", proof: proof});
+              } else {
+                res.status(200).json({message: "The query is counter-satisfiable. The goal does not logically follow from the assumptions and legislation", type: "info"});
+              }
             } else if (proof) {
               logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be executed: ${proof}`);
               res.status(400).json({'error': proof});
@@ -181,10 +185,10 @@ exports.consistency = function(req, res, next) {
         if (code == 1) { // mleancop ok
           if (cons) {
             logger.info(`The assumptions of query ${req.params.queryId} of user ${JSON.stringify(req.user)} are consistent`);
-            res.status(200).json({data: {"consistent": true}});
+            res.status(200).json({message: "The assumptions of the query together with the legislation are consistent", type: "success"});
           } else {
             logger.info(`The assumptions of query ${req.params.queryId} of user ${JSON.stringify(req.user)} are not consistent`);
-            res.status(200).json({data: {"consistent": false}});
+            res.status(200).json({message: "The assumptions of the query together with the legislation are not consistent", type: "info"});
           }
         } else if (code == 2) { //timeout
             logger.info(`Assumptions of query ${req.params.queryId} of user ${JSON.stringify(req.user)} are probably consistent`);
@@ -196,7 +200,7 @@ exports.consistency = function(req, res, next) {
       })
     } else {
       logger.error(`The assumptions of query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be checked for consistency since the query cannot be found`);
-      res.status(404).json({err: "Cannot find query"});
+      res.status(404).json({error: "Cannot find query"});
     }
     });
 };

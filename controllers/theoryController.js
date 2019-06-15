@@ -171,10 +171,10 @@ exports.consistency = function(req, res, next) {
         if (code == 1) { // mleancop ok
           if (cons) {
             logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is consistent`);
-            res.status(200).json({data: {"consistent": true}});
+            res.status(200).json({message: "The legislation is consistent", type: "success"});
           } else {
             logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is not consistent`);
-            res.status(200).json({data: {"consistent": false}});
+            res.status(200).json({message: "The legislation is not consistent", type: "info"});
           }
         } else if (code == 2) { //timeout
             logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is probably consistent`);
@@ -186,7 +186,7 @@ exports.consistency = function(req, res, next) {
       })
     } else {
       logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be checked for consistency since it cannot be found`);
-      res.status(404).json({err: "Cannot find theory"});
+      res.status(404).json({error: "Cannot find theory"});
     }
     });
 };
@@ -199,10 +199,10 @@ exports.independent = function(req, res, next) {
         if (code == 1) { // mleancop ok
           if (cons) {
             logger.info(`Norm ${req.params.formId} of theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is independent`);
-            res.status(200).json({data: {"independent": true}});
+            res.status(200).json({message: "The norm is logically independent from the rest of the legislation", type: "success"});
           } else {
             logger.info(`Norm ${req.params.formId} of theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is not independent`);
-            res.status(200).json({data: {"independent": false}});
+            res.status(200).json({message: "The norm is not logically independent from the rest of the legislation", type: "info"});
           }
         } else if (code == 2) { //timeout
             logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is probably indepenedent`);

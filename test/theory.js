@@ -439,26 +439,26 @@ describe("Checking a theory for consistency", function(){
 			server
 				.get(`/api/theories/${theory._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": true}}, done);
+				.expect(200, {message: 'The legislation is consistent', type: 'success'}, done);
   });
   it("should return false in case it is inconsistent @slow", function(done){
 			server
 				.get(`/api/theories/${theory2._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": false}}, done);
+				.expect(200, {message: 'The legislation is not consistent', type: 'info'}, done);
 		});
   it("should return true in case it is inconsistent but the formula is inactive  @slow", function(done){
 			server
 				.get(`/api/theories/${theory5._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": true}}, done);
+				.expect(200, {message: 'The legislation is consistent', type: 'success'}, done);
 		});
 
   it("should return 404 in case it cannot find the theory", function(done){
 			server
 				.get('/api/theories/111/consistency')
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(404, { err:  'Cannot find theory'  }, done);
+				.expect(404, { error:  'Cannot find theory'  }, done);
 		});
   it("should return 400 in case it cannot parse the prover output from some reason @slow", function(done){
       this.timeout(5000);
@@ -492,24 +492,28 @@ describe("Checking a formula in the formalization for independency", function(){
 			server
 				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"independent": true}}, done);
+				.expect(200, {message: 'The norm is logically independent from the rest of the legislation',
+          type: 'success'}, done);
   });
   it("should return false in case it is dependent @slow", function(done){
 			server
 				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[1]._id}`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"independent": false}}, done);
+				.expect(200, {message: 'The norm is not logically independent from the rest of the legislation',
+          type: 'info'}, done);
   });
   it("should return true in case it is independent and is being called twice @slow", function(done){
 			server
 				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(200, {data: {"independent": true}}, done)
+        .expect(200, {message: 'The norm is logically independent from the rest of the legislation',
+          type: 'success'}, done)
         .end(function() {
           server
             .get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
             .set('Authorization', `Bearer ${token.token}`)
-            .expect(200, {data: {"independent": true}}, done);
+            .expect(200, {message: 'The norm is logically independent from the rest of the legislation',
+              type: 'success'}, done);
         })
   });
 });

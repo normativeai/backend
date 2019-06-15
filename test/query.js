@@ -485,18 +485,18 @@ describe("Execute query", function(){
 				.get(`/api/queries/${query._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
         .expect(200)
-        .expect(function(res) {
-          if (res.body.data.result != "Theorem") throw new Error(`Expected Theorem by got ${res.body.data.result}`)
+        .then(function(res) {
+          assert.equal(JSON.parse(res.text).message, 'The query is valid. The goal logically follows from the assumptions and legislation')
+          done()
         })
-        .end(done)
   });
 
 	it("should return false and no proof when it is a Non-theorem @slow", function(done){
 			server
 				.get(`/api/queries/${query2._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(200, { data: {"result": "Non-Theorem"}
-        },	done);
+        .expect(200, { message: 'The query is counter-satisfiable. The goal does not logically follow from the assumptions and legislation',
+          type: 'info'},	done);
   });
   it("should return code 400 if query is illegal @slow", function(done){
       this.timeout(5000);
@@ -510,8 +510,11 @@ describe("Execute query", function(){
 			server
 				.get(`/api/queries/${query4._id}/exec`)
         .set('Authorization', `Bearer ${token.token}`)
-        .expect(200, {data: {"result": "Theorem", "proof": "[[a : []], [[-(a) : -([])]]]"}
-        },	done);
+        .expect(200)
+        .then(function(res) {
+          assert.equal(JSON.parse(res.text).message, 'The query is valid. The goal logically follows from the assumptions and legislation')
+          done()
+        })
   });
   it("should succeed executing a query generated from annotations and is with a goal @slow", function(done){
     const t = Object.assign({}, query8);
@@ -527,7 +530,7 @@ describe("Execute query", function(){
           .set('Authorization', `Bearer ${token.token}`)
           .expect(200)
           .then(response => {
-            assert.equal(JSON.parse(response.text).data.result, "Non-Theorem")
+            assert.equal(JSON.parse(response.text).message, "The query is counter-satisfiable. The goal does not logically follow from the assumptions and legislation")
             done();
             });
           })
@@ -609,26 +612,29 @@ describe("Checking a query assumptions for consistency with relation to a theory
 			server
 				.get(`/api/queries/${query4._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": true}}, done);
+				.expect(200, {message: 'The assumptions of the query together with the legislation are consistent',
+          type: 'success'}, done);
   });
   it("should return false in case it is inconsistent @slow", function(done){
 			server
 				.get(`/api/queries/${query5._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": false}}, done);
+				.expect(200, {message: 'The assumptions of the query together with the legislation are not consistent',
+          type: 'info'}, done);
 		});
   it("should return false in case it is inconsistent among the assumptions only @slow", function(done){
 			server
 				.get(`/api/queries/${query6._id}/consistency`)
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(200, {data: {"consistent": false}}, done);
+				.expect(200, {message: 'The assumptions of the query together with the legislation are not consistent',
+          type: 'info'}, done);
 		});
 
   it("should return 404 in case it cannot find the query", function(done){
 			server
 				.get('/api/queries/111/consistency')
         .set('Authorization', `Bearer ${token.token}`)
-				.expect(404, { err:  'Cannot find query'  }, done);
+				.expect(404, { error:  'Cannot find query'  }, done);
 		});
 });
 
