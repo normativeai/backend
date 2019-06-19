@@ -543,51 +543,7 @@ describe("Checking theory static computeViolations", function(){
         ]
       }
     }
-    let violations =  [{
-      "text": "Violation of A contract shall be governed by the law chosen by the parties.",
-      "connective": {
-        "name": "Definitional Only If",
-        "code": "defonif",
-        "formulas": [
-          {
-            "text": "Violating the text",
-            "term": {
-              "name": "violation"
-            }
-          },
-          {
-            "text": "A contract shall be governed by the law chosen by the parties.",
-            "connective": {
-              "name": "And",
-              "code": "and",
-              "formulas": [
-                {
-                  "text": "the law chosen by the parties",
-                  "term": {
-                    "name": "validChoice(Law,Part)"
-                  }
-                },
-                {
-                  "text": "Negation of A contract",
-                  "connective": {
-                    "name": "Negation",
-                    "code": "neg",
-                    "formulas": [
-                      {
-                        "text": "A contract",
-                        "term": {
-                          "name": "contract(Law,Part)"
-                        }
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }]
+    let violations =  [{"original":"Violation of A contract shall be governed by the law chosen by the parties.","json":{"text":"Violation of A contract shall be governed by the law chosen by the parties.","connective":{"name":"Definitional Only If","code":"defonif","formulas":[{"text":"Violating the text","term":{"name":"violation"}},{"text":"A contract shall be governed by the law chosen by the parties.","connective":{"name":"And","code":"and","formulas":[{"text":"the law chosen by the parties","term":{"name":"validChoice(Law,Part)"}},{"text":"Negation of A contract","connective":{"name":"Negation","code":"neg","formulas":[{"text":"A contract","term":{"name":"contract(Law,Part)"}}]}}]}}]}},"formula":"((validChoice(Law,Part) , (~ contract(Law,Part))) => violation)"}]
     assert.equal(JSON.stringify(Theory.computeViolations([json])),JSON.stringify(violations))
     done()
   });
