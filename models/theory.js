@@ -33,7 +33,11 @@ theorySchema.statics.computeViolations = function(jsons) {
   const concat = (x,y) => x.concat(y)
   var jsonParser = require('./jsonParser');
   return jsons.map(function(json) {
-    return jsonParser.extractViolations(json).map(function(x) { return {'original': x.text, 'json': x, 'formula': jsonParser.parseFormula(x)}})
+    return jsonParser.extractViolations(json).map(function(x) {
+      var ret = {'original': x.text, 'json': x, 'formula': jsonParser.parseFormula(x)}
+      console.info(`Violations ${JSON.stringify(ret)} were extracted from norm ${JSON.stringify(x)}`)
+      return ret
+    })
   }).reduce(concat, [])
 }
 

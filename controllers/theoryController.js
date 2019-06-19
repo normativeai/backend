@@ -78,9 +78,9 @@ exports.update = function(req, res, next) {
     var body = req.body;
     body.lastUpdate = new Date();
     try {
-      body.autoFormalization = Theory.computeAutomaticFormalization(body.content)
-      //var violations = Theory.computeViolations(autoForms)
-      //body.autoFormalization = autoForms.concat(violations)
+      var autoForms = Theory.computeAutomaticFormalization(body.content)
+      var violations = Theory.computeViolations(autoForms.map(x => x.json))
+      body.autoFormalization = autoForms.concat(violations)
       body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoFormalization.map(x => x.json))
       Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
         if (!err && (result.nModified > 0)) {

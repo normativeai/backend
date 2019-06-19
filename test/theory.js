@@ -185,7 +185,7 @@ describe("Update theory", function(){
         .expect(404, { error:  'Theory could not be found'
         },	done);
   });
-  it("should check that the auto formaliztion were updated correctly", function(done){
+  it("should check that the auto formaliztion were updated correctly 1", function(done){
       const t = Object.assign({}, theory);
       t.content = theory6.content
       let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");

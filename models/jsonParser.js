@@ -73,17 +73,21 @@ function extractViolations(obj) {
   if (obj.hasOwnProperty('connective')){
     switch (obj.connective.code) {
       case "and":
-        return obj.formulas.flatMap(x => extractViolations(x))
+        const concat = (x,y) => x.concat(y)
+        var ret = obj.connective.formulas.map(x => extractViolations(x)).reduce(concat, [])
+        return ret
       case "obif":
         return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1])
       case "obonif":
         return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0])
       case "fbif":
       case "fbonif":
-        throw {error: "Extracting violations automatically from prohibitions"}
+        throw {error: "Extracting violations automatically from prohibitions is not yet implemented"}
       default:
         return []
     }
+  } else {
+    return []
   }
 }
 
