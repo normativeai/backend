@@ -5,7 +5,7 @@ const names = {
   "neg": "Negation",
   "or": "Or",
   "and": "And",
-  "eq": "Term Equality",
+  /*"eq": "Term Equality",*/
   "defif": "Definitional If",
   "defonif": "Definitional Only If",
   "ob": "Obligation",
