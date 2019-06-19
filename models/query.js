@@ -82,7 +82,7 @@ querySchema.pre('updateOne', function(next) {
 });
 
 querySchema.methods.execQuery = function(cb) {
-  if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate) {
+  if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
 
     if (!!!this.theory) {
@@ -115,7 +115,7 @@ querySchema.methods.execQuery = function(cb) {
 };
 
 querySchema.methods.isConsistent = function(cb) {
-  if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate) {
+  if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate || this.theory.lastUpdate > this.lastConsistencyDate ) {
     var helper = require('./queryHelper');
 
     if (!!!this.theory) {
