@@ -69,6 +69,63 @@ function parseConnector(obj) {
   }
 }
 
+function extractViolations(obj) {
+  if (obj.hasOwnProperty('connective')){
+    switch (obj.connective.code) {
+      case "and":
+        return obj.formulas.flatMap(x => extractViolations(x))
+      case "obif":
+        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1])
+      case "obonif":
+        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0])
+      case "fbif":
+      case "fbonif":
+        throw {error: "Extracting violations automatically from prohibitions"}
+      default:
+        return []
+    }
+  }
+}
+
+function extractFromObligation(text, lhs, rhs) {
+  return [{
+      "text": `Violation of ${text}`,
+      "connective": {
+        "name": "Definitional Only If",
+        "code": "defonif",
+        "formulas": [
+          {
+            "text": "Violating the text",
+            "term": {
+              "name": "violation"
+            }
+          },
+          {
+            "text": text,
+            "connective": {
+              "name": "And",
+              "code": "and",
+              "formulas": [
+                lhs
+                ,
+                {
+                  "text": `Negation of ${rhs.text}`,
+                  "connective": {
+                    "name": "Negation",
+                    "code": "neg",
+                    "formulas": [
+                      rhs
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }]
+}
+
 function expectedArgs(conCode) {
   switch (conCode) {
     case "defif":
@@ -94,4 +151,4 @@ function expectedArgs(conCode) {
   }
 }
 
-module.exports  = { "parseFormula": parseFormula, "arities": expectedArgs };
+module.exports  = { "parseFormula": parseFormula, "extractViolations": extractViolations,"arities": expectedArgs };

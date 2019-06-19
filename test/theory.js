@@ -518,6 +518,81 @@ describe("Checking a formula in the formalization for independency", function(){
   });
 });
 
+describe("Checking theory static computeViolations", function(){
+
+	it("should compute correctly all violations", function(done){
+    let voc = {"symbol": "contract", "original": "A contract", "full": "contract(Law,Part)" }
+    let json =  {
+      "text": "A contract shall be governed by the law chosen by the parties.",
+      "connective": {
+        "name": "Obligation Only If",
+        "code": "obonif",
+        "formulas": [
+          {
+            "text": "A contract",
+            "term": {
+              "name": "contract(Law,Part)"
+            }
+          },
+          {
+            "text": "the law chosen by the parties",
+            "term": {
+              "name": "validChoice(Law,Part)"
+            }
+          }
+        ]
+      }
+    }
+    let violations =  [{
+      "text": "Violation of A contract shall be governed by the law chosen by the parties.",
+      "connective": {
+        "name": "Definitional Only If",
+        "code": "defonif",
+        "formulas": [
+          {
+            "text": "Violating the text",
+            "term": {
+              "name": "violation"
+            }
+          },
+          {
+            "text": "A contract shall be governed by the law chosen by the parties.",
+            "connective": {
+              "name": "And",
+              "code": "and",
+              "formulas": [
+                {
+                  "text": "the law chosen by the parties",
+                  "term": {
+                    "name": "validChoice(Law,Part)"
+                  }
+                },
+                {
+                  "text": "Negation of A contract",
+                  "connective": {
+                    "name": "Negation",
+                    "code": "neg",
+                    "formulas": [
+                      {
+                        "text": "A contract",
+                        "term": {
+                          "name": "contract(Law,Part)"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }]
+    assert.equal(JSON.stringify(Theory.computeViolations([json])),JSON.stringify(violations))
+    done()
+  });
+});
+
 describe("Checking theory static computeAutomaticVocabulary", function(){
 
 	it("should parse correctly terms with parentheses", function(done){

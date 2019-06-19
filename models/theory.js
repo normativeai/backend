@@ -29,6 +29,14 @@ theorySchema.methods.getFormalization = function() {
 // TODO add objects to the formalization to store the json objects. We also need to store the generated formulas
 // Maybe original will be the text?
 
+theorySchema.statics.computeViolations = function(jsons) {
+  const concat = (x,y) => x.concat(y)
+  var jsonParser = require('./jsonParser');
+  return jsons.map(function(json) {
+    return jsonParser.extractViolations(json).map(function(x) { return {'original': x.text, 'json': x, 'formula': jsonParser.parseFormula(x)}})
+  }).reduce(concat, [])
+}
+
 // this is static since update pre hooks are problematic so we call it from the controller and the doc is not read yet
 theorySchema.statics.computeAutomaticFormalization = function (content) {
   if (content != null) {

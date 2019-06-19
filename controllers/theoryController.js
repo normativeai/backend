@@ -21,6 +21,7 @@ exports.create = [
       }
       try {
         var autoForm = Theory.computeAutomaticFormalization(req.body.content)
+        //autoForm = autoForm.concat(Theory.computeViolations(autoForm))
         var autoVoc = Theory.computeAutomaticVocabulary(autoForm.map(x => x.json))
         Theory.create({
           _id: req.body._id,
@@ -78,6 +79,8 @@ exports.update = function(req, res, next) {
     body.lastUpdate = new Date();
     try {
       body.autoFormalization = Theory.computeAutomaticFormalization(body.content)
+      //var violations = Theory.computeViolations(autoForms)
+      //body.autoFormalization = autoForms.concat(violations)
       body.autoVocabulary = Theory.computeAutomaticVocabulary(body.autoFormalization.map(x => x.json))
       Theory.updateOne({ '_id': req.params.theoryId, user: req.user._id }, { $set: body}, function (err, result) {
         if (!err && (result.nModified > 0)) {
