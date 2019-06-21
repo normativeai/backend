@@ -80,9 +80,9 @@ function extractViolations(obj) {
         return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1])
       case "obonif":
         return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0])
-      case "fbif":
+      /*case "fbif":
       case "fbonif":
-        throw {error: "Extracting violations automatically from prohibitions is not yet implemented"}
+        throw {error: "Extracting violations automatically from prohibitions is not yet implemented"}*/
       default:
         return []
     }
