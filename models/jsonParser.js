@@ -77,12 +77,13 @@ function extractViolations(obj) {
         var ret = obj.connective.formulas.map(x => extractViolations(x)).reduce(concat, [])
         return ret
       case "obif":
-        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1])
+        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1], true)
       case "obonif":
-        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0])
-      /*case "fbif":
+        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0], true)
+      case "fbif":
+        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1], false)
       case "fbonif":
-        throw {error: "Extracting violations automatically from prohibitions is not yet implemented"}*/
+        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0], false)
       default:
         return []
     }
@@ -91,7 +92,21 @@ function extractViolations(obj) {
   }
 }
 
-function extractFromObligation(text, lhs, rhs) {
+function extractFromObligation(text, lhs, rhs, obOrProb) {
+  var goal = rhs
+  if (obOrProb) { // if we are doing an obligation and not a prohibition
+    goal =
+      {
+        "text": `Negation of ${rhs.text}`,
+        "connective": {
+          "name": "Negation",
+          "code": "neg",
+          "formulas": [
+            rhs
+          ]
+        }
+      }
+  }
   return [{
       "text": `Violation of ${text}`,
       "connective": {
@@ -112,16 +127,7 @@ function extractFromObligation(text, lhs, rhs) {
               "formulas": [
                 lhs
                 ,
-                {
-                  "text": `Negation of ${rhs.text}`,
-                  "connective": {
-                    "name": "Negation",
-                    "code": "neg",
-                    "formulas": [
-                      rhs
-                    ]
-                  }
-                }
+                goal
               ]
             }
           }
