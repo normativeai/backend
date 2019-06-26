@@ -242,7 +242,7 @@ describe("Update theory", function(){
         .put(`/api/theories/${t._id}`)
         .set('Authorization', `Bearer ${token.token}`)
         .send(t)
-        .expect(400, {"error": 'The sentence        A contract       shall be governed by       the law chosen by the parties.      contains the connective Obligation Only If which expectes 2 operands, but 3 were given.'}, done)
+        .expect(400, {"error": 'The sentence        A contract       shall be governed by       the law chosen by the parties.      contains the connective It Ought to be ___ If ___ which expectes 2 operands, but 3 were given.'}, done)
   })
   it("should return 400 and correct message on an update of a write protected theory", function(done){
       const t = Object.assign({}, theory8);
@@ -525,7 +525,7 @@ describe("Checking theory static computeViolations", function(){
     let json =  {
       "text": "A contract shall be governed by the law chosen by the parties.",
       "connective": {
-        "name": "Obligation Only If",
+        "name": "It Ought to be ___ If ___",
         "code": "obonif",
         "formulas": [
           {

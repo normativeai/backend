@@ -2,23 +2,23 @@ const cheerio = require('cheerio');
 var logger = require('../config/winston');
 
 const names = {
-  "neg": "Negation",
-  "or": "Or",
-  "and": "And",
+  "neg": "Not ___",
+  "or": "___ Or ___ [Or ___ [...]]",
+  "and": "___ And ___ [And ___ [...]]",
   /*"eq": "Term Equality",*/
-  "defif": "Definitional If",
-  "defonif": "Definitional Only If",
-  "ob": "Obligation",
-  "pm": "Permission",
-  "fb": "Forbidden",
-  "id": "Ideally",
-  "obif": "Obligation If",
-  "obonif": "Obligation Only If",
-  "pmif": "Permission If",
-  "pmonif": "Permission Only If",
-  "fbif": "Forbidden If",
-  "fbonif": "Forbidden Only If",
-  "equiv": "Equivalence"
+  "defif": "If ___ Then ___",
+  "defonif": "___ If ___",
+  "ob": "It Ought to be ___",
+  "pm": "It is Permitted that ___",
+  "fb": "It is Prohibited that ___",
+  "id": "Ideally it is the case that ___",
+  "obif": "If ___ Then it Ought to be ___",
+  "obonif": "It Ought to be ___ If ___",
+  "pmif": "If ___ Then it is permitted that ___",
+  "pmonif": "It is permitted that ___ If ___",
+  "fbif": "If ___ Then it is prohibited that ___",
+  "fbonif": "It is prohibited that ___ If ___",
+  "equiv": "___ is equivalent to ___"
 }
 
 function isAnnotationElement(spanElem) {
