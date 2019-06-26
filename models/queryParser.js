@@ -87,23 +87,27 @@ var lang = P.createLanguage({
 
   neg: r => P.seq(word("~ "), r.formula).tie(),
 
-  permitted: r => P.seqMap(word("Pm^").then(r.integer).or(word("Pm ").map(_ => 0)), r.formula, function(n,f) {return  pm(f,n)}),
+  agents_arglist: r => r.constant.sepBy1(word(",")),
 
-  forbidden: r => P.seqMap(word("Fb^").then(r.integer).or(word("Fb ").map(_ => 0)), r.formula, function(n,f) {return  fb(f,n)}),
+  agents: r => P.alt(r.lbracket.then(r.agents_arglist.skip(r.rbracket)).map(ls => {return ls.reduce((acc,val, ind) => acc + Math.pow(10, ind) * val.charCodeAt(0), 0)}),r.integer),
 
-  ought: r => P.seqMap(word("Ob^").then(r.integer).or(word("Ob ").map(_ => 0)), r.formula, function(n,f) {return  ob(f,n)}),
+  permitted: r => P.seqMap(word("Pm^").then(r.agents).or(word("Pm ").map(_ => 0)), r.formula, function(n,f) {return  pm(f,n)}),
 
-  ideal: r => P.seqMap(word("Id^").then(r.integer).or(word("Id ").map(_ => 0)), r.formula, function(n,f) {return  o1(f,n)}),
+  forbidden: r => P.seqMap(word("Fb^").then(r.agents).or(word("Fb ").map(_ => 0)), r.formula, function(n,f) {return  fb(f,n)}),
+
+  ought: r => P.seqMap(word("Ob^").then(r.agents).or(word("Ob ").map(_ => 0)), r.formula, function(n,f) {return  ob(f,n)}),
+
+  ideal: r => P.seqMap(word("Id^").then(r.agents).or(word("Id ").map(_ => 0)), r.formula, function(n,f) {return  o1(f,n)}),
 
   binary: r => P.seq(r.lparen, r.formula, P.alt(word(","), word(";"), word("=>"), word("<=>")), r.formula, r.rparen).tie(),
 
   nbinary: r => P.seq(r.lparen, P.alt(r.no,r.po,r.fo), r.rparen).tie(),
 
-  no: r => P.seqMap(r.formula, word("O>^").then(r.integer).or(word("O>").map(_ => 0)), r.formula, function(f1,n,f2) {return oimp(f1,f2,n)}),
+  no: r => P.seqMap(r.formula, word("O>^").then(r.agents).or(word("O>").map(_ => 0)), r.formula, function(f1,n,f2) {return oimp(f1,f2,n)}),
 
-  po: r => P.seqMap(r.formula, word("P>^").then(r.integer).or(word("P>").map(_ => 0)), r.formula, function(f1,n,f2) {return pimp(f1,f2,n)}),
+  po: r => P.seqMap(r.formula, word("P>^").then(r.agents).or(word("P>").map(_ => 0)), r.formula, function(f1,n,f2) {return pimp(f1,f2,n)}),
 
-  fo: r => P.seqMap(r.formula, word("F>^").then(r.integer).or(word("F>").map(_ => 0)), r.formula, function(f1,n,f2) {return fimp(f1,f2,n)}),
+  fo: r => P.seqMap(r.formula, word("F>^").then(r.agents).or(word("F>").map(_ => 0)), r.formula, function(f1,n,f2) {return fimp(f1,f2,n)}),
 
   atom: r => P.alt(r.tre, r.fls, r.func, r.constant),
 
@@ -148,3 +152,5 @@ exports.parseFormula = function(str) {
 exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
+
+
