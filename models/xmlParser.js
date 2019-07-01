@@ -2,23 +2,23 @@ const cheerio = require('cheerio');
 var logger = require('../config/winston');
 
 const names = {
-  "neg": "Not ___",
-  "or": "___ Or ___ [Or ___ [...]]",
-  "and": "___ And ___ [And ___ [...]]",
+  "neg": {"name": "Not", "description": "Not ___"},
+  "or": {"name": "Or", "description": "___ Or ___ [Or ___ [...]]"},
+  "and": {"name": "And", "description": "___ And ___ [And ___ [...]]"},
   /*"eq": "Term Equality",*/
-  "defif": "If ___ Then ___",
-  "defonif": "___ If ___",
-  "ob": "It Ought to be ___",
-  "pm": "It is Permitted that ___",
-  "fb": "It is Prohibited that ___",
-  "id": "Ideally it is the case that ___",
-  "obif": "If ___ Then it Ought to be ___",
-  "obonif": "It Ought to be ___ If ___",
-  "pmif": "If ___ Then it is permitted that ___",
-  "pmonif": "It is permitted that ___ If ___",
-  "fbif": "If ___ Then it is prohibited that ___",
-  "fbonif": "It is prohibited that ___ If ___",
-  "equiv": "___ is equivalent to ___"
+  "defif": {"name": "If / Then", "description": "If ___ Then ___"},
+  "defonif": {"name": "Always / If", "description": "___ If ___"},
+  "ob": {"name": "Obligation", "description": "It Ought to be ___"},
+  "pm": {"name": "Permission", "description": "It is Permitted that ___"},
+  "fb": {"name": "Prohibitence", "description": "It is Prohibited that ___"},
+  "id": {"name": "Ideally", "description": "Ideally it is the case that ___"},
+  "obif": {"name": "If / Then Obligation", "description": "If ___ Then it Ought to be ___"},
+  "obonif": {"name": "Always Obligation / If", "description": "It Ought to be ___ If ___"},
+  "pmif": {"name": "If / Then Permission", "description": "If ___ Then it is permitted that ___"},
+  "pmonif": {"name": "Always Permission / If", "description": "It is permitted that ___ If ___"},
+  "fbif": {"name": "If / Then Prohibition", "description": "If ___ Then it is prohibited that ___"},
+  "fbonif": {"name": "Always Prohibition / If", "description": "It is prohibited that ___ If ___"},
+  "equiv": {"name": "Equivalence", "description": "___ is equivalent to ___"}
 }
 
 function isAnnotationElement(spanElem) {
@@ -84,8 +84,16 @@ function parseConnective($,spanElem) {
   const forms = children.map(function(elem) {
     return parseFormula($,elem)
   });
+  var con = names[connective]
+  var name = "undefined"
+  var desc = "undefined"
+  if (con) {
+    name = con.name
+    desc =con.description
+  }
   return {
-    "name": names[connective],
+    "name": name,
+    "description": desc,
     "code": connective,
     "formulas": forms
   }

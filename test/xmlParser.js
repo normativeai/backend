@@ -18,13 +18,13 @@ describe("XML parser", function(){
   });
   it(`should parse an xml string correctly 3`, function(done){
     const xml_string = "<span id=\"some-id-1\" class=\"annotator-connective\" data-connective=\"ob\"><p><span id=\"some-id-3\" class=\"annotator-connective\" data-connective=\"ob\"><span id=\"some-id-2\" class=\"annotator-term\" data-term=\"contract(Law,Part)\"></span></span></p></span>"
-    let json_string = '{"text":"","connective":{"name":"It Ought to be ___","code":"ob","formulas":[{"text":"","connective":{"name":"It Ought to be ___","code":"ob","formulas":[{"text":"","term":{"name":"contract(Law,Part)"}}]}}]}}'
+    let json_string = '{"text":"","connective":{"name": "Obligation", "description": "It Ought to be ___","code":"ob","formulas":[{"text":"","connective":{"name": "Obligation", "description": "It Ought to be ___","code":"ob","formulas":[{"text":"","term":{"name":"contract(Law,Part)"}}]}}]}}'
     assert.equal(JSON.stringify(parser.parse(xml_string)[0]), JSON.stringify(JSON.parse(json_string)));
     done();
   });
   it(`should parse an xml string correctly 4`, function(done){
     const xml_string = "<span id=\"some-id-1\" class=\"annotator-connective\" data-connective=\"ob\"><span id=\"some-id-3\" class=\"annotator-connective\" data-connective=\"ob\"><p><span id=\"some-id-2\" class=\"annotator-term\" data-term=\"contract(Law,Part)\"></span></p></span></span>"
-    let json_string = '{"text":"","connective":{"name":"It Ought to be ___","code":"ob","formulas":[{"text":"","connective":{"name":"It Ought to be ___","code":"ob","formulas":[{"text":"","term":{"name":"contract(Law,Part)"}}]}}]}}'
+    let json_string = '{"text":"","connective":{"name": "Obligation", "description": "It Ought to be ___","code":"ob","formulas":[{"text":"","connective":{"name": "Obligation", "description": "It Ought to be ___","code":"ob","formulas":[{"text":"","term":{"name":"contract(Law,Part)"}}]}}]}}'
     assert.equal(JSON.stringify(parser.parse(xml_string)[0]), JSON.stringify(JSON.parse(json_string)));
     done();
   });
