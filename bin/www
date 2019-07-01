@@ -30,6 +30,9 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+console.log(`Node server started on port ${config.port}`)
+
+
 /**
  * Normalize a port into a number, string, or false.
  */
