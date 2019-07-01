@@ -98,13 +98,13 @@ exports.update = function(req, res, next) {
           });
 
         } else {
-          logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be updated: ${JSON.stringify(err)} -- ${err}`);
+          logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be updated: ${err}`);
           res.status(400).json({error: err});
         }
       });
-    } catch (err) {
-      logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be updated: ${JSON.stringify(err)} -- ${err}`);
-      res.status(400).json(err);
+    } catch (error) {
+      logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be updated: ${error}`);
+      res.status(400).json(error);
     }
   }
 };

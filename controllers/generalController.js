@@ -14,7 +14,7 @@ exports.connectives = function(req, res, next) {
       arity = 'Two or more'
     else
       throw `Unknown arity of operator ${key}`
-    obj[key] = {'code': key, 'name': ops[key].name, 'description': ops[key].description,'arity': arity}
+    obj[key] = {'code': key, 'name': ops[key], 'arity': arity}
     return obj
   }, {})
   res.json({"data": ret})
