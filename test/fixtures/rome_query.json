@@ -2,7 +2,8 @@
   {
     "text": "A contract shall be governed by the law chosen by the parties.",
     "connective": {
-      "name": "It Ought to be ___ If ___",
+      "name": "Always Obligation / If",
+      "description": "It Ought to be ___ If ___",
       "code": "obonif",
       "formulas": [
         {
