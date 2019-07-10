@@ -32,7 +32,7 @@ function pm(f,n) {
 
 function fb(f,n) {
   var nf = `(~ ${f})`
-  return `(~ ${ob(nf,n)})`
+  return ob(nf,n)
 }
 
 function pimp(f1,f2,n) {
