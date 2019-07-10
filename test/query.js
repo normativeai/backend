@@ -551,6 +551,22 @@ describe("Execute query", function(){
           .expect(400, {error: 'Query has no goal. Please assign goals before trying to execute queries'}, done)
       })
   });
+  it("should return false and additional info when the goal is defeated @slow", function(done){
+    const t = Object.assign({}, query8);
+    t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li></ol>"
+    // update theory
+    server
+      .put(`/api/queries/${t._id}`)
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(t)
+      .end(function() {
+        server
+				.get(`/api/queries/${query2._id}/exec`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(200, { message: 'The query is counter-satisfiable. The goal does not logically follow from the assumptions and legislation',
+          type: 'info'},	done);
+  });
+
 
 });
 
