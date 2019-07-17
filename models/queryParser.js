@@ -6,16 +6,16 @@ function norm(n,pos) {
   return n * 2 + pos
 }
 
-function o1(f,n) {
+function id(f,n) {
   return `(# ${norm(n,1)}^d: ${f})`
 }
 
-function o2(f,n) {
+function aw(f,n) {
   return `(# ${norm(n,2)}^d: ~ ${f})`
 }
 
 function ob(f,n) {
-  return `(${o1(f,n)}, ${o2(f,n)})`
+  return `(${id(f,n)}, ${aw(f,n)})`
 }
 
 function p1(f,n) {
@@ -36,15 +36,15 @@ function fb(f,n) {
 }
 
 function pimp(f1,f2,n) {
-  return `((${f1} => ${pm(f2,n)}),(${o1(pm(f1,n),n)} => ${o1(pm(f2,n),n)}))`
+  return `((${f1} => ${pm(f2,n)}),(${id(pm(f1,n),n)} => ${id(pm(f2,n),n)}))`
 }
 
 function oimp(f1,f2,n) {
-  return `((${f1} => ${ob(f2,n)}),(${o1(ob(f1,n),n)} => ${o1(ob(f2,n),n)}))`
+  return `((${f1} => ${ob(f2,n)}),(${id(ob(f1,n),n)} => ${id(ob(f2,n),n)}))`
 }
 
 function fimp(f1,f2,n) {
-  return `((${f1} => ${fb(f2,n)}),(${o1(fb(f1,n),n)} => ${o1(fb(f2,n),n)}))`
+  return `((${f1} => ${fb(f2,n)}),(${id(fb(f1,n),n)} => ${id(fb(f2,n),n)}))`
 }
 
 let whitespace = P.regexp(/\s*/m);
@@ -83,7 +83,7 @@ var lang = P.createLanguage({
 
   formula: r => P.alt(r.unary, r.nbinary, r.binary, r.vatom),
 
-  unary: r => P.seq(r.lparen, P.alt(r.neg, r.permitted, r.forbidden, r.ought, r.ideal), r.rparen).tie(),
+  unary: r => P.seq(r.lparen, P.alt(r.neg, r.permitted, r.forbidden, r.ought, r.ideal, r.awful), r.rparen).tie(),
 
   neg: r => P.seq(word("~ "), r.formula).tie(),
 
@@ -97,7 +97,9 @@ var lang = P.createLanguage({
 
   ought: r => P.seqMap(word("Ob^").then(r.agents).or(word("Ob ").map(_ => 0)), r.formula, function(n,f) {return  ob(f,n)}),
 
-  ideal: r => P.seqMap(word("Id^").then(r.agents).or(word("Id ").map(_ => 0)), r.formula, function(n,f) {return  o1(f,n)}),
+  ideal: r => P.seqMap(word("Id^").then(r.agents).or(word("Id ").map(_ => 0)), r.formula, function(n,f) {return  id(f,n)}),
+
+  awful: r => P.seqMap(word("Aw^").then(r.agents).or(word("Aw ").map(_ => 0)), r.formula, function(n,f) {return  aw(f,n)}),
 
   binary: r => P.seq(r.lparen, r.formula, P.alt(word(","), word(";"), word("=>"), word("<=>")), r.formula, r.rparen).tie(),
 
