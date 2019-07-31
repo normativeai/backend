@@ -177,13 +177,16 @@ describe("Connecting to API",function(){
       _id: query._id,
       name: query.name,
       description: query.description,
-      lastUpdate: query.lastUpdate
+      lastUpdate: query.lastUpdate,
+      theory: t1._id
     }
     const q2 = {
       _id: query2._id,
       name: query2.name,
       description: query2.description,
-      lastUpdate: query2.lastUpdate
+      lastUpdate: query2.lastUpdate,
+      theory: t1._id
+
     }
 
     var token = {token: undefined};
