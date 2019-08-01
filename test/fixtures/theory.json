@@ -6,6 +6,7 @@
 					"name"          : "Test title",
 					"description"   : "Desc plah plah",
 					"content"       : "Content",
+          "comment"       : "A comment",
 					"vocabulary"    : [{"_id": "4342306d8e147f10f17aceaa",  "full": "", "symbol": "D0.1", "original": "the contract requires the seller to take care of the carriage of goods"}, { "_id": "4342306d8e147f10f16aceab", "full": "", "symbol": "D1", "original": "the goods are handed over to the first carrier"}],
 					"formalization" : [{"_id": "4342306d8e147f10f18aceaa", "original": "31(a) if the contract of sale involves carriage of the goods – in handing the goods over to the first carrier for transmission to the buyer", "formula": "(d01 O>^1 d1)"}]
         },
@@ -17,6 +18,7 @@
 					"name"          : "Test2 name",
 					"description"   : "Desc2 blah blah",
 					"content"       : "Content",
+          "comment"       : "A comment",
 					"vocabulary"    : [{"_id": "4542306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4542306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
 					"formalization" : [{"_id": "4542306d8e148f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "d"},{"_id": "4542306d9e147f10f16aceaa", "original": "Delivery means you should make Insurance 2", "formula": "(~ d)"}]
         },
@@ -29,6 +31,7 @@
 					"name"          : "Test3 title",
 					"description"   : "Desc3 plah plah",
 					"content"       : "Content",
+          "comment"       : "A comment",
 					"vocabulary"    : [{"_id": "4742306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4742306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
 					"formalization" : [{"_id": "4742306d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "$#@$@#"}]
         },
@@ -40,6 +43,7 @@
 					"name"          : "Test4 title",
 					"description"   : "Desc4 plah plah",
 					"content"       : "Content",
+          "comment"       : "<div><b>A comment</b></div>",
 					"vocabulary"    : [{"_id": "4742306d8e147f10f17acead", "symbol": "a", "original": "Delivery"}],
 					"formalization" : [{"_id": "4742306d8e147f10f18acead", "original": "test", "formula": "a"},{"_id": "2742306d8e147f10f18acead", "original": "test", "formula": "a"}, {"_id": "1742306d8e147f10f18acead", "original": "test", "formula": "b"} ]
         },
@@ -51,6 +55,7 @@
 					"name"          : "Test2 name",
 					"description"   : "Desc2 blah blah",
 					"content"       : "Content",
+          "comment"       : "<div><b>A comment</b></div>",
 					"vocabulary"    : [{"_id": "4542306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4542306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
 					"formalization" : [{"_id": "4542306d8e148f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "e", "active": false},{"_id": "4542306d8e149f10f16aceaa", "original": "Delivery means you should make Insurance 2", "formula": "(~ e)"}]
         },
@@ -62,6 +67,7 @@
 					"name"          : "Test6 title",
 					"description"   : "Desc plah plah",
 					"content"       : "<!doctype html>  <html> <head>   <style type=\"text/css\">     span.annotator-connective {       border: 1px dashed gray;       border-radius: 3px;       background-color: #e1e1e1;       padding: 0px;       display: inline-block;       text-decoration: underline;       text-decoration-style: dashed;       cursor: help;     }     span.annotator-term {       background-color: lime;       border: 1px solid darkgreen;       padding: 0px 1px 0px 1px;       margin: 1px 2px 1px 2px;       display: inline-block;       text-decoration: unset;       cursor: auto;     }   </style> </head> <body> <div id=\"annotator\">   <h1>Rome II</h1>   <ol>     <li>       <span id=\"some-id-1\" class=\"annotator-connective\" data-connective=\"obonif\"><span id=\"some-id-2\" class=\"annotator-term\" data-term=\"contract(Law,Part)\" title=\"contract(Law,Part)\">A contract</span> shall be governed by <span id=\"some-id-3\" class=\"annotator-term\" data-term=\"validChoice(Law,Part)\" title=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span>       <span id=\"some-id-4\" class=\"annotator-connective\" data-connective=\"defonif\"><span id=\"some-id-5\" class=\"annotator-term\" data-term=\"validChoice(Law,Part)\">The choice</span> shall be made <span id=\"some-id-6\" class=\"annotator-connective\" data-connective=\"or\"><span id=\"some-id-7\" class=\"annotator-term\" data-term=\"expressedChoice(Law,Part)\">expressly</span> or <span id=\"some-id-8\" class=\"annotator-term\" data-term=\"demonstratedCertaintyChoice(Law,Part)\">clearly demonstrated by the terms of the contract</span> or <span id=\"some-id-9\" class=\"annotator-term\" data-term=\"demonstratedCircumstancesChoice(Law,Part)\">the circumstances of the case</span></span>.</span>       <span id=\"some-id-10\" class=\"annotator-connective\" data-connective=\"and\"><span id=\"some-id-11\" class=\"annotator-term\" data-term=\"validChoice(Law,Part)\">By their choice</span> the parties can select the law applicable to <span id=\"some-id-12\" class=\"annotator-connective\" data-connective=\"or\"><span id=\"some-id-13\" class=\"annotator-term\" data-term=\"validChoice(Law,Whole)\">the whole</span> or to <span id=\"some-id-14\" class=\"annotator-term\" data-term=\"validChoice(Law,part(SomePart))\">part only of the contract</span></span>.</span>     </li>   </ol> </div> </body> </html>",
+          "comment"       : "<div><b>A comment</b></div>",
 					"vocabulary"    : [],
 					"formalization" : []
         },
@@ -72,7 +78,8 @@
 					"name"          : "Test7 title",
 					"description"   : "Desc plah plah",
 					"content"       : "<!doctype html>  <html> <head>   <style type=\"text/css\">     span.annotator-connective {       border: 1px dashed gray;       border-radius: 3px;       background-color: #e1e1e1;       padding: 0px;       display: inline-block;       text-decoration: underline;       text-decoration-style: dashed;       cursor: help;     }     span.annotator-term {       background-color: lime;       border: 1px solid darkgreen;       padding: 0px 1px 0px 1px;       margin: 1px 2px 1px 2px;       display: inline-block;       text-decoration: unset;       cursor: auto;     }   </style> </head> <body> <div id=\"annotator\">   <h1>Rome II</h1>   <ol>     <li>       <span id=\"some-id-1\" class=\"annotator-connective\" data-connective=\"band\"><span id=\"some-id-2\" class=\"annotator-term\" data-term=\"contract(Law,Part)\" title=\"contract(Law,Part)\">A contract</span> shall be governed by <span id=\"some-id-3\" class=\"annotator-term\" data-term=\"validChoice(Law,Part)\" title=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span>       <span id=\"some-id-4\" class=\"annotator-connective\" data-connective=\"band\"><span id=\"some-id-5\" class=\"annotator-term\" data-term=\"validChoice(Law,Part)\">The choice</span> shall be made <span id=\"some-id-6\" class=\"annotator-connective\" data-connective=\"or\"><span id=\"some-id-7\" class=\"annotator-term\" data-term=\"expressedChoice(Law,Part)\">expressly</span> or <span id=\"some-id-8\" class=\"annotator-term\" data-term=\"demonstratedCertaintyChoice(Law,Part)\">clearly demonstrated by the terms of the contract</span> or <span id=\"some-id-9\" class=\"annotator-term\" data-term=\"demonstratedCircumstancesChoice(Law,Part)\">the circumstances of the case</span></span>.</span>       <span id=\"some-id-10\" class=\"annotator-connective\" data-connective=\"band\"><span id=\"some-id-11\" class=\"annotator-term\" data-term=\"validChoice(Law,Part)\">By their choice</span> the parties can select the law applicable to <span id=\"some-id-12\" class=\"annotator-connective\" data-connective=\"or\"><span id=\"some-id-13\" class=\"annotator-term\" data-term=\"validChoice(Law,Whole)\">the whole</span> or to <span id=\"some-id-14\" class=\"annotator-term\" data-term=\"validChoice(Law,part(SomePart))\">part only of the contract</span></span>.</span>     </li>   </ol> </div> </body> </html>",
-					"vocabulary"    : [],
+          "comment"       : "<div><b>A comment</b></div>",
+          "vocabulary"    : [],
 					"formalization" : []
         },
       "Theory8":
@@ -82,9 +89,9 @@
 					"name"          : "Test8",
 					"description"   : "write protected",
 					"content"       : "",
+          "comment"       : "",
 					"vocabulary"    : [],
 					"formalization" : [],
           "writeProtected": true
         }
 }
-

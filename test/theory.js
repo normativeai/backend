@@ -131,6 +131,7 @@ describe("Get theories", function(){
           assert.equal(theory.description, t.description);
           assert.equal(JSON.stringify(theory.formalization), JSON.stringify(t.formalization));
           assert.equal(theory.content, t.content);
+          assert.equal(theory.comment, t.comment);
           assert.equal(JSON.stringify(theory.vocabulary),JSON.stringify(t.vocabulary));
           done();
         }).catch(err => {
@@ -185,7 +186,7 @@ describe("Update theory", function(){
         .expect(404, { error:  'Theory could not be found'
         },	done);
   });
-  it("should check that the auto formaliztion were updated correctly 1", function(done){
+  it("should check that the auto formalization were updated correctly 1", function(done){
       const t = Object.assign({}, theory);
       t.content = theory6.content
       let json_string = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
