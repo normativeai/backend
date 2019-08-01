@@ -676,3 +676,56 @@ describe("Changing queries of write protected user", function(){
       .expect(400, {error: "Query cannot be deleted since the user is write protected"}, done);
   });
 })
+
+describe("Counter model finding for query", function(){
+
+  var token = {token: undefined};
+
+	beforeEach(done => {
+		User.create(user, function (err) {
+    utils.login(server, token, user, () => {
+    theory.user = user;
+    Theory.create(theory, function(err, theory) {
+    query.theory = theory._id;
+    query.user = user;
+    Query.create(query, function(err, query) {
+    query2.theory = theory._id;
+    query2.user = user;
+    Query.create(query2, function(err, query2) {
+    query3.theory = theory._id;
+    query3.user = user;
+    Query.create(query3, function(err, query3) {
+    done();})})})})});
+	})});
+
+	afterEach(done => {
+		Query.deleteOne({'name': query.name}, function (err) {
+		Query.deleteOne({'name': query2.name}, function (err) {
+		Query.deleteOne({'name': query3.name}, function (err) {
+		Theory.deleteOne({'name': theory.name}, function (err) {
+		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
+	});
+
+  it("should fail to find a counter model when it is a theorem @slow", function(done){
+			server
+				.get(`/api/queries/${query._id}/cmodel`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(200, { message: 'The query is counter-satisfiable. The goal does not logically follow from the assumptions and legislation',
+          type: 'info'},	done);
+  });
+	it("should return a counter model when it is a Non-theorem @slow", function(done){
+			server
+				.get(`/api/queries/${query2._id}/cmodel`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(200, { message: 'The query is counter-satisfiable. The goal does not logically follow from the assumptions and legislation',
+          type: 'success'},	done);
+  });
+  it("should return code 400 if query is illegal @slow", function(done){
+      this.timeout(5000);
+			server
+				.get(`/api/queries/${query3._id}/cmodel`)
+        .set('Authorization', `Bearer ${token.token}`)
+        .expect(400)
+        .then(response => {done()});
+  });
+});

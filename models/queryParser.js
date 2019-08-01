@@ -139,7 +139,7 @@ var lang = P.createLanguage({
 
 });
 
-exports.parseFormula = function(str) {
+function parseFormula(str) {
   if (str.includes('__var'))
     throw 'DL* formulae must not contain "__var"'
   //hash = crypto.createHash('md5').update(str).digest('hex');
@@ -151,8 +151,9 @@ exports.parseFormula = function(str) {
     return form
 }
 
-exports.parse = function(str) {
+function parse(str) {
   return lang.problem.tryParse(str);
 }
 
+module.exports = {parse: parse, parseFormula: parseFormula}
 

@@ -37,6 +37,9 @@ router.route("/queries")
 router.route('/queries/:queryId/exec')
   .get(queryController.exec)
 
+router.route('/queries/:queryId/cmodel')
+  .get(queryController.cmodel)
+
 router.route('/queries/:queryId')
   .get(queryController.getOne)
   .put(queryController.update)

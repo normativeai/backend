@@ -84,6 +84,8 @@ querySchema.pre('updateOne', function(next) {
 querySchema.methods.execQuery = function(cb) {
   if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
+    var engine = require('./mleancop');
+    var parser = require('./queryParser');
 
     if (!!!this.theory) {
       cb(0, false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
@@ -94,7 +96,7 @@ querySchema.methods.execQuery = function(cb) {
       if (!this.autoGoal.formula) {
         this.autoGoal.formula = this.goal
       }
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, function(theorem, proof, additionalCode) {
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, engine, parser, function(theorem, proof, additionalCode) {
         if (theorem) {
           obj.lastQueryTheorem = theorem;
           obj.lastQueryProof = proof;
@@ -113,6 +115,42 @@ querySchema.methods.execQuery = function(cb) {
     cb(1, this.lastQueryTheorem, this.lastQueryProof);
   }
 };
+
+querySchema.methods.findCModels = function(cb) {
+  if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
+    var helper = require('./queryHelper');
+    var engine = require('./nitpick');
+    var parser = require('./queryParser2HOML');
+
+    if (!!!this.theory) {
+      cb(0, false, 'Query is not associated with a specific theory. Please set the theory before looking for counter models');
+    } else if (!this.goal && !this.autoGoal.formula) {
+      cb(0, false, 'Query has no goal. Please assign goals before looking for counter models');
+    } else {
+      var obj = this
+      if (!this.autoGoal.formula) {
+        this.autoGoal.formula = this.goal
+      }
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, engine, parser, function(theorem, proof, additionalCode) {
+        if (theorem) {
+          obj.lastQueryTheorem = theorem;
+          obj.lastQueryProof = proof;
+          obj.lastQueryDate = new Date();
+          obj.save(function (err) {
+            if (err)
+              logger.error(`Cannot save query state. ${err}`);
+          });
+          cb(1, theorem, proof);
+        } else {
+          cb(additionalCode, theorem, proof);
+        }
+      });
+    }
+  } else {
+    cb(1, this.lastQueryTheorem, this.lastQueryProof);
+  }
+};
+
 
 querySchema.methods.isConsistent = function(cb) {
   if (typeof this.lastConsistencyDate === 'undefined' || this.lastUpdate > this.lastConsistencyDate || this.theory.lastUpdate > this.lastConsistencyDate ) {

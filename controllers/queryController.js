@@ -176,6 +176,44 @@ exports.exec = function(req, res) {
   });
 };
 
+// Looking for counter models.
+exports.cmodel = function(req, res) {
+  Query.findOne({"_id": req.params.queryId})
+    .populate('theory')
+    .exec(function(err, query) {
+      if (query) {
+        query.findCModels(function(code, theorem, proof) {
+          if (code == 1) { // engine ok
+            if (theorem) {
+              logger.info(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} is a ${theorem}`);
+              if (theorem == "Theorem") {
+                res.status(200).json({message: "The query is valid. The goal logically follows from the assumptions and legislation and therefore no counter-model exists", type: "info"});
+              } else {
+                res.status(200).json({message: "The query is counter-satisfiable. The following is one counter model", type: "success", cmodel: proof});
+              }
+            } else if (proof) {
+              logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be checked for counter models: ${proof}`);
+              res.status(400).json({'error': proof});
+            } else {
+              logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be checked for counter models since it is invalid`);
+              res.status(400).json({'error': 'MleanCoP error: invalid query'});
+            }
+          } else if (code == 2) { //timeout
+            logger.info(`Goal of query ${req.params.queryId} of user ${JSON.stringify(req.user)} was timeoutted `);
+            res.status(206).json({message: 'Backend prover ran out of time to find counter models.', type: 'warning'});
+          } else {
+            logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be looked for counter models: ${proof}`);
+            res.status(400).json({'error': proof});
+          }
+        });
+      } else {
+        logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be looked for counter models since it cannot be found`);
+        res.status(400).json({'error': 'Unknown query ID'});
+      }
+  });
+};
+
+
 exports.consistency = function(req, res, next) {
   Query.findById(req.params.queryId)
     .populate('theory')
