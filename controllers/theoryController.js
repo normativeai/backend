@@ -30,6 +30,7 @@ exports.create = [
           user: req.user,
           description: req.body.description,
           content: req.body.content,
+          comment: req.body.comment,
           vocabulary: req.body.vocabulary,
           formalization: req.body.formalization,
           creator: req.body.creator,
@@ -65,7 +66,7 @@ exports.get = function(req, res, next) {
 };
 
 exports.getOne = function(req, res, next) {
-  Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description','formalization','autoFormalization', 'content','vocabulary', 'autoVocabulary'], function (err, theory) {
+  Theory.findById(req.params.theoryId, ['_id','name','lastUpdate','description','formalization','autoFormalization', 'content', 'comment', 'vocabulary', 'autoVocabulary'], function (err, theory) {
     res.json({data: theory})
   });
 };
