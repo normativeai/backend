@@ -10,6 +10,7 @@ var theorySchema = new Schema({
     name 		          : String,
     description       : String,
     content           : String, // annotated XML
+    comment           : String,
     vocabulary        : [{symbol: String, original: String, full: String}],
     autoVocabulary    : [{symbol: String, original: String, full: String}],
     formalization     : [{original: String, json: Object, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
