@@ -26,7 +26,7 @@ exports.signup = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.error(`Logging for ${req.body.email} with password ${req.body.password} - ${JSON.stringify(errors.array())}`);
+      logger.error(`Logging for ${req.body.email} - ${JSON.stringify(errors.array())}`);
       return res.status(422).json({ errors: errors.array() });
     }
     User.create({
@@ -35,10 +35,10 @@ exports.signup = [
       name: req.body.name,
     }, function (err, user) {
         if (err) {
-          logger.error(`Logging for ${req.body.email} with password ${req.body.password} - User already exists`);
+          logger.error(`Logging for ${req.body.email} - User already exists`);
           res.status(400).json({error: 'User already exists'});
         } else {
-          logger.info(`Logging for ${req.body.email} with password ${req.body.password} - User successfully created`);
+          logger.info(`Logging for ${req.body.email} - User successfully created`);
           res.status(201).json({data: user});
         }
     });
