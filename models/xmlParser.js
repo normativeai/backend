@@ -14,10 +14,8 @@ const names = {
   "id": {"name": "Ideally", "description": "Ideally it is the case that ___"},
   "obif": {"name": "If / Then Obligation", "description": "If ___ Then it Ought to be ___"},
   "obonif": {"name": "Always Obligation / If", "description": "It Ought to be ___ If ___"},
-  "pmif": {"name": "If / Then Permission", "description": "If ___ Then it is weakly permitted that ___"},
-  "pmonif": {"name": "Always Permission / If", "description": "It is weakly permitted that ___ If ___"},
-  "spmif": {"name": "If / Then Strong Permission", "description": "If ___ Then it is strongly permitted that ___"},
-  "spmonif": {"name": "Always Strong Permission / If", "description": "It is strongly permitted that ___ If ___"},
+  "pmif": {"name": "If / Then Permission", "description": "If ___ Then it is permitted that ___"},
+  "pmonif": {"name": "Always Permission / If", "description": "It is permitted that ___ If ___"},
   "fbif": {"name": "If / Then Prohibition", "description": "If ___ Then it is prohibited that ___"},
   "fbonif": {"name": "Always Prohibition / If", "description": "It is prohibited that ___ If ___"},
   "equiv": {"name": "Equivalence", "description": "___ is equivalent to ___"}
