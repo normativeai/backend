@@ -59,9 +59,9 @@ function parseConnector(obj) {
     case "pmonif":
       return `(${formulas[1]} P> ${formulas[0]})`;
     case "spmif":
-      return `((${formulas[0]} P> ${formulas[1]}), ((~ ${formulas[0]}) => (~ (Pm ${formulas[1]}))))`;
+      return `((${formulas[0]} P> ${formulas[1]}), ((~ ${formulas[0]}) O> (~ ${formulas[1]})))`;
     case "spmonif":
-      return `((${formulas[1]} P> ${formulas[0]}), ((~ ${formulas[1]}) => (~ (Pm ${formulas[0]}))))`;
+      return `((${formulas[1]} P> ${formulas[0]}), ((~ ${formulas[1]}) O> (~ ${formulas[0]})))`;
     case "fbif":
       return `(${formulas[0]} F> ${formulas[1]})`;
     case "fbonif":
