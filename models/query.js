@@ -122,7 +122,7 @@ querySchema.methods.isConsistent = function(cb) {
       cb(false, 'Query is not associated with a specific theory. Please set the theory before trying to check for consistency');
     } else {
       var obj = this
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions, "(x, (~ x))", function(theorem, proof, additionalCode) {
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), "(x, (~ x))", function(theorem, proof, additionalCode) {
         if (theorem) {
           obj.lastConsistency = (theorem != 'Theorem');
           obj.lastConsistencyDate = new Date();

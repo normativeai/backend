@@ -622,6 +622,27 @@ describe("Checking a query assumptions for consistency with relation to a theory
 				.expect(200, {message: 'The assumptions of the query together with the legislation are not consistent',
           type: 'info'}, done);
 		});
+  it("should return false in case it is inconsistent 2 @slow", function(done){
+    const q = Object.assign({}, query5);
+    q.assumptions = ["a"];
+    const t = Object.assign({}, theory4);
+    t.formalization =  [{ formula: "(a => b)"},{formula: "(a => (~ b))"} ]
+			server
+      .put(`/api/queries/${q._id}`)
+      .set('Authorization', `Bearer ${token.token}`)
+      .send(q).end(function() {
+          server
+          .put(`/api/theories/${t._id}`)
+          .set('Authorization', `Bearer ${token.token}`)
+          .send(t).end(function() {
+            server
+            .get(`/api/queries/${query5._id}/consistency`)
+            .set('Authorization', `Bearer ${token.token}`)
+            .expect(200, {message: 'The assumptions of the query together with the legislation are not consistent',
+              type: 'info'}, done);
+          })
+      })
+		});
   it("should return false in case it is inconsistent among the assumptions only @slow", function(done){
 			server
 				.get(`/api/queries/${query6._id}/consistency`)
