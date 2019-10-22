@@ -4,10 +4,11 @@ const fs = require('fs');
 var parser = require('../models/jsonParser')
 
 let json_rome = fs.readFileSync("./test/fixtures/rome1.json", "utf8");
+let json_gdpr = fs.readFileSync("./test/fixtures/gdpr.json", "utf8");
 
 const pairs = [
   ['{"text": "aaa","connective": {"code": "or", "formulas": [{"text": "aaa", "term": {"name": "a"}},{"text": "aaa", "term": {"name": "b"}}, {"text": "aaa", "term": {"name": "c"}}] } }','((a ; b) ; c)'],
-  [json_rome, '(validChoice(Law,Part) O> contract(Law,Part))']
+  [json_rome, '(validChoice(Law,Part) O> contract(Law,Part))'],
 ];
 
 describe("JSON parser", function(){
@@ -16,6 +17,10 @@ describe("JSON parser", function(){
       assert.equal(parser.parseFormula(JSON.parse(pairs[i][0])), pairs[i][1]);
     }
     done();
+  });
+
+  it("should parse correctly the GDPR JSON", function(done) {
+    assert.equal(parser.parseFormula(JSON.parse(json_gdpr)), "");
   });
 })
 

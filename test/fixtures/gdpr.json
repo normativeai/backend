@@ -1,0 +1,110 @@
+{
+	"text": "[ Assume a processor nominated by the controller to process the data.] Where personal data relating to a data subject are collected from the data subject, the controller shall, at the time when personal data are obtained, provide the data subject with all of the following information: a. the identity and the contact details of the controller and, where applicable, of the controller’s representative",
+	"connective":
+	{
+		"name":"Macro 1",
+		"description":"Macro 1",
+		"code":"macro1",
+		"formulas":[
+		{
+			"text":"processor nominated by the controller to process the data.] Where personal data relating to a data subject are collected from the data subject, the controller",
+			"connective":
+			{
+				"name":"And",
+				"description":"___ And ___ [And ___ [...]]",
+				"code":"and",
+				"formulas":[
+				{
+					"text":"processor",
+					"term":
+					{
+						"name":"processor(X)"
+					}
+				},
+				{
+					"text":"nominated by the controller",
+					"term":
+					{
+						"name":"nominate(Y,X)"
+					}
+				},
+				{
+					"text":"process the data",
+					"term":
+					{
+						"name":"personal_data_processed_at_time(X,Z,T)"
+					}
+				},
+				{
+					"text":"personal data",
+					"term":
+					{
+						"name":"personal_data(Z,W)"
+					}
+				},
+				{
+					"text":"data subject",
+					"term":
+					{
+						"name":"data_subject(W)"
+					}
+				},
+				{
+					"text":"controller",
+					"term":
+					{
+						"name":"controller(Y,Z)"
+					}
+				}]
+			}
+		},
+		{
+			"text":"at the time when personal data are obtained, provide the data subject with all of the following information: a. the identity and the contact details of the controller and, where applicable, of the controller’s representative",
+			"connective":
+			{
+				"name":"And",
+				"description":"___ And ___ [And ___ [...]]",
+				"code":"and",
+				"formulas":[
+				{
+					"text":"at the time when personal data are obtained, provide the data subject with all of the following information",
+					"term":
+					{
+						"name":"communicate_at_time(Y,W,T,VAR)"
+					}
+				},
+				{
+					"text":"the identity and the contact details of the controller",
+					"term":
+					{
+						"name":"contact_details(Y)"
+					}
+				},
+				{
+					"text":"where applicable, of the controller’s representative",
+					"connective":
+					{
+						"name":"If / Then",
+						"description":"If ___ Then ___",
+						"code":"defif",
+						"formulas":[
+						{
+							"text":"where applicable",
+							"term":
+							{
+								"name":"representative(K,Y)"
+							}
+						},
+						{
+							"text":"of the controller’s representative",
+							"term":
+							{
+								"name":"contact_details(K)"
+							}
+						}]
+					}
+				}]
+			}
+		}]
+	}
+}
