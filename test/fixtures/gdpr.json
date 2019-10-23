@@ -4,7 +4,7 @@
 	{
 		"name":"Macro 1",
 		"description":"Macro 1",
-		"code":"macro1",
+		"code":"obmacro1",
 		"formulas":[
 		{
 			"text":"processor nominated by the controller to process the data.] Where personal data relating to a data subject are collected from the data subject, the controller",

@@ -20,7 +20,11 @@ describe("JSON parser", function(){
   });
 
   it("should parse correctly the GDPR JSON", function(done) {
-    assert.equal(parser.parseFormula(JSON.parse(json_gdpr)), "");
+    let obs = parser.parseFormula(JSON.parse(json_gdpr))
+    assert.equal(obs.length, 2);
+    assert.equal(obs[0], "((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) O> communicate_at_time(Y,W,T,contact_details(Y)))");
+    assert.equal(obs[1], "(((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K)))");
+    done();
   });
 })
 

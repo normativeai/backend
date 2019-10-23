@@ -21,8 +21,7 @@ const names = {
   "fbif": {"name": "If / Then Prohibition", "description": "If ___ Then it is prohibited that ___"},
   "fbonif": {"name": "Always Prohibition / If", "description": "It is prohibited that ___ If ___"},
   "equiv": {"name": "Equivalence", "description": "___ is equivalent to ___"},
-  "macro1": {"name": "Macro 1", "description": "Macro 1"},
-  "macro1cond": {"name": "Condition for Macro 1", "description": "Condition for Macro 1"}
+  "obmacro1": {"name": "Macro for multi obligations", "description": "MACRO ___ ___"}
 
 }
 
