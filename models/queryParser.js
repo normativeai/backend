@@ -144,7 +144,7 @@ exports.parseFormula = function(str) {
     throw 'DL* formulae must not contain "__var"'
   //hash = crypto.createHash('md5').update(str).digest('hex');
   var form = lang.formula.tryParse(str);
-  var vars = form.match(/[A-Z][a-zA-Z_\d]*__var/g)
+  let vars = Array.from(new Set(form.match(/[A-Z][a-zA-Z_\d]*__var/g)))
   if (vars)
     return '(' + vars.map(x => `all ${x}:`).join('') + form + ')'
   else
@@ -155,4 +155,4 @@ exports.parse = function(str) {
   return lang.problem.tryParse(str);
 }
 
-
+//console.log(lang.formula.tryParse('(((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) O> communicate_at_time(Y,W,T,contact_details(Y))),((((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))),(((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) , data_protection_officer(K2, Z)) O> communicate_at_time(Y,W,T,contact_details(K2)))))'))

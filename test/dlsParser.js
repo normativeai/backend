@@ -37,6 +37,9 @@ const pairs = [
   ['([  a    ,   b   ] , c     )', 'f(((a,b) => c)).']
 ];
 
+const pairs2 = [
+  ['(((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) O> communicate_at_time(Y,W,T,contact_details(Y))) , (((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))', '(all X__var:all Y__var:all Z__var:all T__var:all W__var:all K__var:(((((((((processor(X__var),nominate(Y__var,X__var)),personal_data_processed_at_time(X__var,Z__var,T__var)),personal_data(Z__var,W__var)),data_subject(W__var)),controller(Y__var,Z__var)) => ((# 1^d: communicate_at_time(Y__var,W__var,T__var,contact_details(Y__var))), (# 2^d: ~ communicate_at_time(Y__var,W__var,T__var,contact_details(Y__var))))),((# 1^d: ((# 1^d: (((((processor(X__var),nominate(Y__var,X__var)),personal_data_processed_at_time(X__var,Z__var,T__var)),personal_data(Z__var,W__var)),data_subject(W__var)),controller(Y__var,Z__var))), (# 2^d: ~ (((((processor(X__var),nominate(Y__var,X__var)),personal_data_processed_at_time(X__var,Z__var,T__var)),personal_data(Z__var,W__var)),data_subject(W__var)),controller(Y__var,Z__var))))) => (# 1^d: ((# 1^d: communicate_at_time(Y__var,W__var,T__var,contact_details(Y__var))), (# 2^d: ~ communicate_at_time(Y__var,W__var,T__var,contact_details(Y__var)))))))),(((((((((processor(X__var),nominate(Y__var,X__var)),personal_data_processed_at_time(X__var,Z__var,T__var)),personal_data(Z__var,W__var)),data_subject(W__var)),controller(Y__var,Z__var)),representative(K__var,Y__var)) => ((# 1^d: communicate_at_time(Y__var,W__var,T__var,contact_details(K__var))), (# 2^d: ~ communicate_at_time(Y__var,W__var,T__var,contact_details(K__var))))),((# 1^d: ((# 1^d: ((((((processor(X__var),nominate(Y__var,X__var)),personal_data_processed_at_time(X__var,Z__var,T__var)),personal_data(Z__var,W__var)),data_subject(W__var)),controller(Y__var,Z__var)),representative(K__var,Y__var))), (# 2^d: ~ ((((((processor(X__var),nominate(Y__var,X__var)),personal_data_processed_at_time(X__var,Z__var,T__var)),personal_data(Z__var,W__var)),data_subject(W__var)),controller(Y__var,Z__var)),representative(K__var,Y__var))))) => (# 1^d: ((# 1^d: communicate_at_time(Y__var,W__var,T__var,contact_details(K__var))), (# 2^d: ~ communicate_at_time(Y__var,W__var,T__var,contact_details(K__var))))))))))']
+];
 describe("Query parser", function(){
   it(`should parse the strings in ${pairs} correctly`, function(done){
     for(var i = 0 ; i < pairs.length; i++) {
@@ -44,5 +47,12 @@ describe("Query parser", function(){
     }
     done();
   });
+  it(`should parse the strings in ${pairs2} correctly (for formulae)`, function(done){
+    for(var i = 0 ; i < pairs2.length; i++) {
+      assert.equal(parser.parseFormula(pairs2[i][0]), pairs2[i][1]);
+    }
+    done();
+  });
+
 })
 

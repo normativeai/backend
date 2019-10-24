@@ -135,7 +135,9 @@ function parseMacro(obj) {
 				return `(${clhs} O> ${obform2})`
 
 			}
-      return conj.map(combine)
+			return conj.slice(1).reduce(function(acc,c) {
+				return `(${acc} , ${combine(c)})`
+			},combine(conj[0]))
      default:
       throw {error: `Frontend error: Connective ${obj.connective.code} is not known.`};
   }
