@@ -111,17 +111,21 @@ function parseMacro(obj) {
 				var clhs
 				var crhs
 				// if conjunct is a implication, obtain lhs and rhs
-					console.log(`>>>>>>>${JSON.stringify(conjunct)}`)
 				if (conjunct.hasOwnProperty('term')) {
 					clhs = parseFormula(lhs)
 					crhs = parseFormula(conjunct)
 				} else if (isOfType(conjunct.connective, "defif")) {
 					// merge the lhs of the conjunct with that of the expression
 					let bigand = createAnd(lhs, conjunct.connective.formulas[0])
-					console.log(`>>>>>>>${JSON.stringify(bigand)}`)
 					// parse bigand
 					clhs = parseFormula(bigand)
 					crhs = parseFormula(conjunct.connective.formulas[1])
+				} else if (isOfType(conjunct.connective, "defonif")) {
+					// merge the lhs of the conjunct with that of the expression
+					let bigand = createAnd(lhs, conjunct.connective.formulas[1])
+					// parse bigand
+					clhs = parseFormula(bigand)
+					crhs = parseFormula(conjunct.connective.formulas[0])
 				} else {
 					throw {error: `Frontend error: ${obj.connective.name} supports only terms or implications on the right hand side conjunct`};
 				}
