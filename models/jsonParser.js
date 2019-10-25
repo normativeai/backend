@@ -169,6 +169,11 @@ function isMacro(code) {
 	}
 }
 
+const obType = {
+  OBLIGATION: 1,
+  PROHIBITENCE: 2,
+  SPERMISSION: 3 // the obligation generated from a strong permission
+}
 
 function extractViolations(obj) {
   if (obj.hasOwnProperty('connective')){
@@ -178,13 +183,17 @@ function extractViolations(obj) {
         var ret = obj.connective.formulas.map(x => extractViolations(x)).reduce(concat, [])
         return ret
       case "obif":
-        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1], true)
+        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1], obType.OBLIGATION)
       case "obonif":
-        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0], true)
+        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0], obType.OBLIGATION)
       case "fbif":
-        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1], false)
+        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1], obType.PROHIBITENCE)
       case "fbonif":
-        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0], false)
+        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0], obType.PROHIBITENCE)
+      case "spmif":
+        return extractFromObligation(obj.text, obj.connective.formulas[0], obj.connective.formulas[1], obType.SPERMISSION)
+      case "spmonif":
+        return extractFromObligation(obj.text, obj.connective.formulas[1], obj.connective.formulas[0], obType.SPERMISSION)
       default:
         return []
     }
@@ -193,9 +202,9 @@ function extractViolations(obj) {
   }
 }
 
-function extractFromObligation(text, lhs, rhs, obOrProb) {
+function extractFromObligation(text, lhs, rhs, ot) {
   var goal = rhs
-  if (obOrProb) { // if we are doing an obligation and not a prohibition
+  if (ot === obType.OBLIGATION) { // if we are doing an obligation and not a prohibition
     goal =
       {
         "text": `Negation of ${rhs.text}`,
@@ -204,6 +213,20 @@ function extractFromObligation(text, lhs, rhs, obOrProb) {
           "code": "neg",
           "formulas": [
             rhs
+          ]
+        }
+      }
+  }
+  cond = lhs
+  if (ot === obType.SPERMISSION) {
+    cond =
+      {
+        "text": `Negation of ${lhs.text}`,
+        "connective": {
+          "name": "Negation",
+          "code": "neg",
+          "formulas": [
+            lhs
           ]
         }
       }
@@ -226,7 +249,7 @@ function extractFromObligation(text, lhs, rhs, obOrProb) {
               "name": "And",
               "code": "and",
               "formulas": [
-                lhs
+                cond
                 ,
                 goal
               ]
