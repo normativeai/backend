@@ -1,126 +1,116 @@
-var supertest = require("supertest");
-var server = supertest.agent("http://localhost:3000");
+const request = require("supertest");
+const expect = require('chai').expect
+const app = require('../app');
 const utils = require('./utils.js');
 const User = require('../models/user');
 const user = require('./fixtures/user.json').User;
 
 describe("Creation of users",function(){
 
-	after(done => {
+	afterEach(done => {
 		User.deleteOne({'email': user.email}, function (err) {done();});
 	});
 
-  it("should return code 201 and created the user if all input is ok",function(done){
-    server
-    .post("/api/signup")
-    .send(user)
-		.expect(201)
-		.then(response => {
-			done();
-		})
+  it("should return code 201 and created the user if all input is ok", async function() {
+    const res = await request(app)
+      .post("/api/signup")
+      .send(user)
+    expect(res.statusCode).equals(201)
   });
-  it("should return code 400 if user already exists",function(done){
-		User.create(user, function (err) { });
-    server
-    .post("/api/signup")
-    .send(user)
-		.expect(400, {error: 'User already exists'}, done);
+  it("should return code 400 if user already exists", async function() {
+		User.create(user);
+    const res = await request(app)
+      .post("/api/signup")
+      .send(user)
+    expect(res.statusCode).equals(400)
+    expect(res.body).to.have.property('error', 'User already exists')
   });
-  it("should return code 422 and message if no email was given",function(done){
+  it("should return code 422 and message if no email was given", async function() {
     var obj = Object.assign({}, user);
     obj.email = '';
-    server
-    .post("/api/signup")
-    .send(obj)
-		.expect(422, { errors:
-       [ { location: 'body', param: 'email', msg: 'email required', value: '' }]}, done);
+    const res = await request(app)
+      .post("/api/signup")
+      .send(obj)
+    expect(res.statusCode).equals(422)
+    expect(res.body).to.have.property('errors').to.eql([ { location: 'body', param: 'email', msg: 'email required', value: '' }])
   });
-  it("should return code 422 and message if no password was given",function(done){
+  it("should return code 422 and message if no password was given", async function() {
     var obj = Object.assign({}, user);
     obj.password= '';
-    server
-    .post("/api/signup")
-    .send(obj)
-		.expect(422, { errors:
-       [ { location: 'body', param: 'password', msg: 'password required', value: '' }]}, done);
+    const res = await request(app)
+      .post("/api/signup")
+      .send(obj)
+    expect(res.statusCode).equals(422)
+    expect(res.body).to.have.property('errors').to.eql([ { location: 'body', param: 'password', msg: 'password required', value: '' }])
   });
 });
 
 describe("Login",function(){
 
-	before(done => {
+	beforeEach(done => {
 		User.create(user, function (err) { done();});
 	});
 
-	after(done => {
+	afterEach(done => {
 		User.deleteOne({'email': user.email}, function (err) {done();});
 	});
 
-  it("should return code 200 on success",function(done){
-    server
-    .post("/api/login")
-		.send({email: 'test@test.com', password: 'test'})
-    .expect(200)
-		.then(response => {
-			done();
-		})
+  it("should return code 200 on success", async function() {
+    const res = await request(app)
+      .post("/api/login")
+      .send({email: 'test@test.com', password: 'test'})
+    expect(res.statusCode).equals(200)
   });
 
-  it("should be case insensitive on email",function(done){
-    server
-    .post("/api/login")
-		.send({email: 'Test@tEst.com', password: 'test'})
-    .expect(200)
-		.then(response => {
-			done();
-		})
+  it("should be case insensitive on email", async function() {
+    const res = await request(app)
+      .post("/api/login")
+      .send({email: 'Test@tEst.com', password: 'test'})
+    expect(res.statusCode).equals(200)
   });
 
-	it("should return code 400 on unknown user",function(done){
-    server
-    .post("/api/login")
-		.send({email: 'unknown@test.com', password: 'test'})
-		.expect(400, {data: false,
-			err: 'Username and/or password are unknown or incorrect'
-		}, done);
+	it("should return code 400 on unknown user", async function() {
+    const res = await request(app)
+      .post("/api/login")
+      .send({email: 'unknown@test.com', password: 'test'})
+    expect(res.statusCode).equals(400)
+    expect(res.body).to.have.property('err', 'Username and/or password are unknown or incorrect')
   });
 
-	it("should return code 400 on wrong password",function(done){
-    server
-    .post("/api/login")
-		.send({email: 'test@test.com', password: 'wrong'})
-		.expect(400, {data: false,
-			err: 'Username and/or password are unknown or incorrect'
-		}, done);
+	it("should return code 400 on wrong password", async function() {
+    const res = await request(app)
+      .post("/api/login")
+      .send({email: 'test@test.com', password: 'wrong'})
+    expect(res.statusCode).equals(400)
+    expect(res.body).to.have.property('err', 'Username and/or password are unknown or incorrect')
   });
 });
 
 describe("Logout",function(){
 
-  var token = {token: undefined};
-	before(done => {
-		User.create(user, function (err) {
-    utils.login(server,token, user, done)});
+  var token
+
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
 	});
 
-	after(done => {
-		User.deleteOne({'email': user.email}, function (err) {done();});
+	afterEach(async function() {
+		await User.deleteOne({'email': user.email})
 	});
-  it("should access user data before logout",function(done){
-    server
-    .get("/api/users")
-    .set('Authorization', `Bearer ${token.token}`)
-		.expect(200)
-		.then(response => {
-			done();
-		})
+
+  it("should access user data before logout", async function() {
+    const res = await request(app)
+      .get("/api/users")
+      .set('Authorization', `Bearer ${token}`)
+    expect(res.statusCode).equals(200)
   });
-  it("should return code 200",function(done){
-    server
-    .get("/api/logout")
-    .set('Authorization', `Bearer ${token.token}`)
-		.expect(200, { "message": "Logged out."
-		}, done);
+  it("should return code 200", async function(){
+    const res = await request(app)
+      .get("/api/logout")
+      .set('Authorization', `Bearer ${token}`)
+    expect(res.statusCode).equals(200)
+    expect(res.body).to.have.property('message', 'Logged out.')
   });
   /*it("should fail to access user data after logout",function(done){
     server
@@ -136,22 +126,21 @@ describe("Connecting to API",function(){
 
   var u;
 
-	before(done => {
-		User.create(user, function (err, user) { u = user; done();});
+	beforeEach(async function() {
+		u = await User.create(user)
 	});
 
-	after(done => {
-		User.deleteOne({'email': user.email}, function (err) {done();});
+	afterEach(async function() {
+		await User.deleteOne({'email': user.email})
 	});
 
-  it("should return code 401 on unauthenticated user",function(done){
-    server
-    .get("/api/users")
-		.expect(401, {
-		}, done);
+  it("should return code 401 on unauthenticated user", async function(){
+    const res = await request(app)
+      .get("/api/users")
+    expect(res.statusCode).equals(401)
   });
 
-	describe("with authenticated user",function(){
+	describe("with authenticated user", function(){
 
     const Theory = require('../models/theory');
     const theory = require('./fixtures/theory.json').Theory;
@@ -189,41 +178,39 @@ describe("Connecting to API",function(){
 
     }
 
-    var token = {token: undefined};
+    var token
 
-    before(function(done) {
-      utils.login(server, token, user, () => {
+    beforeEach(async function() {
+      token = await utils.login(user);
       theory.user = u;
-      Theory.create(theory, function (err) {
+      let theoryt = await Theory.create(theory)
       theory2.user = u;
-      Theory.create(theory2, function (err) {
+      let theoryt2 = await Theory.create(theory2)
       query.user = u;
-      Query.create(query, function (err) {
+      query.theory= theoryt;
+      let queryq = await Query.create(query)
       query2.user = u;
-      Query.create(query2, function (err) {
-      u.theories.push(theory);
-      u.theories.push(theory2);
-      u.queries.push(query);
-      u.queries.push(query2);
-      u.save(function (err, u2) {
-        done();
-      })})})})})});
+      query2.theory= theoryt;
+      let queryq2 = await Query.create(query2)
+      u.theories.push(theoryt);
+      u.theories.push(theoryt2);
+      u.queries.push(queryq);
+      u.queries.push(queryq2);
+      await u.save()
     });
-    after(done => {
-      Theory.deleteOne({'name': theory.name}, function (err) {
-      Theory.deleteOne({'name': theory2.name}, function (err) {
-      Query.deleteOne({'name': query.name}, function (err) {
-      Query.deleteOne({'name': query2.name}, function (err) {
-        done();
-      })})})});
+    afterEach(async function() {
+      await Query.deleteOne({'name': query.name})
+      await Query.deleteOne({'name': query2.name})
+      await Theory.deleteOne({'name': theory.name})
+      await Theory.deleteOne({'name': theory2.name})
     });
 
-		it("should return code 200 and all dashboard information",function(done){
-			server
-			.get("/api/users")
-      .set('Authorization', `Bearer ${token.token}`)
-			.expect(200, { data: {'_id': user._id, 'name': user.name, 'email': user.email, 'theories': [t1, t2], 'queries': [q1,q2] }
-      },	done);
+		it("should return code 200 and all dashboard information", async function(){
+      const res = await request(app)
+        .get("/api/users")
+        .set('Authorization', `Bearer ${token}`)
+      expect(res.statusCode).equals(200)
+      expect(res.body).to.have.property('data').to.eql({'_id': user._id, 'name': user.name, 'email': user.email, 'theories': [t1, t2], 'queries': [q1,q2] })
 		});
 	});
 });

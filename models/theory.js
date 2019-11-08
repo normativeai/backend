@@ -141,7 +141,7 @@ theorySchema.methods.isIndependent = function(id, cb) {
   forms = this.getFormalization();
   form = forms.find(f => f._id == id);
   if (typeof form.lastIndependentDate === 'undefined' || this.lastUpdate > form.lastIndependentDate) {
-    forms = forms.slice(0)
+    forms = forms.slice()
     forms.splice(forms.indexOf(form), 1)
     var helper = require('./queryHelper');
     helper.executeQuery(forms, [], form.formula, function(theorem, proof, additionalCode) {

@@ -21,24 +21,24 @@ const theory8 = require('./fixtures/theory.json').Theory8;
 
 describe("Create theory", function(){
 
-  var token = {token: undefined};
+  var token
 
-	before(done => {
-		User.create(user, function (err) {
-    utils.login(server, token, user, () => {
-      done();});
-	})});
+	before(async function() {
+		await User.create(user)
+    token = await utils.login(user)
+	});
 
-	after(done => {
-		Theory.deleteOne({'name': theory.name}, function (err) {
-		Theory.deleteOne({'name': theory6.name}, function (err) {
-		Theory.deleteOne({'name': theory7.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})});
-	})});
+	after(async function() {
+		await Theory.findByIdAndRemove(theory._id)
+		await Theory.findByIdAndRemove(theory6._id)
+		await Theory.findByIdAndRemove(theory7._id)
+		await User.findByIdAndRemove(user._id)
+	});
+
   it("should return the created theory and check it was added to the user", function(done){
     server
       .post("/api/theories")
-      .set('Authorization', `Bearer ${token.token}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(theory)
       .expect(201)
       .then(response => {
@@ -54,7 +54,7 @@ describe("Create theory", function(){
       let voc1 = {"symbol": "validChoice", "original": "the law chosen by the parties", "full": "validChoice(Law,Part)" }
 			server
 				.post("/api/theories")
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.send(theory6)
         .expect(201)
         .then(response => {
@@ -74,7 +74,7 @@ describe("Create theory", function(){
   it("should report correct errors if the auto formaliztion were not created correctly", function(done){
 			server
 				.post("/api/theories")
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.send(theory7)
         .expect(400, {"error": 'Frontend error: Connective band is not known.'}, done)
   });
@@ -94,36 +94,34 @@ describe("Get theories", function(){
     description: theory2.description,
     lastUpdate: theory2.lastUpdate
   };
-  var token = {token: undefined};
+  var token
 
-	before(function(done) {
-		User.create(user, function (err) {
-    utils.login(server, token, user, () => {
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
 		theory.user = user;
-		Theory.create(theory, function (err) {
+		await Theory.create(theory)
 		theory2.user = user;
-		Theory.create(theory2, function (err) {
-      done();
-    })})})});
+		await Theory.create(theory2)
 	});
 
-	after(done => {
-		Theory.deleteOne({'name': theory.name}, function (err) {
-		Theory.deleteOne({'name': theory2.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})});
+	afterEach(async function() {
+		await Theory.findByIdAndRemove(theory._id)
+		await Theory.findByIdAndRemove(theory2._id)
+		await User.findByIdAndRemove(user._id)
 	});
 
 	it("should return an array of all theories of connected user", function(done){
 			server
 				.get("/api/theories")
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {data: [t1, t2]}, done);
 		});
 
   it("should return a chosen theory of connected user with all information", function(done){
 			server
 				.get(`/api/theories/${theory._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200)
         .then(response => {
           const t = response.body.data;
@@ -142,21 +140,21 @@ describe("Get theories", function(){
 
 describe("Update theory", function(){
 
-  var token = {token: undefined};
+  var token
 
-	before(done => {
-		User.create(user, function (err) {
-		utils.login(server, token, user, () => {
+	beforeEach(async function() {
+		await User.create(user)
+		token = await utils.login(user)
 		theory.user = user;
-		Theory.create(theory, function (err) {;
+		await Theory.create(theory)
 		theory8.user = user;
-		Theory.create(theory8, function (err) {done();})})})});
+		await Theory.create(theory8)
 	});
 
-	after(done => {
-		Theory.deleteOne({"name": "temp"}, function (err) {
-		Theory.deleteOne({"name": "Test8"}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})});
+	afterEach(async function() {
+    await Theory.findByIdAndRemove(theory._id)
+    await Theory.findByIdAndRemove(theory8._id)
+    await User.findByIdAndRemove(user._id)
 	});
 
 	it("should return 200 on successfull update", function(done){
@@ -164,7 +162,7 @@ describe("Update theory", function(){
       t.name = "temp";
 			server
 				.put(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.send(t)
         .expect(200, { message: 'Theory updated'
         },	done);
@@ -173,7 +171,7 @@ describe("Update theory", function(){
   /*Mongo doesnt give this information it("should return 204 on no update was needed", function(done){
 			server
 				.put(`/api/theories/${theory._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.send(theory)
         .expect(204, {
         },	done);
@@ -181,7 +179,7 @@ describe("Update theory", function(){
   it("should return 404 on inability to find theory to update", function(done){
 			server
 				.put('/api/theories/111')
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.send(theory)
         .expect(404, { error:  'Theory could not be found'
         },	done);
@@ -195,11 +193,11 @@ describe("Update theory", function(){
       // update theory
       server
         .put(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(t).end(function() {
           server
             .get(`/api/theories/${t._id}`)
-            .set('Authorization', `Bearer ${token.token}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(200)
             .then(response => {
               const t = response.body.data;
@@ -219,7 +217,7 @@ describe("Update theory", function(){
       // update theory
       server
         .put(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(t)
         .expect(200)
         .then(response => {
@@ -231,7 +229,7 @@ describe("Update theory", function(){
       // update theory
       server
         .put(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(t)
         .expect(400, {"error": 'Frontend error: Connective band is not known.'}, done)
   })
@@ -241,7 +239,7 @@ describe("Update theory", function(){
       // update theory
       server
         .put(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .send(t)
         .expect(400, {"error": 'The sentence        A contract       shall be governed by       the law chosen by the parties.      contains the connective Always Obligation / If which expectes 2 operands, but 3 were given.'}, done)
   })
@@ -250,7 +248,7 @@ describe("Update theory", function(){
       t.name = "temp";
 			server
 				.put(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.send(t)
         .expect(400, { "error": 'Theory cannot be updated since it is write protected'
         },	done);
@@ -260,7 +258,7 @@ describe("Update theory", function(){
       t.name = "temp";
 			server
 				.put(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.send(t)
         .expect(400, { "error": 'Theory cannot be updated since it is write protected'
         },	done);
@@ -271,31 +269,32 @@ describe("Delete theory", function(){
 
   const t = Object.assign({}, theory);
   t.name = "temp";
-  var token = {token: undefined};
+  var token
 
-	before(done => {
-		User.create(user, function (err) {
-		utils.login(server, token, user, () => {
+	beforeEach(async function() {
+		await User.create(user)
+		token = await utils.login(user)
 		theory.user = user;
     t.user = user;
-		Theory.create(theory, function (err) {done();})})});
+		await Theory.create(theory)
 	});
 
-	after(done => {
-		User.deleteOne({'email': user.email}, function (err) {done();});
+	afterEach(async function() {
+    await Theory.findByIdAndRemove(theory._id)
+    await User.findByIdAndRemove(user._id)
 	});
 
 	it("should return 200 on success", function(done){
 			server
 				.delete(`/api/theories/${t._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200, { message: 'Theory deleted'
         },	done);
   });
   it("should return 404 on inability to find theory to delete", function(done){
 			server
 				.delete('/api/theories/111')
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(404, { error:  'Theory could not be found'
         },	done);
   });
@@ -316,75 +315,70 @@ describe("Find theories", function(){
     description: theory2.description,
     lastUpdate: theory2.lastUpdate
   };
-  var token = {token: undefined};
+  var token
 
-	before(function(done) {
-		User.create(user, function (err) {
-    utils.login(server, token, user, () => {
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
 		theory.user = user;
-		Theory.create(theory, function (err) {
+		await Theory.create(theory)
 		theory2.user = user;
-		Theory.create(theory2, function (err) {
-      done();
-    })})})});
+		await Theory.create(theory2)
 	});
 
-	after(done => {
-		Theory.deleteOne({'name': theory.name}, function (err) {
-		Theory.deleteOne({'name': theory2.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})});
+	afterEach(async function() {
+    await Theory.findByIdAndRemove(theory._id)
+    await Theory.findByIdAndRemove(theory2._id)
+    await User.findByIdAndRemove(user._id)
 	});
 
 	it("should find a theory by a keyword in description", function(done){
 			server
 				.get("/api/theories/find?query=blah")
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {data: [t2]}, done);
 		});
 
 	it("should find a theory by a keyword in name", function(done){
 			server
 				.get("/api/theories/find?query=name")
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {data: [t2]}, done);
 		});
 
   it("should find all theories when given .*", function(done){
 			server
 				.get("/api/theories/find?query=.*")
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {data: [t1,t2]}, done);
 		});
 });
 
 describe("Clone a theory", function(){
 
-  var token = {token: undefined};
+  var token
 
-	beforeEach(function(done) {
-		User.create(user, function (err) {
-    utils.login(server, token, user, () => {
-		User.create(user2, function (err) {
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
+		await User.create(user2)
 		theory.user = user;
-		Theory.create(theory, function (err) {
+		await Theory.create(theory)
 		theory3.user = user2;
-		Theory.create(theory3, function (err) {
-      done();
-    })})})})});
+		await Theory.create(theory3)
 	});
 
-	afterEach(done => {
-		Theory.deleteOne({'name': theory.name}, function (err) {
-		Theory.deleteOne({'name': theory2.name}, function (err) {
-		Theory.deleteOne({'name': theory3.name}, function (err) {
-		Theory.deleteOne({'name': theory3.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})})})});
+	afterEach(async function() {
+    await Theory.findByIdAndRemove(theory._id)
+    await Theory.findByIdAndRemove(theory3._id)
+    await User.findByIdAndRemove(user._id)
+    await User.findByIdAndRemove(user2._id)
 	});
 
 	it("should duplicate a theory of another user and check it is connected to the current user", function(done){
 			server
 				.post(`/api/theories/${theory3._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(201)
         .then(response => {
           User.findById(user._id, function(err, user) {
@@ -397,7 +391,7 @@ describe("Clone a theory", function(){
     it("should change the theory name into <name> (Clone)", function(done){
 			server
 				.post(`/api/theories/${theory3._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(201)
         .then(response => {
           Theory.findById(response.body.data.theory._id, function(err, theory) {
@@ -411,24 +405,22 @@ describe("Clone a theory", function(){
 
 describe("Checking a theory for consistency", function(){
 
-  var token = {token: undefined};
+  var token
 
-	before(function(done) {
-		User.create(user, function (err) {
-    utils.login(server, token, user, () => {
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
 		theory.user = user;
-		Theory.create(theory, function (err) {
+		await Theory.create(theory)
 		theory2.user = user;
-		Theory.create(theory2, function (err) {
+		await Theory.create(theory2)
 		theory3.user = user;
-		Theory.create(theory3, function (err) {
+		await Theory.create(theory3)
 		theory5.user = user;
-		Theory.create(theory5, function (err) {
-      done();
-    })})})})})});
+		await Theory.create(theory5)
 	});
 
-	after(done => {
+	afterEach(done => {
 		Theory.deleteOne({'name': theory.name}, function (err) {
 		Theory.deleteOne({'name': theory2.name}, function (err) {
 		Theory.deleteOne({'name': theory3.name}, function (err) {
@@ -439,33 +431,33 @@ describe("Checking a theory for consistency", function(){
 	it("should return true in case it is consistent @slow", function(done){
 			server
 				.get(`/api/theories/${theory._id}/consistency`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {message: 'The legislation is consistent', type: 'success'}, done);
   });
   it("should return false in case it is inconsistent @slow", function(done){
 			server
 				.get(`/api/theories/${theory2._id}/consistency`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {message: 'The legislation is not consistent', type: 'info'}, done);
 		});
   it("should return true in case it is inconsistent but the formula is inactive  @slow", function(done){
 			server
 				.get(`/api/theories/${theory5._id}/consistency`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {message: 'The legislation is consistent', type: 'success'}, done);
 		});
 
   it("should return 404 in case it cannot find the theory", function(done){
 			server
 				.get('/api/theories/111/consistency')
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(404, { error:  'Cannot find theory'  }, done);
 		});
   it("should return 400 in case it cannot parse the prover output from some reason @slow", function(done){
       this.timeout(5000);
 			server
 				.get(`/api/theories/${theory3._id}/consistency`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
         .then(response => {done()});
 		});
@@ -473,46 +465,44 @@ describe("Checking a theory for consistency", function(){
 
 describe("Checking a formula in the formalization for independency", function(){
 
-  var token = {token: undefined};
+  var token
 
-	before(function(done) {
-		User.create(user, function (err) {
-    utils.login(server, token, user, () => {
-		theory4.user = user;
-		Theory.create(theory4, function (err) {
-      done();
-    })})});
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
+		theory4.user = user
+		await Theory.create(theory4)
 	});
 
-	after(done => {
-		Theory.deleteOne({'name': theory4.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})});
+	afterEach(async function() {
+    await Theory.findByIdAndRemove(theory4._id)
+    await User.findByIdAndRemove(user._id)
 	});
 
 	it("should return true in case it is independent @slow", function(done){
 			server
 				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {message: 'The norm is logically independent from the rest of the legislation',
           type: 'success'}, done);
   });
   it("should return false in case it is dependent @slow", function(done){
 			server
 				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[1]._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
 				.expect(200, {message: 'The norm is not logically independent from the rest of the legislation',
           type: 'info'}, done);
   });
   it("should return true in case it is independent and is being called twice @slow", function(done){
 			server
 				.get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200, {message: 'The norm is logically independent from the rest of the legislation',
           type: 'success'}, done)
         .end(function() {
           server
             .get(`/api/theories/${theory4._id}/independent/${theory4.formalization[2]._id}`)
-            .set('Authorization', `Bearer ${token.token}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(200, {message: 'The norm is logically independent from the rest of the legislation',
               type: 'success'}, done);
         })
@@ -579,45 +569,44 @@ describe("Checking theory static computeAutomaticVocabulary", function(){
 
 describe("Changing theories of write protected user", function(){
 
-  var token = {token: undefined};
+  var token
 
-	before(done => {
-		User.create(user3, function (err) {
-		utils.login(server, token, user3, () => {
+	beforeEach(async function() {
+		await User.create(user3)
+		token = await utils.login(user3)
 		theory.user = user3;
-		Theory.create(theory, function (err) {;
-      done();})});
-	})});
+		await Theory.create(theory)
+	});
 
-	after(done => {
-		Theory.deleteOne({"name": "temp"}, function (err) {
+	afterEach(done => {
+		Theory.deleteOne({"name": theory.name}, function (err) {
 		User.deleteOne({'email': user3.email}, function (err) {done();})});
 	});
 
   it("should check that a theory cannot be created", function(done){
     server
       .post("/api/theories")
-      .set('Authorization', `Bearer ${token.token}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(theory)
       .expect(400, {error: "Theory cannot be created since the user is write protected"}, done);
   });
   it("should check that a theory cannot be updated", function(done){
     server
       .put(`/api/theories/${theory._id}`)
-      .set('Authorization', `Bearer ${token.token}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(theory)
       .expect(400, {error: "Theory cannot be updated since the user is write protected"}, done);
   });
   it("should check that a theory cannot be deleted", function(done){
     server
       .delete(`/api/theories/${theory._id}`)
-      .set('Authorization', `Bearer ${token.token}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400, {error: "Theory cannot be deleted since the user is write protected"}, done);
   });
   it("should check that a theory cannot be cloned", function(done){
     server
       .post(`/api/theories/${theory._id}`)
-      .set('Authorization', `Bearer ${token.token}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(400, {error: "Theory cannot be cloned since the user is write protected"}, done);
   });
 })

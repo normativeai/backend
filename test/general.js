@@ -8,22 +8,21 @@ var server = supertest.agent("http://localhost:3000");
 
 describe("Requesting the connectives", function(){
 
-  var token = {token: undefined};
+  var token
 
-	before(done => {
-		User.create(user, function (err) {
-    utils.login(server, token, user, () => {
-    done();})});
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
 	});
 
-	after(done => {
+	afterEach(done => {
 		User.deleteOne({'email': user.email}, function (err) {done();});
 	});
 
   it('should return an object containing the connectives, their codes and their arities', function(done){
 			server
 				.get(`/api/general/connectives`)
-        .set('Authorization', `Bearer ${token.token}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200)
         .then(response => {
           var or = response.body.data.or

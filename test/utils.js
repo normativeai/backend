@@ -1,5 +1,8 @@
 'use strict';
 
+const request = require("supertest");
+const app = require('../app');
+
  //  Modified from https://github.com/elliotf/mocha-mongoose
 
  var config = require('../config/development');
@@ -31,14 +34,11 @@
    return done();
  });
 
-function login(server, token, user, done) {
-	server
+async function login(user) {
+  const res = await request(app)
     .post("/api/login")
     .send(user)
-		.end(function(err, response){
-      token.token = response.body.token;
-			done();
-		});
+  return res.body.token;
 };
 
 module.exports.login = login;
