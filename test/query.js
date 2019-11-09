@@ -1,7 +1,6 @@
 const request = require("supertest");
 const supertest = require("supertest");
-const chai = require('chai')
-const expect = chai.expect
+const expect = require('chai').expect
 const app = require('../app');
 const fs = require('fs');
 const assert = require('assert')
@@ -24,9 +23,6 @@ const query6 = require('./fixtures/query.json').Query6;
 const query7 = require('./fixtures/query.json').Query7;
 const query8 = require('./fixtures/query.json').Query8;
 const query9 = require('./fixtures/query.json').Query9;
-
-chai.use(require('chai-like'));
-chai.use(require('chai-things'));
 
 var server = supertest.agent("http://localhost:3000");
 
@@ -58,44 +54,36 @@ describe("Create query", function(){
       .get('/api/users')
       .set('Authorization', `Bearer ${token}`)
     console.log(JSON.stringify(res.body))
-    expect(res.body).to.have.property('data').to.have.property('queries').to.be.an('array').that.contains.something.like({'_id':query._id});
+    expect(res.body.data.queries[0]).to.have.property('_id',query._id);
   });
-  it("should check that the auto assumptions were created correctly", function(done){
+  it("should check that the auto assumptions were created correctly", async function() {
       const t = Object.assign({}, query);
       let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
       t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li> <li><span id=\"some-id\" class=\"annotator-goal\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1016\" data-term=\"contract(Law,Part)\">A contract</span></span></li></ol>"
-			server
+      var res = await request(app)
 				.post("/api/queries")
         .set('Authorization', `Bearer ${token}`)
 				.send(t)
-        .expect(201)
-        .then(response => {
-          Query.findById(query._id, function(err, query) {
-            assert.equal(JSON.stringify(query.autoAssumptions[0].json), JSON.stringify(JSON.parse(json_string)[0]));
-            assert.equal(query.autoAssumptions[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
-            assert.equal(JSON.stringify(query.autoGoal.json), JSON.stringify(JSON.parse(json_string)[1]));
-            assert.equal(query.autoGoal.formula, "contract(Law,Part)");
-            done();
-          });
-        })
+      expect(res.statusCode).equals(201)
+      const q = await Query.findById(t._id)
+      expect(q.autoAssumptions[0]).to.have.property('json').to.deep.equal(JSON.parse(json_string)[0])
+      expect(q.autoAssumptions[0]).to.have.property('formula').to.equal("(validChoice(Law,Part) O> contract(Law,Part))")
+      expect(q.autoGoal).to.have.property('json').to.deep.equal(JSON.parse(json_string)[1])
+      expect(q.autoGoal).to.have.property('formula').to.equal("contract(Law,Part)")
   });
-  it("should check that the auto assumptions were created correctly 2", function(done){
+  it("should check that the auto assumptions were created correctly 2", async  function() {
       const t = Object.assign({}, query9);
       let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
-			server
+      var res = await request(app)
 				.post("/api/queries")
         .set('Authorization', `Bearer ${token}`)
 				.send(t)
-        .expect(201)
-        .then(response => {
-          Query.findById(t._id, function(err, query) {
-            assert.equal(JSON.stringify(query.autoAssumptions[0].json), JSON.stringify(JSON.parse(json_string)[0]));
-            assert.equal(query.autoAssumptions[0].formula, "(validChoice(Law,Part) O> contract(Law,Part))");
-            assert.equal(JSON.stringify(query.autoGoal.json), JSON.stringify(JSON.parse(json_string)[1]));
-            assert.equal(query.autoGoal.formula, "contract(Law,Part)");
-            done();
-          });
-        })
+      expect(res.statusCode).equals(201)
+      const q = await Query.findById(t._id)
+      expect(q.autoAssumptions[0]).to.have.property('json').to.deep.equal(JSON.parse(json_string)[0])
+      expect(q.autoAssumptions[0]).to.have.property('formula').to.equal("(validChoice(Law,Part) O> contract(Law,Part))")
+      expect(q.autoGoal).to.have.property('json').to.deep.equal(JSON.parse(json_string)[1])
+      expect(q.autoGoal).to.have.property('formula').to.equal("contract(Law,Part)")
   });
   it("should create query even if no goal exists", function(done){
       const t = Object.assign({}, query);
@@ -106,14 +94,15 @@ describe("Create query", function(){
 				.send(t)
         .expect(201, done)
   });
-  it("should report correct errors if the auto formaliztion were not created correctly", function(done){
+  it("should report correct errors for query if the auto formaliztion were not created correctly", async function() {
       const t = Object.assign({}, query);
       t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li> <li><span id=\"some-id\" class=\"annotator-gol\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1016\" data-term=\"contract(Law,Part)\">A contract</span></span></li></ol>"
-			server
+      var res = await request(app)
 				.post("/api/queries")
         .set('Authorization', `Bearer ${token}`)
 				.send(t)
-        .expect(400, {"error": 'Cannot parse XML. Unknown annotator value: gol'}, done)
+      expect(res.statusCode).equals(400)
+      expect(res.body).to.have.property('error','Error: Cannot parse XML. Unknown annotator value: gol')
   });
   it("should check a query is created correctly even when no theory is associated with it", function(done){
     query.theory = undefined
@@ -330,17 +319,17 @@ describe("Update query", function(){
             })
   })})
 
-  it("should report correct errors if the auto formaliztion were not updated correctly", function(done){
+  it("should report correct errors if the auto formaliztion were not updated correctly", async function(){
       const t = Object.assign({}, query);
       let json_string = fs.readFileSync("./test/fixtures/rome_query.json", "utf8");
       t.content = "<h2>Article 3 - Freedom of choice</h2><p><br></p><ol><li><span class=\"connective-depth-1 annotator-connective\" id=\"2a7dc4b6-8b46-42d9-8959-7bdb7e010d12\" data-connective=\"obonif\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1013\" data-term=\"contract(Law,Part)\">A contract</span> shall be governed by <span class=\"annotator-term\" id=\"1a3346fb-2d3f-43d1-be2a-dd588c6ad3fd\" data-term=\"validChoice(Law,Part)\">the law chosen by the parties</span>.</span> The choice shall be made expressly or clearly demonstrated by the terms of the contract or the circumstances of the case. By their choice the parties can select the law applicable to the whole or to part only of the contract. </li> <li><span id=\"some-id\" class=\"annotator-gol\"><span class=\"annotator-term\" id=\"7e74072b-b8fd-4cf0-8dc9-387767de1016\" data-term=\"contract(Law,Part)\">A contract</span></span></li></ol>"
-      // update theory
-      server
+      var res = await request(app)
         .put(`/api/queries/${t._id}`)
         .set('Authorization', `Bearer ${token}`)
-        .send(t)
-        .expect(400, {"error": 'Cannot parse XML. Unknown annotator value: gol'}, done)
-  })
+				.send(t)
+      expect(res.statusCode).equals(400)
+      expect(res.body).to.have.property('error','Error: Cannot parse XML. Unknown annotator value: gol')
+  });
   it("should check a query is updated correctly even when no theory is associated with it", function(done){
       const t = Object.assign({}, query);
       t.theory = undefined
@@ -430,21 +419,20 @@ describe("Delete query", function(){
 		await User.findByIdAndRemove(user._id)
 	});
 
-	it("should return 200 on success", function(done){
-			server
+	it("should return 200 on success", async function(){
+      var res = await request(app)
 				.delete(`/api/queries/${t._id}`)
         .set('Authorization', `Bearer ${token}`)
-        .expect(200, { message: 'Query deleted'
-        },	done);
+      expect(res.statusCode).equals(200)
+      expect(res.body).to.have.property('message','Query deleted')
   });
-  it("should return 404 on inability to find the query to delete", function(done){
-			server
+  it("should return 404 on inability to find the query to delete", async function(){
+      var res = await request(app)
 				.delete('/api/queries/111')
         .set('Authorization', `Bearer ${token}`)
-        .expect(404, { error: 'Query could not be found'
-        },	done);
+      expect(res.statusCode).equals(404)
+      expect(res.body).to.have.property('error','Query could not be found')
   });
-
 });
 
 describe("Execute query", function(){

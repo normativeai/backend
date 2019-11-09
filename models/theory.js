@@ -138,8 +138,8 @@ theorySchema.statics.isActive = function(form) {
 };
 
 theorySchema.methods.isIndependent = function(id, cb) {
-  forms = this.getFormalization();
-  form = forms.find(f => f._id == id);
+  var forms = Array.from(this.getFormalization());
+  var form = forms.find(f => f._id == id);
   if (typeof form.lastIndependentDate === 'undefined' || this.lastUpdate > form.lastIndependentDate) {
     forms = forms.slice()
     forms.splice(forms.indexOf(form), 1)

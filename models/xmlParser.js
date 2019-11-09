@@ -63,7 +63,7 @@ function parseFormula($,spanElem) {
         "goal": parseGoal($,spanElem)
       }
     default:
-      throw {error: `Cannot parse XML. Unknown annotator value: ${code}`}
+      throw Error(`Cannot parse XML. Unknown annotator value: ${code}`)
   }
 }
 

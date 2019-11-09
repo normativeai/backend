@@ -53,11 +53,11 @@ exports.create = [
               }
           })})}).catch(function(error) {
               logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${error}`);
-              res.status(400).json(error);
+              res.status(400).json({error: `${error}`});
             });
       } catch (error) {
         logger.error(`Query of user ${JSON.stringify(req.user)} cannot be created: ${error}`);
-        res.status(400).json(error);
+        res.status(400).json({error: error});
       }
     }
   }
@@ -114,7 +114,7 @@ exports.update = function(req, res, next) {
       });
     } catch (error) {
           logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be updated: ${error}`);
-      res.status(400).json(error);
+      res.status(400).json({error: `${error}`});
     }
   }
 };
