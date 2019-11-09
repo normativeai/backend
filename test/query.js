@@ -1,8 +1,11 @@
+const request = require("supertest");
 const supertest = require("supertest");
+const chai = require('chai')
+const expect = chai.expect
+const app = require('../app');
 const fs = require('fs');
 const assert = require('assert')
 const sinon = require('sinon');
-const app = require('../app');
 const userController = require('../controllers/userController');
 const utils = require('./utils.js');
 const User = require('../models/user');
@@ -22,6 +25,9 @@ const query7 = require('./fixtures/query.json').Query7;
 const query8 = require('./fixtures/query.json').Query8;
 const query9 = require('./fixtures/query.json').Query9;
 
+chai.use(require('chai-like'));
+chai.use(require('chai-things'));
+
 var server = supertest.agent("http://localhost:3000");
 
 describe("Create query", function(){
@@ -35,25 +41,24 @@ describe("Create query", function(){
     await Theory.create(theory)
   });
 
-	afterEach(done => {
-		Query.deleteOne({'name': query.name}, function (err) {
-		Query.deleteOne({'name': query9.name}, function (err) {
-		Theory.deleteOne({'name': theory.name}, function (err) {
-		User.deleteOne({'email': user.email}, function (err) {done();})})})});
+	afterEach(async function() {
+		await Query.findByIdAndRemove(query._id)
+		await Query.findByIdAndRemove(query9._id)
+		await Theory.findByIdAndRemove(theory._id)
+		await User.findByIdAndRemove(user._id)
 	});
 
-	it("should return the created query and check it was added to the user", function(done){
-    server
+	it("should return the created query and check it was added to the user", async function(){
+    var res = await request(app)
       .post("/api/queries")
       .set('Authorization', `Bearer ${token}`)
       .send(query)
-      .expect(201)
-      .then(response => {
-        User.findById(user._id, function(err, user) {
-          assert.equal(user.queries[0]._id, query._id);
-          done();
-        });
-      })
+    expect(res.statusCode).equals(201)
+    var res = await request(app)
+      .get('/api/users')
+      .set('Authorization', `Bearer ${token}`)
+    console.log(JSON.stringify(res.body))
+    expect(res.body).to.have.property('data').to.have.property('queries').to.be.an('array').that.contains.something.like({'_id':query._id});
   });
   it("should check that the auto assumptions were created correctly", function(done){
       const t = Object.assign({}, query);

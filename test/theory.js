@@ -470,14 +470,14 @@ describe("Checking a formula in the formalization for independency", function(){
 	beforeEach(async function() {
 		await User.create(user)
     token = await utils.login(user)
-		theory4.user = user
+		theory4.user = user;
 		await Theory.create(theory4)
 	});
 
 	afterEach(async function() {
     await Theory.findByIdAndRemove(theory4._id)
     await User.findByIdAndRemove(user._id)
-	});
+  });
 
 	it("should return true in case it is independent @slow", function(done){
 			server

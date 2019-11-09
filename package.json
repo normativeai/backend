@@ -10,7 +10,7 @@
     "test-all": "mocha"
   },
   "dependencies": {
-    "bcrypt": "^3.0.2",
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.3",
     "cookie-parser": "~1.4.3",
