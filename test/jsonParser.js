@@ -13,10 +13,17 @@ const pairs = [
 ];
 
 describe("JSON parser", function(){
-  it(`should parse the objects in ${pairs} correctly`, function(done){
-    for(var i = 0 ; i < pairs.length; i++) {
-      assert.equal(parser.parseFormula(JSON.parse(pairs[i][0])), pairs[i][1]);
-    }
+  it(`should parse ${pairs[0][0]} correctly`, function(done){
+    assert.equal(parser.parseFormula(JSON.parse(pairs[0][0])), pairs[0][1]);
+    done();
+  });
+  it(`should parse ${pairs[1][0]} correctly`, function(done){
+    let state = new Map()
+    assert.equal(parser.parseFormula(JSON.parse(pairs[1][0]), state), pairs[1][1]);
+    done();
+  });
+  it(`should parse ${pairs[2][0]} correctly`, function(done){
+    assert.equal(parser.parseFormula(JSON.parse(pairs[2][0])), pairs[2][1]);
     done();
   });
 

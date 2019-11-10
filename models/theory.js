@@ -48,9 +48,10 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
     var xmlParser = require('./xmlParser');
     var jsonParser = require('./jsonParser');
     logger.info(`Parsing html: ${content}`);
+    let state = new Map();
     var ret = xmlParser.parse(content).map(function(obj) {
       logger.info(`Parsing json: ${JSON.stringify(obj)}`);
-      var form = jsonParser.parseFormula(obj)
+      var form = jsonParser.parseFormula(obj,state)
        return {
         original: obj.text,
         json: obj,

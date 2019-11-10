@@ -22,7 +22,8 @@ const names = {
   "fbonif": {"name": "Always Prohibition / If", "description": "It is prohibited that ___ If ___"},
   "equiv": {"name": "Equivalence", "description": "___ is equivalent to ___"},
   "sep": {"name": "-----------------", "description": "Separator, do not use!"},
-  "label": {"name": "Labeling sentences", "description": " Use ___ to Label ___"},
+  "label": {"name": "Labeling sentences", "description": " Use ___ as a Label for ___"},
+  "exception": {"name": "Exception", "description": "Sentences labeled by [___ [___ [...]] Shall not apply if ___"},
   "obmacro1": {"name": "Macro for multi obligations", "description": "MACRO ___ ___"}
 }
 
