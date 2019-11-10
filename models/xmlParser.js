@@ -21,8 +21,8 @@ const names = {
   "fbif": {"name": "If / Then Prohibition", "description": "If ___ Then it is prohibited that ___"},
   "fbonif": {"name": "Always Prohibition / If", "description": "It is prohibited that ___ If ___"},
   "equiv": {"name": "Equivalence", "description": "___ is equivalent to ___"},
+  "label": {"name": "Labeling sentences", "description": " Use ___ to Label ___"},
   "obmacro1": {"name": "Macro for multi obligations", "description": "MACRO ___ ___"}
-
 }
 
 function isAnnotationElement(spanElem) {

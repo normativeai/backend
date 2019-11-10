@@ -8,6 +8,7 @@ let json_gdpr = fs.readFileSync("./test/fixtures/gdpr.json", "utf8");
 
 const pairs = [
   ['{"text": "aaa","connective": {"code": "or", "formulas": [{"text": "aaa", "term": {"name": "a"}},{"text": "aaa", "term": {"name": "b"}}, {"text": "aaa", "term": {"name": "c"}}] } }','((a ; b) ; c)'],
+  ['{"text": "ccc","connective": {"code": "label", "formulas": [{"text": "ccc", "term": {"name": "index1"}}, {"text": "aaa","connective": {"code": "or", "formulas": [{"text": "aaa", "term": {"name": "a"}},{"text": "aaa", "term": {"name": "b"}}, {"text": "aaa", "term": {"name": "c"}}]}} ] }}','((a ; b) ; c)'],
   [json_rome, '(validChoice(Law,Part) O> contract(Law,Part))'],
 ];
 

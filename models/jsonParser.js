@@ -20,6 +20,8 @@ function parseGoal(obj) {
   return parseFormula(obj.goal.formula);
 }
 
+let labelsMap = new Map();
+
 function parseConnector(obj) {
 	var formulas = obj.connective.formulas.map(f => parseFormula(f));
   var argsNum = expectedArgs(obj.connective.code);
@@ -87,6 +89,19 @@ function parseMacro(obj) {
     throw {error: `The sentence ${obj.text} contains the connective ${obj.connective.name} which expectes ${argsNum} operands, but ${formulas.length} were given.`}
   }
   switch (obj.connective.code) {
+    case "label":
+      /*
+       * This macro allows for the labeling of formulae
+       * The formulae is parsed as usual and is returned by this method
+       * At the same time, it is indexed by the term and is stored in this jsonParser for further use
+       */
+      if (!formulas[0].hasOwnProperty('term')) {
+        throw {error: `Frontend error: ${obj.connective.name} must have a term on the first argument.Got instead ${JSON.stringify(formulas[0])}`};
+      }
+      const formula = parseFormula(formulas[1])
+      const label = parseFormula(formulas[0])
+      labelsMap.set(label, formula)
+      return formula
     case "obmacro1":
 			/*
 				This macro simulates obif but accepts a multi obligation rhs (as a conjunction).
@@ -162,6 +177,7 @@ function isOfType(connective, type) {
 
 function isMacro(code) {
 	switch (code) {
+		case "label":
 		case "obmacro1":
 			return true;
 		default:
@@ -273,6 +289,7 @@ function expectedArgs(conCode) {
     case "eq":
     case "equiv":
 		case "obmacro1":
+		case "label":
       return 2
     case "neg":
     case "ob":
