@@ -49,15 +49,24 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
     var jsonParser = require('./jsonParser');
     logger.info(`Parsing html: ${content}`);
     let state = new Map();
-    var ret = xmlParser.parse(content).map(function(obj) {
-      logger.info(`Parsing json: ${JSON.stringify(obj)}`);
-      var form = jsonParser.parseFormula(obj,state)
-       return {
-        original: obj.text,
-        json: obj,
-        formula: form
+    // in theories, we apply a 3 passes computation to handle exceptions and labels
+    let jsons = xmlParser.parse(content)
+    jsons.forEach(obj=> jsonParser.parseFormula(obj,{pass: 1, map: state})) // pass 1
+    jsons.forEach(obj => jsonParser.parseFormula(obj,{pass: 2, map: state})) // pass 2
+    // now last pass which returns the formulas
+    var ret = jsons.map(function(obj) {
+      logger.info(`Parsing (pass 3) json: ${JSON.stringify(obj)}`);
+      var form = jsonParser.parseFormula(obj,{pass: 3, map: state})
+      if (form != null) {
+         return {
+          original: obj.text,
+          json: obj,
+          formula: form
+        }
+      } else {
+        return undefined
       }
-    })
+    }).filter(el => el != null)
     //logger.info(`Converted content ${content} into formalization ${JSON.stringify(ret)}.`);
     return ret
   } else {

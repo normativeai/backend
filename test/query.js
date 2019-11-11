@@ -53,7 +53,6 @@ describe("Create query", function(){
     var res = await request(app)
       .get('/api/users')
       .set('Authorization', `Bearer ${token}`)
-    console.log(JSON.stringify(res.body))
     expect(res.body.data.queries[0]).to.have.property('_id',query._id);
   });
   it("should check that the auto assumptions were created correctly", async function() {
