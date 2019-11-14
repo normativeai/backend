@@ -158,6 +158,7 @@ function parseMacro(obj, state) {
 			/*
 				This macro simulates obif but accepts a multi obligation rhs (as a conjunction).
 				The first element in the conjuct is the term to place in the obligation (containing the VAR value)
+        VAR can also be contained on the left hand side
 				It creates one obligation for each other conjunct on the rhs while replacing the macro VAR in the
 					first element with the term in the conjunct.
 				If the conjuct is not a term but an implication, it addes all the lhs of the implication to the lhs of the obligation.
@@ -198,8 +199,9 @@ function parseMacro(obj, state) {
 				}
 				// substitute cojunct for VAR in obform
 				let obform2 = obform.replace('VAR', crhs)
+				let clhs2 = clhs.replace('VAR', crhs)
 				// return new obligation
-				return `(${clhs} O> ${obform2})`
+				return `(${clhs2} O> ${obform2})`
 
 			}
 			return conj.slice(1).reduce(function(acc,c) {
@@ -369,4 +371,4 @@ function expectedArgs(conCode) {
  * 3) compute formula taking into account all additional information which was gathered before
  */
 
-module.exports  = { "parseFormula": parseFormula, "extractViolations": extractViolations,"arities": expectedArgs };
+module.exports  = { "parseFormula": parseFormula, "extractViolations": extractViolations,"arities": expectedArgs, "createConnective": createConnective };

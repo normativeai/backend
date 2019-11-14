@@ -34,6 +34,22 @@ describe("JSON parser", function(){
     assert.equal(parser.parseFormula(JSON.parse(json_gdpr)), "(((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) O> communicate_at_time(Y,W,T,contact_details(Y))) , (((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))");
     done();
   });
+  it("should parse correctly obmacro1 containing VAR on the left side as well", function(done) {
+    let gdpr = JSON.parse(json_gdpr)
+    let cond = gdpr.connective.formulas[0]
+    let lhsVAR = {
+					"text":"at the time when personal data are obtained, provide the data subject with all of the following information",
+					"term":
+					{
+						"name":"communicate_at_time(Y,W,T,VAR)"
+					}
+				}
+    let newCond = parser.createConnective("and", [lhsVAR, cond])
+    gdpr.connective.formulas[0] = newCond
+    assert.equal(parser.parseFormula(gdpr), "(((communicate_at_time(Y,W,T,contact_details(Y)) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) O> communicate_at_time(Y,W,T,contact_details(Y))) , (((communicate_at_time(Y,W,T,contact_details(K)) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))");
+    done();
+  });
+
 })
 
 describe("Three passes JSON parser", function() {
