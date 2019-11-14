@@ -544,6 +544,34 @@ describe("Execute query", function(){
       })
   });
 
+  it("should check that a query can be executed correctly on GDPR article 13", async function(){
+      var t = Object.assign({}, theory);
+      var q = Object.assign({}, query);
+      let txml = fs.readFileSync("./test/fixtures/gdpr_13.xml", "utf8");
+      let qxml = fs.readFileSync("./test/fixtures/gdpr_13_query.xml", "utf8");
+      t.content = txml
+      q.content = qxml
+      q.theory = t._id
+      // update theory
+      var res = await request(app)
+        .put(`/api/theories/${t._id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(t)
+      expect(res.statusCode).equals(200)
+      // update query
+      var res = await request(app)
+        .put(`/api/queries/${q._id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(q)
+      expect(res.statusCode).equals(200)
+
+      var res = await request(app)
+        .get(`/api/queries/${q._id}/exec`)
+        .set('Authorization', `Bearer ${token}`)
+      expect(res.statusCode).equals(200)
+  })
+
+
 });
 
 describe("Execute query with missing information", function(){

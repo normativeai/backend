@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "devstart": "nodemon --inspect ./bin/www",
+    "dev": "nodemon --inspect ./bin/www",
     "test": "mocha --grep @slow --invert",
     "test-grep": "mocha --grep",
     "test-all": "mocha"
@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "deep-equal-in-any-order": "^1.0.21",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.6",
     "sinon": "^7.1.1",

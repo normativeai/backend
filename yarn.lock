@@ -759,6 +759,14 @@ deep-eql@^3.0.1:
   dependencies:
     type-detect "^4.0.0"
 
+deep-equal-in-any-order@^1.0.21:
+  version "1.0.21"
+  resolved "https://registry.yarnpkg.com/deep-equal-in-any-order/-/deep-equal-in-any-order-1.0.21.tgz#3d357e22caa894507210c42108a5e0cd162375b5"
+  integrity sha512-hIWy3f/G54z9He08FGWIxAm4XmBRVax/tf8HI+9mNXJeDq7B/JUXcdBKTspQcBYAZoUTg5ipZtznEi1/Qv0nxQ==
+  dependencies:
+    lodash "^4.17.15"
+    sort-any "^1.1.19"
+
 deep-extend@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.6.0.tgz#c4fa7c95404a17a9c3e8ca7e1537312b736330ac"
@@ -2908,6 +2916,13 @@ snapdragon@^0.8.1:
     source-map "^0.5.6"
     source-map-resolve "^0.5.0"
     use "^3.1.0"
+
+sort-any@^1.1.19:
+  version "1.1.19"
+  resolved "https://registry.yarnpkg.com/sort-any/-/sort-any-1.1.19.tgz#028488cc2340e7cca6da85fd4c0f9270c9798320"
+  integrity sha512-RbbHSbTg7b9K+89nj/Fyv7WpGMAIEvqvmS6B3RzsSIVn0eDpCWJuvLGB8vjCisLtWeN3FYwfYg5EGEQO+oOtvQ==
+  dependencies:
+    lodash "^4.17.15"
 
 source-map-resolve@^0.5.0:
   version "0.5.2"
