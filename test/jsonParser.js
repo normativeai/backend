@@ -85,5 +85,45 @@ describe("Three passes JSON parser", function() {
     assert.equal(threePasses([label,exception]), "((~ cond) => statement)");
     done();
   });
+  it("should parse correctly labels and exceptions over macros", function(done) {
+    let label = {
+      text: "label1",
+      connective: {
+        code: "label",
+        formulas: [
+          {
+            text: "label1",
+            term: {
+              name: "label1"
+            }
+          },
+          JSON.parse(json_gdpr)
+        ]
+      }
+    }
+    let exception = {
+      text: "exception",
+      connective: {
+        code: "exception",
+        formulas: [
+          {
+            text: "label1",
+            term: {
+              name: "label1"
+            }
+          },
+          {
+            text: "bbb",
+            term: {
+              name: "cond"
+            }
+          }
+        ]
+      }
+    }
+    assert.equal(threePasses([label,exception]), "((((~ cond) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) O> communicate_at_time(Y,W,T,contact_details(Y))) , ((((~ cond) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))");
+    done();
+  });
+
 })
 

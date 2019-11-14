@@ -115,6 +115,7 @@ function parseMacro(obj, state) {
        * This macro adds the rhs as an exception to the formulas labeled in positions 0...length-2
        * This happens in pass # 2
        */
+
       if (!state) {
         throw {error: "Frontend error: Exceptions can only used on top level sentences in legislation"}
       }
@@ -135,8 +136,20 @@ function parseMacro(obj, state) {
         let form = state.map.get(label)
         // extract labels and make sure they are terms and that they appear in the state
         // create an implication with the condition on the left
-        let newform = createConnective('defif', [createConnective('neg', [condition]), form])
-        state.map.set(label, newform)
+        // Note, when applying an exception to obmacro1 (and maybe other future macros),
+        // we need to add the exception within the macro and not to an implication to the macro
+
+        if (form.hasOwnProperty('connective') && (form.connective.code == 'obmacro1')) {
+          // we need to get the left hand side of form, apply the below create connective
+          // and replace the first formula inside form (lhs)
+          let curCond = form.connective.formulas[0]
+          let newCond = createConnective('and', [createConnective('neg', [condition]), curCond])
+          form.connective.formulas[0] = newCond
+          state.map.set(label, form)
+        } else {
+          let newform = createConnective('defif', [createConnective('neg', [condition]), form])
+          state.map.set(label, newform)
+        }
       })
     case "obmacro1":
       if (state && (state.pass != 3)) {
