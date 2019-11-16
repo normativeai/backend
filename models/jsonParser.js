@@ -246,6 +246,7 @@ function isMacro(code) {
 		case "label":
 		case "exception":
 		case "obmacro1":
+		case "obmacro1-copy":
 			return true;
 		default:
 			return false;
