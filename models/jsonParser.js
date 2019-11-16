@@ -23,7 +23,7 @@ function parseGoal(obj) {
 
 function parseConnector(obj, state) {
   if (!state || state.pass == 3) {
-    var formulas = obj.connective.formulas.map(f => parseFormula(f));
+    var formulas = obj.connective.formulas.map(f => parseFormula(f, state));
     var argsNum = expectedArgs(obj.connective.code);
     if (argsNum < 0 && formulas.length < 2) {
       throw {error: `The sentence ${obj.text} contains the connective ${obj.connective.name} which expectes at least two operands, but ${formulas.length} were given.`}
@@ -103,11 +103,14 @@ function parseMacro(obj, state) {
       if (!formulas[0].hasOwnProperty('term')) {
         throw {error: `Frontend error: ${obj.connective.name} must have a term on the first argument.Got instead ${JSON.stringify(formulas[0])}`};
       }
-      const label = parseFormula(formulas[0])
+      const label = parseFormula(formulas[0], state)
       if (state.pass == 1) {
-        state.map.set(label, formulas[1])
+        // we sometime need to try and parse the formula contained within. we anyway store the non parsed version in the state
+        // since we might need to manipulat it in json form
+        parseFormula(formulas[1], state)
+        setInState(label, formulas[1], state)
       } else if (state.pass == 3) {
-        return parseFormula(state.map.get(label))
+        return parseFormula(getFromState(label, state), state)
       }
       return
     case "exception":
@@ -132,8 +135,8 @@ function parseMacro(obj, state) {
         if (!isTerm(term)) {
           throw {error: `Frontend error: Labels must be terms, got ${JSON.stringify(term)}`}
         }
-        let label = parseFormula(term)
-        let form = state.map.get(label)
+        let label = parseFormula(term, state)
+        let form = getFromState(label, state)
         // extract labels and make sure they are terms and that they appear in the state
         // create an implication with the condition on the left
         // Note, when applying an exception to obmacro1 (and maybe other future macros),
@@ -145,10 +148,10 @@ function parseMacro(obj, state) {
           let curCond = form.connective.formulas[0]
           let newCond = createConnective('and', [createConnective('neg', [condition]), curCond])
           form.connective.formulas[0] = newCond
-          state.map.set(label, form)
+          setInState(label, form, state)
         } else {
           let newform = createConnective('defif', [createConnective('neg', [condition]), form])
-          state.map.set(label, newform)
+          setInState(label, newform, state)
         }
       })
     case "obmacro1":
@@ -164,13 +167,13 @@ function parseMacro(obj, state) {
 				If the conjuct is not a term but an implication, it addes all the lhs of the implication to the lhs of the obligation.
 			*/
 			// ensure second argument is a conjunction
-			if (!isOfType(formulas[1].connective, "and")) {
-				throw {error: `Frontend error: ${obj.connective.name} must have a conjunct on the second argument.Got instead ${formulas[1].connective.code}`};
+			if (!formulas[1].hasOwnProperty('connective') || !isOfType(formulas[1].connective, "and")) {
+				throw {error: `Frontend error: ${obj.connective.name} must have a conjunct on the second argument.`};
 			}
 			// parse conjunction
 			//let conj = formulas[1].connective.formulas.map(parseFormula)
 			// extract ob rhs from conjunction
-			let obform = parseFormula(formulas[1].connective.formulas[0])
+			let obform = parseFormula(formulas[1].connective.formulas[0], state)
 			let conj = formulas[1].connective.formulas.slice(1)
 			// lhs
 			let lhs = formulas[0]
@@ -180,20 +183,20 @@ function parseMacro(obj, state) {
 				var crhs
 				// if conjunct is a implication, obtain lhs and rhs
 				if (conjunct.hasOwnProperty('term')) {
-					clhs = parseFormula(lhs)
-					crhs = parseFormula(conjunct)
+					clhs = parseFormula(lhs, state)
+					crhs = parseFormula(conjunct, state)
 				} else if (isOfType(conjunct.connective, "defif")) {
 					// merge the lhs of the conjunct with that of the expression
 					let bigand = createConnective('and', [lhs, conjunct.connective.formulas[0]])
 					// parse bigand
-					clhs = parseFormula(bigand)
-					crhs = parseFormula(conjunct.connective.formulas[1])
+					clhs = parseFormula(bigand, state)
+					crhs = parseFormula(conjunct.connective.formulas[1], state)
 				} else if (isOfType(conjunct.connective, "defonif")) {
 					// merge the lhs of the conjunct with that of the expression
 					let bigand = createConnective('and', [lhs, conjunct.connective.formulas[1]])
 					// parse bigand
-					clhs = parseFormula(bigand)
-					crhs = parseFormula(conjunct.connective.formulas[0])
+					clhs = parseFormula(bigand, state)
+					crhs = parseFormula(conjunct.connective.formulas[0], state)
 				} else {
 					throw {error: `Frontend error: ${obj.connective.name} supports only terms or implications on the right hand side conjunct`};
 				}
@@ -209,13 +212,98 @@ function parseMacro(obj, state) {
 			},combine(conj[0]))
 
     case "obmacro1-copy":
-      if (state && (state.pass != 3)) {
+      /*
+       * This macro intends of copying a obmacro1 sentence and change it. It has 3 parts
+       * 1) An optional conjunction of further conditions to each obligation in obmacro1
+       * 2) Additional obligations, which include also the VAR one in the first position. in this case, the new VAR replaces the copied one
+       * 3) The label of the copied sentence
+       * Note that the other macro must be before this one in the text. Order is important here since
+       * both are handled in the same pass.
+       */
+      if (!state) {
+        throw {error: "Frontend error: Macro copy can only be used on top level sentences in legislation"}
+      }
+      if (state.pass == 2) {
+        // doing nothing
         return
       }
+
+      if (state.pass == 3) {
+        return parseFormula(state.map.get(computeUniqueLabel(obj)))
+      }
+
+
+      // in the first pass, we create the new formula and store it using a unique label
+      // in the third pass, we return the formula stored with the unique label
+
+      // first, we obtain the three parts, there can be 2 or 3 formulae in total
+      let optConds = formulas[formulas.length-3]
+      let addObs = formulas[formulas.length-2]
+      let targetMacro = formulas[formulas.length-1]
+
+      // check that the target macro is indicated using a term
+      if (!isTerm(targetMacro)) {
+        throw {error: `Frontend error: Labels must be terms, got ${JSON.stringify(targetMacro)}`}
+      }
+
+      // check that addObs contain a conjunction with VAR at the head
+      if (!addObs.hasOwnProperty('connective') || addObs.connective.code != 'and' || !addObs.connective.formulas[0].term.name.includes('VAR')) {
+        throw {error: `Frontend error: The additional obligations must be a conjunction with a VAR term in the first position`}
+      }
+
+
+      // ssecond, we obtain the target macro
+      let label2 = parseFormula(targetMacro, state)
+      let form = getFromState(label2, state)
+
+      // we check that the target formula is indeed the right macro
+      if (!form.hasOwnProperty('connective') || form.connective.code != 'obmacro1') {
+        throw {error: `${obj.connective.name} can only copy from the relevant macro but got ${JSON.stringify(form.connective.code)}`}
+      }
+
+      // we need to replace its first formula with one containing the additional conditions, if they exist
+      var conds = form.connective.formulas[0]
+      if (optConds) {
+        conds = createConnective('and', [optConds,conds])
+      }
+
+      // we now add an obligation and replace the VAR. We need to replace it with the additional
+      // obligations, as we know that VAR is in first position in the conjunction
+      // first remove the old VAR from a copy of the obligations
+      let oldObs = form.connective.formulas[1].connective.formulas.slice()
+      // remove the first element
+      oldObs.splice(0,1)
+      // add the new elements
+      let obs = createConnective('and', addObs.connective.formulas.concat(oldObs))
+
+      // lastly, we create a new obmacro1 with the new formulae
+      setInState(computeUniqueLabel(obj), createConnective('obmacro1', [conds,obs]),state)
       return
     default:
-      throw {error: `Frontend error: Connective ${obj.connective.code} is not known.`};
+      throw {error: `Frontend error: Macro ${obj.connective.code} is not known.`};
   }
+}
+
+function getFromState(label, state) {
+  let form = state.map.get(label) // first get the formula from the state
+  let unique = computeUniqueLabel(form) // compute the hash
+  return state.map.get(unique) || form // return the chained labeled formula if exists
+}
+
+function setInState(label, form, state) {
+  state.map.set(label, form)
+}
+
+// this is used in order to create unique labels for formulae to be stored in the state
+function computeUniqueLabel(formula) {
+  var hash = 0;
+  let text = JSON.stringify(formula)
+  for (var i = 0; i < text.length; i++) {
+    var character = text.charCodeAt(i);
+    hash = ((hash<<5)-hash)+character;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash
 }
 
 function createConnective(conn, formulas) {
