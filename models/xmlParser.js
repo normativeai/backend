@@ -24,7 +24,8 @@ const names = {
   "sep": {"name": "-----------------", "description": "Separator, do not use!"},
   "label": {"name": "Labeling sentences", "description": " Use ___ as a Label for ___"},
   "exception": {"name": "Exception", "description": "Sentences labeled by [___ [___ [...]] Shall not apply if ___"},
-  "obmacro1": {"name": "Macro for multi obligations", "description": "MACRO ___ ___"}
+  "obmacro1": {"name": "Macro for multi obligations", "description": "MACRO ___ ___"},
+  "obmacro1-copy": {"name": "Copying Macro for multiple obligations", "description": "MACRO ___ [___ [...]] ___"}
 }
 
 function isAnnotationElement(spanElem) {

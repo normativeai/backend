@@ -207,7 +207,13 @@ function parseMacro(obj, state) {
 			return conj.slice(1).reduce(function(acc,c) {
 				return `(${acc} , ${combine(c)})`
 			},combine(conj[0]))
-     default:
+
+    case "obmacro1-copy":
+      if (state && (state.pass != 3)) {
+        return
+      }
+      return
+    default:
       throw {error: `Frontend error: Connective ${obj.connective.code} is not known.`};
   }
 }

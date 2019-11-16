@@ -18,8 +18,11 @@ describe("Creation of users",function(){
     expect(res.statusCode).equals(201)
   });
   it("should return code 400 if user already exists", async function() {
-		User.create(user);
-    const res = await request(app)
+    var res = await request(app)
+      .post("/api/signup")
+      .send(user)
+    expect(res.statusCode).equals(201)
+    var res = await request(app)
       .post("/api/signup")
       .send(user)
     expect(res.statusCode).equals(400)

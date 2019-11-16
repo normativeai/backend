@@ -25,7 +25,6 @@ class QueryHelper {
         try {
       console.log(f)
           var f_parsed = parser.parseFormula(f);
-      console.log("<<<<<<<")
           cmd += f_parsed;
           hadValue = true;
         } catch (error) {
