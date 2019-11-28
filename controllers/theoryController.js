@@ -182,7 +182,7 @@ exports.consistency = function(req, res, next) {
           }
         } else if (code == 2) { //timeout
             logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is probably consistent`);
-            res.status(206).json({message: 'Backend prover could not resolve the consistency of this legislation. This normally means (but not always) that the legilsation is consistent!', type: 'warning'});
+            res.status(206).json({message: 'Backend prover could not resolve the consistency of this legislation wthin 5 seconds. This normally means (but not always) that the legilsation is consistent!', type: 'warning'});
         } else {
           logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be checked for consistency ${cons}`);
           res.status(400).json({error: cons});
@@ -210,7 +210,7 @@ exports.independent = function(req, res, next) {
           }
         } else if (code == 2) { //timeout
             logger.info(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} is probably indepenedent`);
-            res.status(206).json({message: 'Backend prover could not resolve the independency of this norm. This normally means (but not always) that the norm is independent!', type: 'warning'});
+            res.status(206).json({message: 'Backend prover could not resolve the independency of this norm within 5 seconds. This normally means (but not always) that the norm is independent!', type: 'warning'});
         } else { //mleancop error
           logger.error(`Theory ${req.params.theoryId} of user ${JSON.stringify(req.user)} cannot be checked for independency: ${cons}`);
           res.status(400).json({error: cons});
