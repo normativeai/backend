@@ -267,8 +267,6 @@ function parseMacro(obj, state) {
         conds = createConnective('and', [optConds,conds])
       }
 
-      // we now add an obligation and replace the VAR. We need to replace it with the additional
-      // obligations, as we know that VAR is in first position in the conjunction
       // first remove the old VAR from a copy of the obligations
       let oldObs = form.connective.formulas[1].connective.formulas.slice()
       // remove the first element

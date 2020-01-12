@@ -108,8 +108,8 @@ exports.update = function(req, res, next) {
             }
           });
         } else {
-          logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be updated: ${err}`);
-          res.status(400).json({'error': err});
+          logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be updated: ${JSON.stringify(err)}`);
+          res.status(400).json({'error': JSON.stringify(err)});
         }
       });
     } catch (error) {
