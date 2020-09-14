@@ -94,13 +94,7 @@ querySchema.methods.execQuery = function(cb) {
         this.autoGoal.formula = this.goal
       }
 
-      var addAssump = [] // additional assumptions based on theory
-      if (this.theory.name.match(/GDPR/i)) {
-        // GDPR related assumptions
-        addAssump = ["controller(controller,data)","nominate(controller,processor)","processor(processor)","personal_data_processed(processor, data, second_processing_time, justification, purpose)","personal_data(data,subject)","data_subject(subject)","collected_at(data,collection_time)","controller(controller,data)","nominate(controller, processor_2)","processor(processor_2)","personal_data_processed(processor_2, data, first_processing_time, justification_2, purpose_2)","earlier(first_processing_time,second_processing_time)","different_from(purpose, purpose_2)","((((Pm communicate_before_time(Controllerlog1, Subjectlog1, Zlog1, Actionlog1)) , earlier(Ylog1, Zlog1)) , earlier(Xlog1, Ylog1)) => (Pm communicate_within_time(Xlog1,Controllerlog1, Subjectlog1, Ylog1, Actionlog1)))"]
-      }
-
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)).concat(addAssump), this.autoGoal.formula, function(theorem, proof, additionalCode) {
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, function(theorem, proof, additionalCode) {
         if (theorem) {
           obj.lastQueryTheorem = theorem;
           obj.lastQueryProof = proof;
