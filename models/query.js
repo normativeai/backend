@@ -94,7 +94,13 @@ querySchema.methods.execQuery = function(cb) {
       if (!this.autoGoal.formula) {
         this.autoGoal.formula = this.goal
       }
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, function(theorem, proof, additionalCode) {
+      // Additional assumptions of GDPR related queries
+      var addAssump = []
+      if (this.theory.getName().match(/GDPR/i)) {
+        logger.info(`>>>>>>>>>>>>>>>>TEMP>>>>>>>>>>>>>>>>>>${this.autoAssumptions.map(x => x.formula)}`);
+        addAssump = []
+      }
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)).contact(addAssump), this.autoGoal.formula, function(theorem, proof, additionalCode) {
         if (theorem) {
           obj.lastQueryTheorem = theorem;
           obj.lastQueryProof = proof;
