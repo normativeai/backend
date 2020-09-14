@@ -82,6 +82,7 @@ querySchema.pre('updateOne', function(next) {
 });
 
 querySchema.methods.execQuery = function(cb) {
+logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>START1`)
   if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
 
