@@ -145,7 +145,6 @@ exports.exec = function(req, res) {
     .populate('theory')
     .exec(function(err, query) {
       if (query) {
-logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>START0`)
         query.execQuery(function(code, theorem, proof) {
           if (code == 1) { //mleancop ok
             if (theorem) {

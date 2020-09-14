@@ -82,11 +82,8 @@ querySchema.pre('updateOne', function(next) {
 });
 
 querySchema.methods.execQuery = function(cb) {
-logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>START1`)
   if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
-
-logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>START`)
     if (!!!this.theory) {
       cb(0, false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
     } else if (!this.goal && !this.autoGoal.formula) {
@@ -96,13 +93,11 @@ logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>START`)
       if (!this.autoGoal.formula) {
         this.autoGoal.formula = this.goal
       }
-logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>${this.theory.name.match(/GDPR/i)}`)
 
       var addAssump = [] // additional assumptions based on theory
       if (this.theory.name.match(/GDPR/i)) {
         // GDPR related assumptions
-logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>${this.autoAssumptions.map(x => x.formula)}`)
-        addAssump = []
+        addAssump = ["controller(controller,data),nominate(controller,processor),processor(processor),personal_data_processed(processor, data, time_x, justification, purpose),personal_data(data,subject),data_subject(subject),collected_at(data,time_y),controller(controller,data),nominate(controller, processor_2),processor(processor_2),personal_data_processed(processor_2, data, time_z, justification_2, purpose_2),earlier(time_z,time_x),different_from(purpose, purpose_2),((((Pm communicate_before_time(Controllerlog1, Subjectlog1, Zlog1, Actionlog1)) , earlier(Ylog1, Zlog1)) , earlier(Xlog1, Ylog1)) => (Pm communicate_within_time(Xlog1,Controllerlog1, Subjectlog1, Ylog1, Actionlog1)))"]
       }
 
       helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)).concat(addAssump), this.autoGoal.formula, function(theorem, proof, additionalCode) {
