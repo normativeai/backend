@@ -85,6 +85,8 @@ querySchema.methods.execQuery = function(cb) {
   if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
 
+logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>${this.theory.getName().match(/GDPR/i)}`)
+
     if (!!!this.theory) {
       cb(0, false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
     } else if (!this.goal && !this.autoGoal.formula) {
@@ -94,7 +96,14 @@ querySchema.methods.execQuery = function(cb) {
       if (!this.autoGoal.formula) {
         this.autoGoal.formula = this.goal
       }
-      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, function(theorem, proof, additionalCode) {
+      var addAssump = [] // additional assumptions based on theory
+      if (this.theory.getName().match(/GDPR/i)) {
+        // GDPR related assumptions
+logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>${this.autoAssumptions.map(x => x.formula)}`)
+        addAssump = []
+      }
+
+      helper.executeQuery(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)).concat(addAssump), this.autoGoal.formula, function(theorem, proof, additionalCode) {
         if (theorem) {
           obj.lastQueryTheorem = theorem;
           obj.lastQueryProof = proof;
