@@ -84,6 +84,7 @@ querySchema.pre('updateOne', function(next) {
 querySchema.methods.execQuery = function(cb) {
   if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
+    logger.info(`>>>>>>>>>>>>>>>>TMP>>>>>>>>>>>>>>>>>>${this.theory.getName().match(/GDPR/i}`);
 
     if (!!!this.theory) {
       cb(0, false, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
