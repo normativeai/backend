@@ -22,7 +22,6 @@ function exportGoal(obj) {
 }
 
 function exportConnector(obj, state) {
-  if (!state || state.pass == 3) {
     var formulas = obj.connective.formulas.map(f => exportFormula(f, state));
     var argsNum = expectedArgs(obj.connective.code);
     if (argsNum < 0 && formulas.length < 2) {
@@ -77,7 +76,6 @@ function exportConnector(obj, state) {
        default:
         throw {error: `Frontend error: Connective ${obj.connective.code} is not known.`};
     }
-  }
 }
 
 function exportMacro(obj, state) {
@@ -97,35 +95,21 @@ function exportMacro(obj, state) {
        * At the same time, it is indexed by the term and is stored in this jsonexportr for further use
        * This happens in pass # 1
        */
-      if (!state) {
-        throw {error: "Frontend error: Labels can only used on top level sentences in legislation"}
-      }
       if (!formulas[0].hasOwnProperty('term')) {
         throw {error: `Frontend error: ${obj.connective.name} must have a term on the first argument.Got instead ${JSON.stringify(formulas[0])}`};
       }
       const label = exportFormula(formulas[0], state)
-      if (state.pass == 1) {
         // we sometime need to try and export the formula contained within. we anyway store the non exportd version in the state
         // since we might need to manipulat it in json form
         exportFormula(formulas[1], state)
         setInState(label, formulas[1], state)
-      } else if (state.pass == 3) {
         return `${label}) ${exportFormula(getFromState(label, state), state)}`
-      }
-      return
     case "exception":
       /*
        * This macro adds the rhs as an exception to the formulas labeled in positions 0...length-2
        * This happens in pass # 2
        */
 
-      if (!state) {
-        throw {error: "Frontend error: Exceptions can only used on top level sentences in legislation"}
-      }
-      if (!state || state.pass != 2) {
-        // doing nothing
-        return
-      }
       // We need to get the formulas with the labels and add the formula as a precondition.
       // TODO: the condition should be naf (negation as failure)
 
@@ -143,9 +127,6 @@ function exportMacro(obj, state) {
       ret += "DO NOT HOLD"
       return ret
     case "obmacro1":
-      if (state && (state.pass != 3)) {
-        return
-      }
 			/*
 				This macro simulates obif but accepts a multi obligation rhs (as a conjunction).
 				The first element in the conjuct is the term to place in the obligation (containing the VAR value)
@@ -208,17 +189,6 @@ function exportMacro(obj, state) {
        * Note that the other macro must be before this one in the text. Order is important here since
        * both are handled in the same pass.
        */
-      if (!state) {
-        throw {error: "Frontend error: Macro copy can only be used on top level sentences in legislation"}
-      }
-      if (state.pass == 2) {
-        // doing nothing
-        return
-      }
-
-      if (state.pass == 3) {
-        return exportFormula(state.map.get(computeUniqueLabel(obj)))
-      }
 
 
       // in the first pass, we create the new formula and store it using a unique label
@@ -262,8 +232,7 @@ function exportMacro(obj, state) {
       let obs = createConnective('and', addObs.connective.formulas.concat(oldObs))
 
       // lastly, we create a new obmacro1 with the new formulae
-      setInState(computeUniqueLabel(obj), createConnective('obmacro1', [conds,obs]),state)
-      return
+        return exportFormula(createConnective('obmacro1', [conds,obs]), state)
     default:
       throw {error: `Frontend error: Macro ${obj.connective.code} is not known.`};
   }
