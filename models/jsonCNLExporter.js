@@ -72,7 +72,7 @@ function exportConnector(obj, state) {
       case "fb":
         return identUnary("YOU ARE FORBIDDEN", formula[0], state);
       case "id":
-        throw "Not supported!"
+        return identUnary("IDEALLY", formula[0], state);
       case "obif":
         return identBinary("IF",formulas[0],"THEN YOU MUST",formulas[1],state);
       case "obonif":
@@ -82,9 +82,9 @@ function exportConnector(obj, state) {
       case "pmonif":
         return identBinary("IF",formulas[1],"THEN YOU ARE PERMITTED",formulas[0],state);
       case "spmif":
-        throw "Not supported!"
+        return identBinary("IF",formulas[0],"THEN YOU ARE STRONGLY PERMITTED",formulas[1],state);
       case "spmonif":
-        throw "Not supported!"
+        return identBinary("IF",formulas[1],"THEN YOU ARE STRONGLY PERMITTED",formulas[0],state);
       case "fbif":
         return identBinary("IF",formulas[0],"THEN YOU ARE FORBIDDEN",formulas[1],state);
       case "fbonif":
