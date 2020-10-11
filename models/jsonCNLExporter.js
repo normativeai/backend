@@ -9,7 +9,7 @@ function exportFormula(obj, state) {
 			return exportConnector(obj, state);
 		}
   } else if (obj.hasOwnProperty('term')){
-    return obj.term.name;
+    return `${obj.text}[${obj.term.name}]`;
   } else if (obj.hasOwnProperty('goal')){
     return exportGoal(obj);
   } else {
@@ -21,8 +21,30 @@ function exportGoal(obj) {
   return exportFormula(obj.goal.formula);
 }
 
+function ident(state) {
+  let arr = Array.from(Array(state.level).keys()).reduce((acc,x) => acc+" ","")
+  return arr
+}
+function inc(state) {
+  return {level: state.level+1}
+}
+function identBinary(w1,f1,w2,f2,state,w3) {
+  let w3s = w3 ? `${ident(state)}${w3}` : ""
+  return `${ident(state)}${w1}\n${ident(inc(state))}${f1}\n${ident(state)}${w2}\n${ident(inc(state))}${f2}${w3s}\n`;
+}
+
+function identUnary(w1,f1,state) {
+  return `${ident(state)}${w1}\n${ident(inc(state))}${f1}`;
+}
+
+function identMulti(w,fs,state) {
+  return fs.slice(1).reduce(function(acc, val) {
+    return `${acc}\n${ident(state)}${w} ${val}`
+  }, `${ident(state)}${fs[0]}`);
+}
+
 function exportConnector(obj, state) {
-    var formulas = obj.connective.formulas.map(f => exportFormula(f, state));
+    var formulas = obj.connective.formulas.map(f => exportFormula(f, inc(state)));
     var argsNum = expectedArgs(obj.connective.code);
     if (argsNum < 0 && formulas.length < 2) {
       throw {error: `The sentence ${obj.text} contains the connective ${obj.connective.name} which expectes at least two operands, but ${formulas.length} were given.`}
@@ -32,47 +54,43 @@ function exportConnector(obj, state) {
     }
     switch (obj.connective.code) {
       case "neg":
-        return `(NOT ${formulas[0]})`;
+        return identUnary("NOT", formulas[0], state);
       case "or":
-        return formulas.slice(1).reduce(function(acc, val) {
-          return `(${acc} OR ${val})`
-        }, formulas[0]);
+        return identMulti("OR", formulas, state);
       case "and":
-        return formulas.slice(1).reduce(function(acc, val) {
-          return `(${acc} AND ${val})`
-        }, formulas[0]);
+        return identMulti("AND", formulas, state);
       case "eq":
         throw "Equality operators are not yet supported!"
       case "defif":
-        return `(IF ${formulas[0]} THEN ${formulas[1]})`;
+        return identBinary("IF",formulas[0],"THEN",formulas[1],state);
       case "defonif":
-        return `(IF ${formulas[1]} THEN ${formulas[0]})`;
+        return identBinary("IF",formulas[1],"THEN",formulas[0],state);
       case "ob":
-        return `(YOU MUST ${formulas[0]})`
+        return identUnary("YOU MUST", formula[0], state);
       case "pm":
-        return `(YOU ALLOWED ${formulas[0]})`
+        return identUnary("YOU ARE ALLOWED", formula[0], state);
       case "fb":
-        return `(YOU FORBIDDEN ${formulas[0]})`
+        return identUnary("YOU ARE FORBIDDEN", formula[0], state);
       case "id":
         throw "Not supported!"
       case "obif":
-        return `(IF ${formulas[0]} THEN YOU MUST ${formulas[1]})`;
+        return identBinary("IF",formulas[0],"THEN YOU MUST",formulas[1],state);
       case "obonif":
-        return `(IF ${formulas[1]} THEN YOU MUST ${formulas[0]})`;
+        return identBinary("IF",formulas[1],"THEN YOU MUST",formulas[0],state);
       case "pmif":
-        return `(IF ${formulas[0]} THEN YOU ARE ALLOWED ${formulas[1]})`;
+        return identBinary("IF",formulas[0],"THEN YOU ARE PERMITTED",formulas[1],state);
       case "pmonif":
-        return `(IF ${formulas[1]} THEN YOU ARE ALLOWED ${formulas[0]})`;
+        return identBinary("IF",formulas[1],"THEN YOU ARE PERMITTED",formulas[0],state);
       case "spmif":
         throw "Not supported!"
       case "spmonif":
         throw "Not supported!"
       case "fbif":
-        return `(IF ${formulas[0]} THEN YOU ARE FORBIDDEN ${formulas[1]})`;
+        return identBinary("IF",formulas[0],"THEN YOU ARE FORBIDDEN",formulas[1],state);
       case "fbonif":
-        return `(IF ${formulas[1]} THEN YOU ARE FOBIDDEN ${formulas[0]})`;
+        return identBinary("IF",formulas[1],"THEN YOU ARE FORBIDDEN",formulas[0],state);
       case "equiv":
-        return `(${formulas[0]} IF AND ONLY IF ${formulas[1]})`;
+        return identBinary("IT HOLDS",formulas[0],"IF AND ONLY IF",formulas[1],state);
        default:
         throw {error: `Frontend error: Connective ${obj.connective.code} is not known.`};
     }
@@ -98,34 +116,16 @@ function exportMacro(obj, state) {
       if (!formulas[0].hasOwnProperty('term')) {
         throw {error: `Frontend error: ${obj.connective.name} must have a term on the first argument.Got instead ${JSON.stringify(formulas[0])}`};
       }
-      const label = exportFormula(formulas[0], state)
-        // we sometime need to try and export the formula contained within. we anyway store the non exportd version in the state
-        // since we might need to manipulat it in json form
-        exportFormula(formulas[1], state)
-        setInState(label, formulas[1], state)
-        return `${label}) ${exportFormula(getFromState(label, state), state)}`
+      return `${ident(state)}${formulas[0].term.name})`
     case "exception":
-      /*
-       * This macro adds the rhs as an exception to the formulas labeled in positions 0...length-2
-       * This happens in pass # 2
-       */
-
-      // We need to get the formulas with the labels and add the formula as a precondition.
-      // TODO: the condition should be naf (negation as failure)
-
-      // extract conditiond.
-      //
       let condition = formulas[formulas.length-1]
-      let ret = `IN CASE ${condition}$ THEN`
-      formulas.slice(0, -1).map(term => {
+      let fs = formulas.slice(0, -1).map(term => {
         if (!isTerm(term)) {
           throw {error: `Frontend error: Labels must be terms, got ${JSON.stringify(term)}`}
         }
-        let label = exportFormula(term, state)
-        ret += `${label} `
+        return term.term.name
       })
-      ret += "DO NOT HOLD"
-      return ret
+      return identBinary("IF", condition, "THEN THE FOLLOWING", fs, state, "DO NOT HOLD")
     case "obmacro1":
 			/*
 				This macro simulates obif but accepts a multi obligation rhs (as a conjunction).
@@ -173,7 +173,7 @@ function exportMacro(obj, state) {
 				let obform2 = obform.replace('VAR', crhs)
 				let clhs2 = clhs.replace('VAR', crhs)
 				// return new obligation
-				return `IF ${clhs2} THEN YOU MUST ${obform2}`
+				return identBinary("IF",clhs2,"THEN YOU MUST",obform2,state)
 
 			}
 			return conj.slice(1).reduce(function(acc,c) {
@@ -189,10 +189,6 @@ function exportMacro(obj, state) {
        * Note that the other macro must be before this one in the text. Order is important here since
        * both are handled in the same pass.
        */
-
-
-      // in the first pass, we create the new formula and store it using a unique label
-      // in the third pass, we return the formula stored with the unique label
 
       // first, we obtain the three parts, there can be 2 or 3 formulae in total
       let optConds = formulas[formulas.length-3]

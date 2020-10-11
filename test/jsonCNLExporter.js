@@ -16,15 +16,16 @@ const pairs = [
 
 describe("JSON CNL Exporter", function(){
   it(`should export ${pairs[0][0]} correctly`, function(done){
-    assert.equal(exporter.exportFormula(JSON.parse(pairs[0][0])), pairs[0][1]);
+    assert.equal(exporter.exportFormula(JSON.parse(pairs[0][0]), {level:1}), pairs[0][1]);
     done();
   });
   it(`should parse ${pairs[2][0]} correctly`, function(done){
-    assert.equal(exporter.exportFormula(JSON.parse(pairs[2][0])), pairs[2][1]);
+    assert.equal(exporter.exportFormula(JSON.parse(pairs[2][0]), {level:1}), pairs[2][1]);
     done();
   });
   it("should parse correctly the GDPR JSON", function(done) {
-    assert.equal(exporter.exportFormula(JSON.parse(json_gdpr)), "(((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) O> communicate_at_time(Y,W,T,contact_details(Y))) , (((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))");
+    let gdpr = JSON.parse(json_gdpr)
+    assert.equal(exporter.exportFormula(gdpr, {level:1}), "(((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) O> communicate_at_time(Y,W,T,contact_details(Y))) , (((((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z)) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))");
     done();
   });
   it("should parse correctly obmacro1 containing VAR on the left side as well", function(done) {
@@ -38,8 +39,9 @@ describe("JSON CNL Exporter", function(){
 					}
 				}
     let newCond = exporter.createConnective("and", [lhsVAR, cond])
+    console.log(`>>>>>>>>>${JSON.stringify(newCond)}`)
     gdpr.connective.formulas[0] = newCond
-    assert.equal(exporter.exportFormula(gdpr), "(((communicate_at_time(Y,W,T,contact_details(Y)) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) O> communicate_at_time(Y,W,T,contact_details(Y))) , (((communicate_at_time(Y,W,T,contact_details(K)) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))");
+    assert.equal(exporter.exportFormula(gdpr, {level:1}), "(((communicate_at_time(Y,W,T,contact_details(Y)) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) O> communicate_at_time(Y,W,T,contact_details(Y))) , (((communicate_at_time(Y,W,T,contact_details(K)) , (((((processor(X) , nominate(Y,X)) , personal_data_processed_at_time(X,Z,T)) , personal_data(Z,W)) , data_subject(W)) , controller(Y,Z))) , representative(K,Y)) O> communicate_at_time(Y,W,T,contact_details(K))))");
     done();
   });
 

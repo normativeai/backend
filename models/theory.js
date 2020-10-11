@@ -14,7 +14,7 @@ var theorySchema = new Schema({
     vocabulary        : [{symbol: String, original: String, full: String}],
     autoVocabulary    : [{symbol: String, original: String, full: String}],
     formalization     : [{original: String, json: Object, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
-    autoFormalization : [{original: String, json: Object, formula: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
+    autoFormalization : [{original: String, json: Object, formula: String, cnl: String, active: Boolean, lastIndependent: Boolean, lastIndependentDate: Date}],
 		user 							: { type: Schema.Types.ObjectId, ref: 'User' },
     clonedForm        : { type: Schema.Types.ObjectId, ref: 'Theory' },
     lastConsistency   : Boolean,
@@ -47,21 +47,24 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
   if (content != null) {
     var xmlParser = require('./xmlParser');
     var jsonParser = require('./jsonParser');
+    var cnlExporter = require('./jsonCNLExporter');
     logger.info(`Parsing html: ${content}`);
     let state = new Map();
     // in theories, we apply a 3 passes computation to handle exceptions and labels
     let jsons = xmlParser.parse(content)
-    jsons.forEach(obj=> jsonParser.parseFormula(obj,{pass: 1, map: state})) // pass 1
+    jsons.forEach(obj => jsonParser.parseFormula(obj,{pass: 1, map: state})) // pass 1
     jsons.forEach(obj => jsonParser.parseFormula(obj,{pass: 2, map: state})) // pass 2
     // now last pass which returns the formulas
     var ret = jsons.map(function(obj) {
       logger.info(`Parsing (pass 3) json: ${JSON.stringify(obj)}`);
       var form = jsonParser.parseFormula(obj,{pass: 3, map: state})
+      var cnl = cnlExporter.exportFormula(obj, {level: 1})
       if (form != null) {
          return {
           original: obj.text,
           json: obj,
-          formula: form
+          formula: form,
+          cnl: cnl
         }
       } else {
         return undefined
