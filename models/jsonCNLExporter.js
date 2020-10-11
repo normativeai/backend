@@ -116,7 +116,7 @@ function exportMacro(obj, state) {
       if (!formulas[0].hasOwnProperty('term')) {
         throw {error: `Frontend error: ${obj.connective.name} must have a term on the first argument.Got instead ${JSON.stringify(formulas[0])}`};
       }
-      return `${ident(state)}${formulas[0].term.name})`
+      return `${ident(state)}${formulas[0].term.name})${exportFormula(formulas[1], inc(state))}`
     case "exception":
       let condition = formulas[formulas.length-1]
       let fs = formulas.slice(0, -1).map(term => {
