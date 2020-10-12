@@ -54,11 +54,12 @@ theorySchema.statics.computeAutomaticFormalization = function (content) {
     let jsons = xmlParser.parse(content)
     jsons.forEach(obj => jsonParser.parseFormula(obj,{pass: 1, map: state})) // pass 1
     jsons.forEach(obj => jsonParser.parseFormula(obj,{pass: 2, map: state})) // pass 2
+    let state2 = new Map();
     // now last pass which returns the formulas
     var ret = jsons.map(function(obj) {
       logger.info(`Parsing (pass 3) json: ${JSON.stringify(obj)}`);
       var form = jsonParser.parseFormula(obj,{pass: 3, map: state})
-      var cnl = cnlExporter.exportFormula(obj, {level: 1})
+      var cnl = cnlExporter.exportFormula(obj, {level: 1: map: state2})
       if (form != null) {
          return {
           original: obj.text,
