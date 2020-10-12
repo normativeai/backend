@@ -22,24 +22,28 @@ function exportGoal(obj) {
 }
 
 function ident(state) {
-  let arr = Array.from(Array(state.level).keys()).reduce((acc,x) => acc+" ","")
+  let arr = Array.from(Array(state.level).keys()).reduce((acc,x) => acc+"&nbsp;","")
   return arr
 }
+function newline() {
+  return "<br/>"
+}
+function inc(state) {
 function inc(state) {
   return {level: state.level+1}
 }
 function identBinary(w1,f1,w2,f2,state,w3) {
   let w3s = w3 ? `${ident(state)}${w3}` : ""
-  return `${ident(state)}${w1}\n${ident(inc(state))}${f1}\n${ident(state)}${w2}\n${ident(inc(state))}${f2}${w3s}\n`;
+  return `${ident(state)}${w1}${newline()}${ident(inc(state))}${f1}${newline()}${ident(state)}${w2}${newline()}${ident(inc(state))}${f2}${w3s}${newline()}`;
 }
 
 function identUnary(w1,f1,state) {
-  return `${ident(state)}${w1}\n${ident(inc(state))}${f1}`;
+  return `${ident(state)}${w1}${newline()}${ident(inc(state))}${f1}`;
 }
 
 function identMulti(w,fs,state) {
   return fs.slice(1).reduce(function(acc, val) {
-    return `${acc}\n${ident(state)}${w} ${val}`
+    return `${acc}${newline()}${ident(state)}${w} ${val}`
   }, `${ident(state)}${fs[0]}`);
 }
 
