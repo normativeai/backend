@@ -26,7 +26,7 @@ function ident(state) {
   return arr
 }
 function inc(state) {
-  return {level: state.level+1}
+  return {level: state.level+1, map: state.map}
 }
 function identBinary(w1,f1,w2,f2,state,w3) {
   let w3s = w3 ? `${ident(state)}${w3}` : ""
@@ -116,9 +116,10 @@ function exportMacro(obj, state) {
       if (!formulas[0].hasOwnProperty('term')) {
         throw {error: `Frontend error: ${obj.connective.name} must have a term on the first argument.Got instead ${JSON.stringify(formulas[0])}`};
       }
+      setInState(formulas[0],formulas[1],state)
       return `${ident(state)}${formulas[0].term.name})${exportFormula(formulas[1], inc(state))}`
     case "exception":
-      let condition = formulas[formulas.length-1]
+      let condition = exportFormula(formulas[formulas.length-1],inc(state))
       let fs = formulas.slice(0, -1).map(term => {
         if (!isTerm(term)) {
           throw {error: `Frontend error: Labels must be terms, got ${JSON.stringify(term)}`}
@@ -206,8 +207,7 @@ function exportMacro(obj, state) {
       }
 
       // ssecond, we obtain the target macro
-      let label2 = exportFormula(targetMacro, state)
-      let form = getFromState(label2, state)
+      let form = getFromState(targetMacro, state)
 
       // we check that the target formula is indeed the right macro
       if (!form.hasOwnProperty('connective') || form.connective.code != 'obmacro1') {
@@ -234,14 +234,12 @@ function exportMacro(obj, state) {
   }
 }
 
-function getFromState(label, state) {
-  let form = state.map.get(label) // first get the formula from the state
-  let unique = computeUniqueLabel(form) // compute the hash
-  return state.map.get(unique) || form // return the chained labeled formula if exists
+function setInState(label, formula, state) {
+  return state.map.set(computeUniqueLabel(label.term), formula) // return the chained labeled formula if exists
 }
 
-function setInState(label, form, state) {
-  state.map.set(label, form)
+function getFromState(label, state) {
+  return state.map.get(computeUniqueLabel(label.term)) // return the chained labeled formula if exists
 }
 
 // this is used in order to create unique labels for formulae to be stored in the state
