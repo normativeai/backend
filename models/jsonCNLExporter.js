@@ -66,13 +66,13 @@ function exportConnector(obj, state) {
       case "defonif":
         return identBinary("IF",formulas[1],"THEN",formulas[0],state);
       case "ob":
-        return identUnary("YOU MUST", formula[0], state);
+        return identUnary("YOU MUST", formulas[0], state);
       case "pm":
-        return identUnary("YOU ARE ALLOWED", formula[0], state);
+        return identUnary("YOU ARE ALLOWED", formulas[0], state);
       case "fb":
-        return identUnary("YOU ARE FORBIDDEN", formula[0], state);
+        return identUnary("YOU ARE FORBIDDEN", formulas[0], state);
       case "id":
-        return identUnary("IDEALLY", formula[0], state);
+        return identUnary("IDEALLY", formulas[0], state);
       case "obif":
         return identBinary("IF",formulas[0],"THEN YOU MUST",formulas[1],state);
       case "obonif":

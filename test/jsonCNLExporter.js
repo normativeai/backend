@@ -15,6 +15,7 @@ let json_art13_4 = fs.readFileSync("./test/fixtures/gdpr_13_4.json", "utf8");
 const pairs = [
   ['{"text": "aaa","connective": {"code": "or", "formulas": [{"text": "aaa", "term": {"name": "a"}},{"text": "aaa", "term": {"name": "b"}}, {"text": "aaa", "term": {"name": "c"}}] } }','&nbsp;aaa[a]<BR/>&nbsp;OR aaa[b]<BR/>&nbsp;OR aaa[c]'],
   [json_rome, '&nbsp;IF<BR/>&nbsp;&nbsp;the law chosen by the parties[validChoice(Law,Part)]<BR/>&nbsp;THEN YOU MUST<BR/>&nbsp;&nbsp;A contract[contract(Law,Part)]<BR/>'],
+  ['{"text":"It ought to be that Jones goes to assist his neighbors.","connective":{"name":"Obligation","description":"It Ought to be ___","code":"ob","formulas":[{"text":"Jones goes to assist his neighbors","term":{"name":"Jones goes to assist his neighbors"}}]}}','(Ob Jones goes to assist his neighbors)']
 ];
 
 describe("JSON CNL Exporter", function(){
@@ -26,6 +27,11 @@ describe("JSON CNL Exporter", function(){
     assert.equal(exporter.exportFormula(JSON.parse(pairs[1][0]), {level:1}), pairs[1][1]);
     done();
   });
+  it(`should export Chisholm correctly`, function(done){
+    assert.equal(exporter.exportFormula(JSON.parse(pairs[2][0]), {level:1}), pairs[2][1]);
+    done();
+  });
+
   it("should parse correctly the GDPR JSON", function(done) {
     let gdpr = JSON.parse(json_gdpr)
     assert.equal(exporter.exportFormula(gdpr, {level:1}), "&nbsp;IF<BR/>&nbsp;&nbsp;&nbsp;processor[processor(X)]<BR/>&nbsp;AND nominated by the controller[nominate(Y,X)]<BR/>&nbsp;AND process the data[personal_data_processed_at_time(X,Z,T)]<BR/>&nbsp;AND personal data[personal_data(Z,W)]<BR/>&nbsp;AND data subject[data_subject(W)]<BR/>&nbsp;AND controller[controller(Y,Z)]<BR/>&nbsp;THEN YOU MUST<BR/>&nbsp;&nbsp;at the time when personal data are obtained, provide the data subject with all of the following information[communicate_at_time(Y,W,T,the identity and the contact details of the controller[contact_details(Y)])]<BR/> AND &nbsp;IF<BR/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;processor[processor(X)]<BR/>&nbsp;&nbsp;AND nominated by the controller[nominate(Y,X)]<BR/>&nbsp;&nbsp;AND process the data[personal_data_processed_at_time(X,Z,T)]<BR/>&nbsp;&nbsp;AND personal data[personal_data(Z,W)]<BR/>&nbsp;&nbsp;AND data subject[data_subject(W)]<BR/>&nbsp;&nbsp;AND controller[controller(Y,Z)]<BR/>&nbsp;AND where applicable[representative(K,Y)]<BR/>&nbsp;THEN YOU MUST<BR/>&nbsp;&nbsp;at the time when personal data are obtained, provide the data subject with all of the following information[communicate_at_time(Y,W,T,of the controller’s representative[contact_details(K)])]<BR/>")

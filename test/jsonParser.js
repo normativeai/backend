@@ -12,6 +12,7 @@ const pairs = [
   ['{"text": "aaa","connective": {"code": "or", "formulas": [{"text": "aaa", "term": {"name": "a"}},{"text": "aaa", "term": {"name": "b"}}, {"text": "aaa", "term": {"name": "c"}}] } }','((a ; b) ; c)'],
   ['{"text": "ddd","connective": {"code": "label", "formulas": [{"text": "ccc", "term": {"name": "index1"}}, {"text": "aaa","connective": {"code": "or", "formulas": [{"text": "aaa", "term": {"name": "a"}},{"text": "aaa", "term": {"name": "b"}}, {"text": "aaa", "term": {"name": "c"}}]}} ] }}','((a ; b) ; c)'],
   [json_rome, '(validChoice(Law,Part) O> contract(Law,Part))'],
+  ['{"text":"It ought to be that Jones goes to assist his neighbors.","connective":{"name":"Obligation","description":"It Ought to be ___","code":"ob","formulas":[{"text":"Jones goes to assist his neighbors","term":{"name":"Jones goes to assist his neighbors"}}]}}','(Ob Jones goes to assist his neighbors)']
 ];
 
 threePasses = function(jsons) {
@@ -59,6 +60,11 @@ describe("Three passes JSON parser", function() {
     assert.equal(threePasses([JSON.parse(pairs[1][0])]), pairs[1][1]);
     done();
   });
+  it(`should parse Chisholm correctly`, function(done){
+    assert.equal(threePasses([JSON.parse(pairs[3][0])]), pairs[3][1]);
+    done();
+  });
+
   it("should parse correctly labels and exceptions", function(done) {
     let label = {
       text: "label1",
