@@ -19,8 +19,8 @@
 					"description"   : "Desc2 blah blah",
 					"content"       : "Content",
           "comment"       : "A comment",
-					"vocabulary"    : [{"_id": "4542306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4542306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
-					"formalization" : [{"_id": "4542306d8e148f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "d"},{"_id": "4542306d9e147f10f16aceaa", "original": "Delivery means you should make Insurance 2", "formula": "(~ d)"}]
+					"vocabulary"    : [{"_id": "4542316d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4542306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"_id": "4542326d8e148f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "d"},{"_id": "4542306d9e147f10f16aceaa", "original": "Delivery means you should make Insurance 2", "formula": "(~ d)"}]
         },
 
 
@@ -32,8 +32,8 @@
 					"description"   : "Desc3 plah plah",
 					"content"       : "Content",
           "comment"       : "A comment",
-					"vocabulary"    : [{"_id": "4742306d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4742306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
-					"formalization" : [{"_id": "4742306d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "$#@$@#"}]
+					"vocabulary"    : [{"_id": "4742336d8e147f10f16aceaa", "symbol": "D", "original": "Delivery"}, {"_id": "4742306d8e147f10f16aceaa", "symbol": "I", "original": "Insurance"}],
+					"formalization" : [{"_id": "4742346d8e147f10f16aceaa", "original": "Delivery means you should make Insurance", "formula": "$#@$@#"}]
         },
 
     "Theory4":
@@ -44,8 +44,8 @@
 					"description"   : "Desc4 plah plah",
 					"content"       : "Content",
           "comment"       : "<div><b>A comment</b></div>",
-					"vocabulary"    : [{"_id": "4742306d8e147f10f17acead", "symbol": "a", "original": "Delivery"}],
-					"formalization" : [{"_id": "4742306d8e147f10f18acead", "original": "test", "formula": "a"},{"_id": "2742306d8e147f10f18acead", "original": "test", "formula": "a"}, {"_id": "1742306d8e147f10f18acead", "original": "test", "formula": "b"} ]
+					"vocabulary"    : [{"_id": "4742356d8e147f10f17acead", "symbol": "a", "original": "Delivery"}],
+					"formalization" : [{"_id": "4742366d8e147f10f18acead", "original": "test", "formula": "a"},{"_id": "2742306d8e147f10f18acead", "original": "test", "formula": "a"}, {"_id": "1742306d8e147f10f18acead", "original": "test", "formula": "b"} ]
         },
 
     "Theory5":
@@ -93,5 +93,18 @@
 					"vocabulary"    : [],
 					"formalization" : [],
           "writeProtected": true
+        },
+      "Theory9":
+        {
+          "_id"           : "4342106d8e147f10f11aceaa",
+          "lastUpdate"    : "2018-12-30T08:19:57.681Z",
+					"name"          : "Test8",
+					"description"   : "empty",
+					"content"       : "",
+          "comment"       : "",
+					"vocabulary"    : [],
+					"formalization" : [],
+          "writeProtected": false
         }
+
 }

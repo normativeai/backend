@@ -139,6 +139,32 @@ exports.delete = function(req, res, next) {
   }
 };
 
+exports.export = function(req, res) {
+  Query.findOne({"_id": req.params.queryId})
+    .populate('theory')
+    .exec(function(err, query) {
+      if (query) {
+        query.exportQMLTP(function(code, result) {
+          if (code == 1) { //export ok
+            if (result) {
+              logger.info(`Export of ${req.params.queryId} of user ${JSON.stringify(req.user)} is ${result}`);
+                res.status(200).json({data: result});
+            } else {
+              logger.error(`Export of query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be performed since the query is invalid`);
+              res.status(400).json({'error': 'Export error: invalid query'});
+            }
+          } else {
+            logger.error(`Export of query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be executed: ${result}`);
+            res.status(400).json({'error': result});
+          }
+        });
+      } else {
+        logger.error(`Query ${req.params.queryId} of user ${JSON.stringify(req.user)} cannot be exported since it cannot be found`);
+        res.status(400).json({'error': 'Unknown query ID'});
+      }
+  });
+};
+
 // Execute query.
 exports.exec = function(req, res) {
   Query.findOne({"_id": req.params.queryId})

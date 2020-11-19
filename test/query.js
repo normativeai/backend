@@ -21,8 +21,11 @@ const query4 = require('./fixtures/query.json').Query4;
 const query5 = require('./fixtures/query.json').Query5;
 const query6 = require('./fixtures/query.json').Query6;
 const query7 = require('./fixtures/query.json').Query7;
+const theory8 = require('./fixtures/theory.json').Theory8;
 const query8 = require('./fixtures/query.json').Query8;
 const query9 = require('./fixtures/query.json').Query9;
+const query10 = require('./fixtures/query.json').Query10;
+const theory9 = require('./fixtures/theory.json').Theory9;
 
 var server = supertest.agent("http://localhost:3000");
 
@@ -434,6 +437,46 @@ describe("Delete query", function(){
   });
 });
 
+describe("export query", function() {
+  var token
+
+	beforeEach(async function() {
+		await User.create(user)
+    token = await utils.login(user)
+    theory8.user = user;
+    let xml = fs.readFileSync("./test/fixtures/gdpr_13.xml", "utf8");
+    theory8.content = xml
+    query8.theory = theory8._id;
+    query8.user = user;
+    let xml2 = fs.readFileSync("./test/fixtures/gdpr_13_query.xml", "utf8");
+    query8.content = xml2
+	});
+
+	afterEach(async function() {
+		await Query.findByIdAndRemove(query8._id)
+		await Theory.findByIdAndRemove(theory8._id)
+		await User.findByIdAndRemove(user._id)
+	});
+
+  it("should export to QMLTP format correctly", async function(){
+    //first, controller create query and theory, so the generation of automatic formlulas will be done properly
+    var res = await request(app)
+      .post("/api/theories")
+      .set('Authorization', `Bearer ${token}`)
+      .send(theory8)
+    var res = await request(app)
+      .post("/api/queries")
+      .set('Authorization', `Bearer ${token}`)
+      .send(query8)
+    var res = await request(app)
+      .get(`/api/queries/${query8._id}/export`)
+      .set('Authorization', `Bearer ${token}`)
+    expect(res.statusCode).equals(200)
+    //expect(res.body.data).to.equal('');
+  });
+
+});
+
 describe("Execute query", function(){
 
   var token
@@ -443,6 +486,9 @@ describe("Execute query", function(){
     token = await utils.login(user)
     theory.user = user;
     await Theory.create(theory)
+    query.theory = theory._id;
+    theory9.user = user;
+    await Theory.create(theory9)
     query.theory = theory._id;
     query.user = user;
     await Query.create(query)
@@ -459,6 +505,9 @@ describe("Execute query", function(){
     query8.theory = theory._id;
     query8.user = user;
     await Query.create(query8)
+    query10.theory = theory9._id;
+    query10.user = user;
+    await Query.create(query10)
 	});
 
 	afterEach(async function() {
@@ -467,8 +516,10 @@ describe("Execute query", function(){
 		await Query.findByIdAndRemove(query3._id)
 		await Query.findByIdAndRemove(query4._id)
 		await Query.findByIdAndRemove(query8._id)
+		await Query.findByIdAndRemove(query10._id)
 		await Theory.findByIdAndRemove(theory._id)
 		await Theory.findByIdAndRemove(theory4._id)
+		await Theory.findByIdAndRemove(theory9._id)
 		await User.findByIdAndRemove(user._id)
 	});
 
@@ -545,32 +596,29 @@ describe("Execute query", function(){
   });
 
   it("should check that a query can be executed correctly on GDPR article 13", async function(){
-      var t = Object.assign({}, theory);
-      var q = Object.assign({}, query);
       let txml = fs.readFileSync("./test/fixtures/gdpr_13.xml", "utf8");
       let qxml = fs.readFileSync("./test/fixtures/gdpr_13_query.xml", "utf8");
-      t.content = txml
-      q.content = qxml
-      q.theory = t._id
+      theory9.content = txml
+      query10.content = qxml
+      query10.theory = theory9._id
       // update theory
       var res = await request(app)
-        .put(`/api/theories/${t._id}`)
+        .put(`/api/theories/${theory9._id}`)
         .set('Authorization', `Bearer ${token}`)
-        .send(t)
+        .send(theory9)
       expect(res.statusCode).equals(200)
       // update query
       var res = await request(app)
-        .put(`/api/queries/${q._id}`)
+        .put(`/api/queries/${query10._id}`)
         .set('Authorization', `Bearer ${token}`)
-        .send(q)
+        .send(query10)
       expect(res.statusCode).equals(200)
 
       var res = await request(app)
-        .get(`/api/queries/${q._id}/exec`)
+        .get(`/api/queries/${query10._id}/exec`)
         .set('Authorization', `Bearer ${token}`)
       expect(res.statusCode).equals(200)
   })
-
 
 });
 

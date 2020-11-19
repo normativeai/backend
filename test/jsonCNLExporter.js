@@ -15,7 +15,7 @@ let json_art13_4 = fs.readFileSync("./test/fixtures/gdpr_13_4.json", "utf8");
 const pairs = [
   ['{"text": "aaa","connective": {"code": "or", "formulas": [{"text": "aaa", "term": {"name": "a"}},{"text": "aaa", "term": {"name": "b"}}, {"text": "aaa", "term": {"name": "c"}}] } }','&nbsp;aaa[a]<BR/>&nbsp;OR aaa[b]<BR/>&nbsp;OR aaa[c]'],
   [json_rome, '&nbsp;IF<BR/>&nbsp;&nbsp;the law chosen by the parties[validChoice(Law,Part)]<BR/>&nbsp;THEN YOU MUST<BR/>&nbsp;&nbsp;A contract[contract(Law,Part)]<BR/>'],
-  ['{"text":"It ought to be that Jones goes to assist his neighbors.","connective":{"name":"Obligation","description":"It Ought to be ___","code":"ob","formulas":[{"text":"Jones goes to assist his neighbors","term":{"name":"Jones goes to assist his neighbors"}}]}}','(Ob Jones goes to assist his neighbors)']
+  ['{"text":"It ought to be that Jones goes to assist his neighbors.","connective":{"name":"Obligation","description":"It Ought to be ___","code":"ob","formulas":[{"text":"Jones goes to assist his neighbors","term":{"name":"Jones goes to assist his neighbors"}}]}}','&nbsp;YOU MUST<BR/>&nbsp;&nbsp;Jones goes to assist his neighbors[Jones goes to assist his neighbors]']
 ];
 
 describe("JSON CNL Exporter", function(){

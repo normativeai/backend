@@ -81,6 +81,28 @@ querySchema.pre('updateOne', function(next) {
     next()
 });
 
+querySchema.methods.exportQMLTP = function(cb) {
+  var helper = require('./exporter');
+  if (!!!this.theory) {
+    cb(0, 'Query is not associated with a specific theory. Please set the theory before trying to execute queries');
+  } else if (!this.goal && !this.autoGoal.formula) {
+    cb(0, 'Query has no goal. Please assign goals before trying to execute queries');
+  } else {
+    var obj = this
+    if (!this.autoGoal.formula) {
+      this.autoGoal.formula = this.goal
+    }
+
+    helper.export(this.theory.getFormalization(), this.assumptions.concat(this.autoAssumptions.map(x => x.formula)), this.autoGoal.formula, require('./dls2qmltp'), function(result, additionalCode) {
+      if (result) {
+        cb(1, result);
+      } else {
+        cb(additionalCode, result);
+      }
+    });
+  }
+};
+
 querySchema.methods.execQuery = function(cb) {
   if (typeof this.lastQueryDate === 'undefined' || this.lastUpdate > this.lastQueryDate || this.theory.lastUpdate > this.lastQueryDate) {
     var helper = require('./queryHelper');
