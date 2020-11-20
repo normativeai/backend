@@ -12,7 +12,7 @@ const pairs = [
 
 describe("DL*2QMLTP converter", function(){
   it(`should convert ${pairs[0][0]} correctly to ${pairs[0][1]}`, function(done){
-    assert.equal(converter.exportFormula(pairs[0][0]), pairs[0][1]);
+    assert.equal(converter.exportFormula(pairs[0][0],0), pairs[0][1]);
     done();
   });
 })

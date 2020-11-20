@@ -7,6 +7,7 @@ class Exporter {
     var Theory = require('../models/theory');
     var cmd = exporter.header()
     var hadValue = false;
+    var id = 0;
     for (let i = 0; i < formulas.length; i++) {
       if (Theory.isActive(formulas[i])) {
         if (hadValue) {
@@ -14,7 +15,7 @@ class Exporter {
         }
         var f = formulas[i].formula;
         try {
-          var f_parsed = exporter.exportFormula(f);
+          var f_parsed = exporter.exportFormula(f,id++);
           cmd += f_parsed;
           hadValue = true;
         } catch (error) {
@@ -27,7 +28,7 @@ class Exporter {
     for (let i = 0; i < assumptions.length; i++) {
       var f = assumptions[i];
       try {
-        var f_parsed = exporter.exportFormula(f);
+        var f_parsed = exporter.exportFormula(f,id++);
         cmd += exporter.formulaSep();
         cmd += f_parsed;
       } catch (error) {

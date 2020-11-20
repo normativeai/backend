@@ -139,10 +139,8 @@ var lang = P.createLanguage({
 
 });
 
-let runind = 0
-
-exports.exportFormula = function(str) {
-  return `qmf(axiom_${runind++},axiom,` +
+exports.exportFormula = function(str,id) {
+  return `qmf(axiom_${id},axiom,` +
     lang.formula.tryParse(str)
   + ').'
 }
