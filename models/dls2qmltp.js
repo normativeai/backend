@@ -139,9 +139,22 @@ var lang = P.createLanguage({
 
 });
 
+function quantify(str) {
+  if (str.includes('__var'))
+    throw 'DL* formulae must not contain "__var"'
+  //hash = crypto.createHash('md5').update(str).digest('hex');
+  var form = lang.formula.tryParse(str);
+  let vars = Array.from(new Set(form.match(/[A-Z][a-zA-Z_\d]*__var/g)))
+  if (vars)
+    return '(' + vars.map(x => `! ${x}: `).join('') + form + ')'
+  else
+    return form
+
+}
+
 exports.exportFormula = function(str,id) {
   return `qmf(axiom_${id},axiom,` +
-    lang.formula.tryParse(str)
+    quantify(str)
   + ').'
 }
 
@@ -184,6 +197,6 @@ exports.goalSep = function() {
 
 exports.exportGoal = function(str) {
   return 'qmf(con,conjecture,' +
-    lang.conjecture.tryParse(str) +
+    quantify(str) +
     ').'
 }
