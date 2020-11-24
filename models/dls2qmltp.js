@@ -32,15 +32,15 @@ function fb(f) {
 }
 
 function pimp(f1,f2) {
-  return `((${f1} => ${pm(f2)}),(${id(pm(f1))} => ${id(pm(f2))}))`
+  return `((${f1} => ${pm(f2)}) & (${id(pm(f1))} => ${id(pm(f2))}))`
 }
 
 function oimp(f1,f2) {
-  return `((${f1} => ${ob(f2)}),(${id(ob(f1))} => ${id(ob(f2))}))`
+  return `((${f1} => ${ob(f2)}) & (${id(ob(f1))} => ${id(ob(f2))}))`
 }
 
 function fimp(f1,f2) {
-  return `((${f1} => ${fb(f2)}),(${id(fb(f1))} => ${id(fb(f2))}))`
+  return `((${f1} => ${fb(f2)}) & (${id(fb(f1))} => ${id(fb(f2))}))`
 }
 
 let whitespace = P.regexp(/\s*/m);
@@ -63,12 +63,6 @@ function addParents(str) {
   return `qmf(axiom,axiom,\n`
 }
 
-function formHeader() {
-  return `((earlier(X,Y),earlier(Y,Z)) => earlier(X,Z))`
-}
-
-let formTail = ').\n\n'
-
 var lang = P.createLanguage({
 
   lparen: () => word("("),
@@ -76,12 +70,6 @@ var lang = P.createLanguage({
   lbracket: () => word("["),
   rbracket: () => word("]"),
   comma: () => word(","),
-
-  problem: r => P.seqMap(lparen, P.alt(r.complexProblem, r.simpleProblem),r.rparen, function(_,prob,_) {return probHeader() + prob}),
-
-  complexProblem: r => P.seqMap(r.list.skip(r.comma), r.conjecture, function(list, conc) {return `${list.map(x => formHeader() + x +formTail)}\n\n${conc}`}),
-
-  simpleProblem: r => r.conjecture,
 
   formula: r => P.alt(r.binary, r.nbinary, r.unary, r.vatom),
 
