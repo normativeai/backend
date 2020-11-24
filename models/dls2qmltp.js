@@ -134,7 +134,7 @@ function quantify(str) {
   var form = lang.formula.tryParse(str);
   let vars = Array.from(new Set(form.match(/[A-Z][a-zA-Z_\d]*__var/g)))
   if (vars)
-    return '(' + vars.map(x => `! ${x}: `).join('') + form + ')'
+    return '(! [' + vars.join(',') + '] : ' + form + ')'
   else
     return form
 
