@@ -133,7 +133,7 @@ function quantify(str) {
   //hash = crypto.createHash('md5').update(str).digest('hex');
   var form = lang.formula.tryParse(str);
   let vars = Array.from(new Set(form.match(/[A-Z][a-zA-Z_\d]*__var/g)))
-  if (vars)
+  if (vars.length > 0)
     return '(! [' + vars.join(',') + '] : ' + form + ')'
   else
     return form
