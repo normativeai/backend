@@ -107,13 +107,15 @@ var lang = P.createLanguage({
 
   vatom: r => P.alt(r.atom, r.variable),
 
-  func: r => P.seq(r.constant, r.lparen, r.arglist, r.rparen).tie(),
+  func: r => P.seq(r.constant2, r.lparen, r.arglist, r.rparen).tie(),
 
   arglist: r => r.vatom.sepBy1(word(",")).tieWith(","),
 
   integer: () => reg(/[0-9]+/),
 
-  constant: () => reg(/[a-z][a-zA-Z_\d]*/),
+  constant: () => reg(/[a-z][a-zA-Z_\d]*/).map(v => v.concat('__const')),
+
+  constant2: () => reg(/[a-z][a-zA-Z_\d]*/), /* we want to make sure function symbols are different from constant symbols, since we might export it to higher-order */
 
   /*
    * Not any longer
