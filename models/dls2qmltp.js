@@ -71,7 +71,7 @@ var lang = P.createLanguage({
   rbracket: () => word("]"),
   comma: () => word(","),
 
-  formula: r => P.alt(r.binary, r.nbinary, r.unary, r.vatom),
+  formula: r => P.alt(r.binary, r.nbinary, r.unary, r.atom),
 
   conjecture: r => P.alt(r.binary, r.nbinary, r.unary, r.vatom),
 
@@ -99,23 +99,27 @@ var lang = P.createLanguage({
 
   fo: r => P.seqMap(r.formula, word("F>"), r.formula, function(f1,_,f2) {return fimp(f1,f2)}),
 
-  atom: r => P.alt(r.tre, r.fls, r.func, r.constant),
+  atom: r => P.alt(r.tre, r.fls, r.pred, r.constant, r.variable),
 
   tre: () => word("true").map(() => "(not_a_prop | (~ not_a_prop))"),
 
   fls: () => word("false").map(() => "(not_a_prop & (~ not_a_prop))"),
 
-  vatom: r => P.alt(r.atom, r.variable),
+  pred: r => P.seq(r.constant2, r.lparen, r.arglist, r.rparen).tie(),
 
-  func: r => P.seq(r.constant2, r.lparen, r.arglist, r.rparen).tie(),
+  atom2: r => P.alt(r.tre, r.fls, r.func, r.constant, r.variable),
 
-  arglist: r => r.vatom.sepBy1(word(",")).tieWith(","),
+  func: r => P.seq(r.constant3, r.lparen, r.arglist, r.rparen).tie(),
+
+  arglist: r => r.atom2.sepBy1(word(",")).tieWith(","),
 
   integer: () => reg(/[0-9]+/),
 
   constant: () => reg(/[a-z][a-zA-Z_\d]*/).map(v => v.concat('__const')),
 
   constant2: () => reg(/[a-z][a-zA-Z_\d]*/), /* we want to make sure function symbols are different from constant symbols, since we might export it to higher-order */
+
+  constant3: () => reg(/[a-z][a-zA-Z_\d]*/).map(v => v.concat('__fun')), /* similarly, we make a distinction between function and predicate symbols
 
   /*
    * Not any longer
