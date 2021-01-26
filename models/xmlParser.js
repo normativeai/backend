@@ -47,26 +47,34 @@ function parse(html) {
 }
 
 function parseFormula($,spanElem) {
-  const code = $(spanElem).attr("class").split(" ").find(word => word.startsWith("annotator-")).substring(10)
-  const text = $(spanElem).contents().text();
-  switch (code) {
-    case 'connective':
-      return {
-        "text": text,
-        "connective": parseConnective($,spanElem)
-      }
-    case 'term':
-      return {
-        "text": text,
-        "term": parseTerm($,spanElem)
-      }
-    case 'goal':
-      return {
-        "text": text,
-        "goal": parseGoal($,spanElem)
-      }
-    default:
-      throw Error(`Cannot parse XML. Unknown annotator value: ${code}`)
+  // obtain tag class
+  const cls = $(spanElem).attr("class")
+  if (cls) {
+    // we assume that only revelvant span tags have classes. By relevant we mean those with NAI semantics and not those used for styling, like <em>
+    const code = cls.split(" ").find(word => word.startsWith("annotator-")).substring(10)
+    const text = $(spanElem).contents().text();
+    switch (code) {
+      case 'connective':
+        return {
+          "text": text,
+          "connective": parseConnective($,spanElem)
+        }
+      case 'term':
+        return {
+          "text": text,
+          "term": parseTerm($,spanElem)
+        }
+      case 'goal':
+        return {
+          "text": text,
+          "goal": parseGoal($,spanElem)
+        }
+      default:
+        throw Error(`Cannot parse XML. Unknown annotator value: ${code}`)
+    }
+  } else {
+    // otherwise, the tag is not a NAI one and we throw an exception
+    throw Error(`Cannot parse XML. Please do not use styling tags (such as <em>) within annotated text`)
   }
 }
 
